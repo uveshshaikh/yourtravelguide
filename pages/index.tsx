@@ -9,8 +9,12 @@ import { rules } from '../data/rules';
 import { Rule } from '../data/types';
 import { airports } from '../data/airports';
 
+type HomeRule = Pick<Rule, 'slug' | 'title' | 'shortTitle' | 'category' | 'tags' | 'verdict' | 'lastUpdated'> & {
+  searchTokens: string[];
+};
+
 interface HomeProps {
-  allRules: Rule[];
+  allRules: HomeRule[];
 }
 
 type VerdictFilter = 'all' | 'allowed' | 'not_allowed' | 'limited';
@@ -115,7 +119,7 @@ const familyKeywords = new Set([
   'formula',
 ]);
 
-const matchesKeywords = (rule: Rule, keywords: Set<string>) =>
+const matchesKeywords = (rule: HomeRule, keywords: Set<string>) =>
   rule.tags.some(tag => keywords.has(tag.toLowerCase()));
 
 const verdictBadgeLabels: Record<Rule['verdict']['status'], string> = {
@@ -250,6 +254,19 @@ const buildRuleSearchText = (rule: Rule) => {
 };
 
 const buildTokenSet = (text: string) => new Set(splitTokens(text));
+
+const buildRuleSearchTokens = (rule: Rule) => Array.from(buildTokenSet(buildRuleSearchText(rule)));
+
+const toHomeRule = (rule: Rule): HomeRule => ({
+  slug: rule.slug,
+  title: rule.title,
+  shortTitle: rule.shortTitle,
+  category: rule.category,
+  tags: rule.tags,
+  verdict: rule.verdict,
+  lastUpdated: rule.lastUpdated,
+  searchTokens: buildRuleSearchTokens(rule),
+});
 
 const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
 
@@ -418,6 +435,14 @@ export default function Home({ allRules }: HomeProps) {
   const fallbackTokens = useMemo(() => splitTokens(searchQuery), [searchQuery]);
   const activeTokens = queryTokens.length > 0 ? queryTokens : fallbackTokens;
 
+  const ruleTokenSets = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    allRules.forEach(rule => {
+      map.set(rule.slug, new Set(rule.searchTokens));
+    });
+    return map;
+  }, [allRules]);
+
   const verdictFilteredRules = useMemo(() => {
     if (verdictFilter === 'all') return allRules;
     return allRules.filter(rule => rule.verdict.status === verdictFilter);
@@ -426,13 +451,14 @@ export default function Home({ allRules }: HomeProps) {
   const searchFilteredRules = useMemo(() => {
     if (!activeTokens.length) return verdictFilteredRules;
     return verdictFilteredRules.filter(rule => {
-      const haystack = buildTokenSet(buildRuleSearchText(rule));
+      const haystack = ruleTokenSets.get(rule.slug);
+      if (!haystack) return false;
       return activeTokens.every(token => tokenMatches(token, haystack));
     });
-  }, [activeTokens, verdictFilteredRules]);
+  }, [activeTokens, ruleTokenSets, verdictFilteredRules]);
 
   const heroPreviewRules = useMemo(() => {
-    if (!hasSearchQuery) return [] as Rule[];
+    if (!hasSearchQuery) return [] as HomeRule[];
     return searchFilteredRules;
   }, [hasSearchQuery, searchFilteredRules]);
 
@@ -1010,12 +1036,12 @@ export default function Home({ allRules }: HomeProps) {
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   // In a real app, you might fetch this from an API or file system
   // Since we import directly, it's available at build time
   return {
     props: {
-      allRules: rules,
+      allRules: rules.map(toHomeRule),
     },
   };
 };

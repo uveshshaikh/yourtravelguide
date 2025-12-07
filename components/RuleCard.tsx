@@ -3,8 +3,10 @@ import Link from 'next/link';
 import { Rule } from '../data/types';
 import TagChip from './TagChip';
 
+type RuleSummary = Pick<Rule, 'slug' | 'shortTitle' | 'category' | 'tags' | 'verdict' | 'lastUpdated'>;
+
 interface RuleCardProps {
-  rule: Rule;
+  rule: RuleSummary;
   contextLabel?: string;
 }
 
