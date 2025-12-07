@@ -1,0 +1,7 @@
+# Robots.txt for YourTravelGuide.in
+# Helps search engines discover and index the site.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://yourtravelguide.in/sitemap.xml
