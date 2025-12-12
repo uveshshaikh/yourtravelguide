@@ -191,7 +191,7 @@ const Layout: React.FC<LayoutProps> = ({
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div className="text-center md:text-left space-y-2">
               <p className="text-lg font-semibold text-slate-900">YourTravelGuide</p>
-              <p className="text-sm text-slate-500">A simple checklist for Indian travelers to confirm what&apos;s allowed before they start their journey.</p>
+              <p className="text-sm text-slate-500">A simple checklist for travelers to confirm what&apos;s allowed before they start their journey.</p>
               <p className="text-sm text-slate-500">
                 Email <a href="mailto:contact@yourtravelguide.in" className="text-blue-600 font-semibold">contact@yourtravelguide.in</a> with any question.
               </p>
