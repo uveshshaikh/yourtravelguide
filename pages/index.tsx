@@ -10,6 +10,7 @@ import { Rule } from '../data/types';
 import { airports } from '../data/airports';
 
 type HomeRule = Pick<Rule, 'slug' | 'title' | 'shortTitle' | 'category' | 'tags' | 'verdict' | 'lastUpdated'> & {
+  subcategory?: string;
   searchTokens: string[];
 };
 
@@ -262,6 +263,7 @@ const toHomeRule = (rule: Rule): HomeRule => ({
   title: rule.title,
   shortTitle: rule.shortTitle,
   category: rule.category,
+  subcategory: 'subcategory' in rule ? (rule as { subcategory?: string }).subcategory : undefined,
   tags: rule.tags,
   verdict: rule.verdict,
   lastUpdated: rule.lastUpdated,

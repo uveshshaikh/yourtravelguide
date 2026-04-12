@@ -68,15 +68,6 @@ export default function Terms() {
             </p>
           </section>
         </div>
-
-        <section className="bg-slate-900 text-white rounded-3xl p-6">
-          <h2 className="text-xl font-bold">Questions about the terms?</h2>
-          <p className="mt-2 text-white/80">
-            Email <a href="mailto:legal@YourTravelGuide.help" className="underline font-semibold">legal@YourTravelGuide.help</a> and we will
-            respond within five working days.
-          </p>
-          <p className="mt-4 text-xs tracking-wide uppercase text-white/60">Last updated: {new Date().toLocaleDateString()}</p>
-        </section>
       </section>
     </Layout>
   );

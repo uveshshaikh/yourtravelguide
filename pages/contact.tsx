@@ -1,4 +1,4 @@
-import Layout from '../components/Layout';
+﻿import Layout from '../components/Layout';
 
 export default function Contact() {
   const pageTitle = 'Contact YourTravelGuide';
@@ -14,11 +14,12 @@ export default function Contact() {
 
         <section className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
           <p className="text-slate-600">
-            Email <a href="mailto:contact@yourtravelguide.in" className="font-semibold text-blue-600 underline">contact@yourtravelguide.in</a> for any question about the site. Add a short subject so we know if it is about media, privacy, partnerships, or mailing paperwork.
+            Email <a href="mailto:yourtravelguidecontactus@gmail.com" className="font-semibold text-blue-600 underline">yourtravelguidecontactus@gmail.com</a> for any question about the site. Add a short subject so we know if it is about media, privacy, partnerships, or mailing paperwork.
           </p>
         </section>
       </section>
     </Layout>
   );
 }
+
 

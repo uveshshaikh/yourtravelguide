@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+﻿import React, { ReactNode, useEffect, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -8,19 +8,37 @@ interface LayoutProps {
   children: ReactNode;
   title?: string;
   description?: string;
+  /** Override canonical URL. Defaults to current path derived from router. */
+  canonicalPath?: string;
+  /** Override the OG image URL. Defaults to a dynamic /api/og image. */
+  ogImage?: string;
 }
+
+const SITE_URL = 'https://yourtravelguide.in';
 
 const Layout: React.FC<LayoutProps> = ({ 
   children, 
-  title = "YourTravelGuide – Know what’s allowed before you travel",
-  description = "Check what items are allowed in flight, train, and bus travel in India. Simple, fast, and reliable rules."
+  title = "YourTravelGuide â€“ Know what's allowed before you travel",
+  description = "Check what items are allowed in flight, train, and bus travel in India. Simple, fast, and reliable rules.",
+  canonicalPath,
+  ogImage,
 }) => {
   const router = useRouter();
+  // Strip query string; use canonicalPath override when supplied
+  const pagePath = canonicalPath ?? router.asPath.split('?')[0];
+  const canonicalUrl = `${SITE_URL}${pagePath}`;
+
+  // Build dynamic OG image URL. Encode title + first 100 chars of description as params.
+  const defaultOgImage = `${SITE_URL}/api/og?${new URLSearchParams({
+    title: title.replace(/ \| YourTravelGuide$/, ''),
+    sub: description.slice(0, 100),
+  }).toString()}`;
+  const resolvedOgImage = ogImage ?? defaultOgImage;
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const navItems = [
     { href: '/first-flight', label: 'First-flight guide' },
-    { href: '/rules/airport-security-behavior-tips', label: 'Security tips' },
+    { href: '/airport-rules/security-screening/airport-security-behavior-tips', label: 'Security tips' },
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },
   ];
@@ -65,6 +83,22 @@ const Layout: React.FC<LayoutProps> = ({
         <title>{title}</title>
         <meta name="description" content={description} />
         <meta name="robots" content="index, follow" />
+        <link rel="canonical" href={canonicalUrl} />
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="YourTravelGuide" />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={resolvedOgImage} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:locale" content="en_IN" />
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={resolvedOgImage} />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="alternate icon" href="/favicon.ico" />
       </Head>
@@ -161,8 +195,8 @@ const Layout: React.FC<LayoutProps> = ({
               </div>
               <div className="mt-auto pt-4 border-t border-slate-100">
                 <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Need help?</p>
-                <a href="mailto:contact@yourtravelguide.in" className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-blue-600">
-                  contact@yourtravelguide.in
+                <a href="mailto:yourtravelguidecontactus@gmail.com" className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-blue-600">
+                  yourtravelguidecontactus@gmail.com
                 </a>
               </div>
             </div>
@@ -195,7 +229,7 @@ const Layout: React.FC<LayoutProps> = ({
               <p className="text-lg font-semibold text-slate-900">YourTravelGuide</p>
               <p className="text-sm text-slate-500">A simple checklist for travelers to confirm what&apos;s allowed before they start their journey.</p>
               <p className="text-sm text-slate-500">
-                Email <a href="mailto:contact@yourtravelguide.in" className="text-blue-600 font-semibold">contact@yourtravelguide.in</a> with any question.
+                Email <a href="mailto:yourtravelguidecontactus@gmail.com" className="text-blue-600 font-semibold">yourtravelguidecontactus@gmail.com</a> with any question.
               </p>
             </div>
             <div className="flex flex-wrap justify-center md:justify-end gap-8 text-sm text-slate-600">
@@ -204,7 +238,7 @@ const Layout: React.FC<LayoutProps> = ({
                 <div className="flex flex-col gap-1">
                   <Link href="/" className="hover:text-blue-600">Rules</Link>
                   <Link href="/first-flight" className="hover:text-blue-600">First-flight guide</Link>
-                  <Link href="/rules/airport-security-behavior-tips" className="hover:text-blue-600">Security tips</Link>
+                  <Link href="/airport-rules/security-screening/airport-security-behavior-tips" className="hover:text-blue-600">Security tips</Link>
                   <Link href="/about" className="hover:text-blue-600">About</Link>
                 </div>
               </div>
@@ -230,3 +264,4 @@ const Layout: React.FC<LayoutProps> = ({
 };
 
 export default Layout;
+

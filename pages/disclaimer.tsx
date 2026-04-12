@@ -50,14 +50,6 @@ export default function Disclaimer() {
             </div>
           </section>
         </div>
-
-        <section className="bg-slate-900 text-white rounded-3xl p-6">
-          <h2 className="text-xl font-bold">Need more clarity?</h2>
-          <p className="mt-2 text-white/80">
-            Write to <a href="mailto:hello@YourTravelGuide.help" className="underline font-semibold">hello@YourTravelGuide.help</a> and we
-            will share the underlying public reference for a rule whenever possible.
-          </p>
-        </section>
       </section>
     </Layout>
   );
