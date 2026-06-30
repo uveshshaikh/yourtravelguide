@@ -1,60 +1,45 @@
-import type { NextConfig } from "next";
-import { rules } from "./data/rules";
-import { buildRuleUrl, isNewArchRule } from "./lib/urls";
+import type { NextConfig } from 'next';
 
+/**
+ * Next.js configuration — App Router.
+ *
+ * Security headers live here (edge-applied to every response). The Content
+ * Security Policy is intentionally generated per-request in `middleware.ts`
+ * with a nonce; the static headers below are the defence-in-depth baseline
+ * that applies even on routes the middleware does not run.
+ */
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false,
 
-  /**
-   * Server-level 308 redirects — auto-generated from rules data.
-   * No manual maintenance: update category in data/rules.ts and it propagates.
-   */
-  async redirects() {
-    const ruleRedirects = rules
-      .filter(isNewArchRule)
-      .map((rule) => ({
-        source: `/rules/${rule.slug}`,
-        destination: buildRuleUrl(rule),
-        permanent: true,
-      }));
+  // Fail the production build on type errors. We never ship red.
+  // (Next 16 removed the built-in `eslint` config key / `next lint`; linting
+  // runs via the ESLint CLI in `pnpm lint` and CI instead.)
+  typescript: { ignoreBuildErrors: false },
 
-    return ruleRedirects;
-  },
+  // Typed routes — compile-time safety for internal links (stable in Next 16).
+  typedRoutes: true,
 
-  /**
-   * Security + performance HTTP headers applied to every response.
-   */
   async headers() {
     return [
       {
         source: '/(.*)',
         headers: [
-          // Prevent MIME-type sniffing
           { key: 'X-Content-Type-Options', value: 'nosniff' },
-          // Block clickjacking
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-          // Force HTTPS on repeat visits (1 year)
-          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
-          // Restrict referrer leakage
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          // Basic permissions policy
-          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(self)' },
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
         ],
       },
-      {
-        // Cache static assets aggressively (Next.js _next/static is content-hashed)
-        source: '/_next/static/(.*)',
-        headers: [
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-        ],
-      },
-      {
-        // Cache OG images for 1 hour (they're dynamic but stable per title)
-        source: '/api/og',
-        headers: [
-          { key: 'Cache-Control', value: 'public, s-maxage=3600, stale-while-revalidate=86400' },
-        ],
-      },
+      // Note: Next.js already serves `/_next/static` as immutable, content-hashed
+      // assets — no custom Cache-Control needed (and setting one warns in dev).
     ];
   },
 };

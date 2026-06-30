@@ -1,0 +1,9 @@
+# Default owners for everything in the repo.
+# Update with real GitHub handles/teams as the team grows.
+* @uveshshaikh
+
+# Architecture & engineering foundation require careful review.
+/docs/adr/        @uveshshaikh
+/lib/env.ts       @uveshshaikh
+/middleware.ts    @uveshshaikh
+/.github/         @uveshshaikh
