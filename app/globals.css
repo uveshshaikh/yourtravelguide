@@ -3,89 +3,237 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/*
- * Design tokens (shadcn/ui · new-york · slate).
- * Semantic variables only — components reference these, never raw colours.
- * Tailwind v4 is CSS-first: the theme lives here, not in a JS config.
- */
+/* ==========================================================================
+   YourTravelGuide — Design Tokens (permanent visual identity)
+   Philosophy: calm, high-whitespace, trust-first. A neutral slate base lets
+   the two colour systems carry meaning:
+     • BRAND (teal)  — identity, links, primary actions.
+     • VERDICT        — the locked Phase-1 semantics that every answer will use:
+        allowed=green · conditional=amber · denied=red · official-notice=blue.
+   Colours are chosen for WCAG 2.2 AA contrast (primary/verdict on white ≥ 4.5:1).
+   ========================================================================== */
+
 :root {
-  --radius: 0.5rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  /* Neutrals (slate) */
+  --background: #ffffff;
+  --foreground: #0f172a; /* slate-900 ink */
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --muted: #f1f5f9; /* slate-100 */
+  --muted-foreground: #64748b; /* slate-500 */
+  --subtle: #f8fafc; /* slate-50 section wash */
+  --border: #e2e8f0; /* slate-200 */
+  --input: #e2e8f0;
+  --secondary: #f1f5f9; /* slate-100 surface */
+  --secondary-foreground: #0f172a;
+
+  /* Brand — teal. Primary uses teal-700 so white text is AA (≈4.6:1). */
+  --primary: #0f766e; /* teal-700 */
+  --primary-foreground: #ffffff;
+  --primary-hover: #115e59; /* teal-800 */
+  --accent: #f0fdfa; /* teal-50 subtle wash */
+  --accent-foreground: #115e59; /* teal-800 */
+  --ring: #0d9488; /* teal-600 focus ring */
+
+  /* Verdict system (Phase 1, locked) — solid + subtle pairings */
+  --allowed: #15803d; /* green-700 */
+  --allowed-foreground: #ffffff;
+  --allowed-subtle: #f0fdf4; /* green-50 */
+  --allowed-subtle-foreground: #166534; /* green-800 */
+
+  --conditional: #b45309; /* amber-700 */
+  --conditional-foreground: #ffffff;
+  --conditional-subtle: #fffbeb; /* amber-50 */
+  --conditional-subtle-foreground: #92400e; /* amber-800 */
+
+  --denied: #b91c1c; /* red-700 */
+  --denied-foreground: #ffffff;
+  --denied-subtle: #fef2f2; /* red-50 */
+  --denied-subtle-foreground: #991b1b; /* red-800 */
+
+  --info: #1d4ed8; /* blue-700 — "official notice" */
+  --info-foreground: #ffffff;
+  --info-subtle: #eff6ff; /* blue-50 */
+  --info-subtle-foreground: #1e40af; /* blue-800 */
+
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
+
+  --radius: 0.75rem;
 }
 
 .dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
+  --background: #020617; /* slate-950 */
+  --foreground: #e2e8f0; /* slate-200 */
+  --card: #0b1220;
+  --card-foreground: #e2e8f0;
+  --popover: #0b1220;
+  --popover-foreground: #e2e8f0;
+  --muted: #1e293b; /* slate-800 */
+  --muted-foreground: #94a3b8; /* slate-400 */
+  --subtle: #0b1220;
+  --border: #1e293b;
+  --input: #1e293b;
+  --secondary: #1e293b; /* slate-800 surface */
+  --secondary-foreground: #e2e8f0;
+
+  --primary: #2dd4bf; /* teal-400 — light accent for dark bg */
+  --primary-foreground: #04211d;
+  --primary-hover: #5eead4;
+  --accent: #0b201e;
+  --accent-foreground: #99f6e4;
+  --ring: #2dd4bf;
+
+  --allowed: #4ade80;
+  --allowed-foreground: #052e16;
+  --allowed-subtle: #0c1f14;
+  --allowed-subtle-foreground: #86efac;
+  --conditional: #fbbf24;
+  --conditional-foreground: #271900;
+  --conditional-subtle: #241a05;
+  --conditional-subtle-foreground: #fcd34d;
+  --denied: #f87171;
+  --denied-foreground: #300a0a;
+  --denied-subtle: #241012;
+  --denied-subtle-foreground: #fca5a5;
+  --info: #60a5fa;
+  --info-foreground: #0a1a33;
+  --info-subtle: #0d1a2e;
+  --info-subtle-foreground: #bfdbfe;
+
+  --destructive: #f87171;
+  --destructive-foreground: #300a0a;
 }
 
+/* Map tokens to Tailwind's theme so utilities exist (bg-primary, text-allowed…). */
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
+  --color-subtle: var(--subtle);
   --color-border: var(--border);
   --color-input: var(--input);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
   --color-ring: var(--ring);
+
+  --color-allowed: var(--allowed);
+  --color-allowed-foreground: var(--allowed-foreground);
+  --color-allowed-subtle: var(--allowed-subtle);
+  --color-allowed-subtle-foreground: var(--allowed-subtle-foreground);
+  --color-conditional: var(--conditional);
+  --color-conditional-foreground: var(--conditional-foreground);
+  --color-conditional-subtle: var(--conditional-subtle);
+  --color-conditional-subtle-foreground: var(--conditional-subtle-foreground);
+  --color-denied: var(--denied);
+  --color-denied-foreground: var(--denied-foreground);
+  --color-denied-subtle: var(--denied-subtle);
+  --color-denied-subtle-foreground: var(--denied-subtle-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-subtle: var(--info-subtle);
+  --color-info-subtle-foreground: var(--info-subtle-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Section rhythm + reading measure */
+  --spacing-section: 5rem;
+  --container-max: 72rem;
 }
 
 @layer base {
   * {
     border-color: var(--color-border);
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+  }
+  /* Visible, consistent focus for every interactive element (WCAG 2.4.7). */
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  /* Respect reduced-motion (WCAG 2.3.3 / user comfort). */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Skip-link: hidden until focused (keyboard users jump past the header). */
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -3rem;
+  z-index: 100;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  padding: 0.5rem 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: top 0.15s ease;
+}
+.skip-link:focus {
+  top: 0.75rem;
+}
+
+/* Print: strip chrome so travellers can save a clean, offline PDF of the answer. */
+@media print {
+  header,
+  footer,
+  .skip-link,
+  [data-no-print] {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+  }
+  main {
+    padding: 0 !important;
+  }
+  /* Reveal link targets in print. */
+  a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.75em;
+    color: #555;
+    word-break: break-all;
   }
 }

@@ -18,19 +18,28 @@ export default async function proxy(request: NextRequest) {
 
   // Per-request nonce for inline scripts/styles.
   const nonce = crypto.randomUUID().replace(/-/g, '');
+  const isDev = process.env.NODE_ENV === 'development';
 
+  /*
+   * Production is strict (nonce + strict-dynamic, NO unsafe-eval). Development
+   * must relax script-src: React dev mode + HMR require eval() and inline
+   * scripts, and the dev server uses same-origin WebSockets. `upgrade-insecure-
+   * requests` is dropped in dev so http://localhost assets aren't force-upgraded.
+   */
   const csp = [
     `default-src 'self'`,
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https:`,
+    isDev
+      ? `script-src 'self' 'unsafe-eval' 'unsafe-inline' https:`
+      : `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https:`,
     `style-src 'self' 'unsafe-inline'`,
     `img-src 'self' blob: data: https:`,
     `font-src 'self' data:`,
-    `connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com`,
+    `connect-src 'self'${isDev ? ' ws:' : ''} https://*.supabase.co https://vitals.vercel-insights.com`,
     `frame-ancestors 'self'`,
     `base-uri 'self'`,
     `form-action 'self'`,
     `object-src 'none'`,
-    `upgrade-insecure-requests`,
+    ...(isDev ? [] : [`upgrade-insecure-requests`]),
   ].join('; ');
 
   response.headers.set('x-nonce', nonce);
