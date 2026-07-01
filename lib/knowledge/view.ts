@@ -32,6 +32,13 @@ export interface SourceView {
   archivedUrl?: string;
 }
 
+export interface AuthorityView {
+  name: string;
+  jurisdiction?: string;
+  websiteUrl?: string;
+  description?: string;
+}
+
 export interface TrustView {
   confidence: Confidence;
   /** Highest evidence tier backing the answer. */

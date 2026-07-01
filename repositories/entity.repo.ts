@@ -22,6 +22,62 @@ import { firstOrThrow, type Actor } from '@/repositories/_base';
  * non-existent airline/country (Rule 3).
  */
 export const entityRepository = {
+  /** Fetch an entity's display fields (code + name) by type + code. */
+  async getByCode(type: EntityType, code: string): Promise<{ code: string; name: string } | null> {
+    const columns = { code: true, name: true } as const;
+    switch (type) {
+      case 'country':
+        return (
+          (await db.query.countries.findFirst({
+            where: and(eq(countries.code, code), isNull(countries.deletedAt)),
+            columns,
+          })) ?? null
+        );
+      case 'airline':
+        return (
+          (await db.query.airlines.findFirst({
+            where: and(eq(airlines.code, code), isNull(airlines.deletedAt)),
+            columns,
+          })) ?? null
+        );
+      case 'airport':
+        return (
+          (await db.query.airports.findFirst({
+            where: and(eq(airports.code, code), isNull(airports.deletedAt)),
+            columns,
+          })) ?? null
+        );
+      case 'document':
+        return (
+          (await db.query.documents.findFirst({
+            where: and(eq(documents.code, code), isNull(documents.deletedAt)),
+            columns,
+          })) ?? null
+        );
+      case 'travel_item':
+        return (
+          (await db.query.travelItems.findFirst({
+            where: and(eq(travelItems.code, code), isNull(travelItems.deletedAt)),
+            columns,
+          })) ?? null
+        );
+      case 'traveller_profile':
+        return (
+          (await db.query.travellerProfiles.findFirst({
+            where: and(eq(travellerProfiles.code, code), isNull(travellerProfiles.deletedAt)),
+            columns,
+          })) ?? null
+        );
+      case 'authority':
+        return (
+          (await db.query.authorities.findFirst({
+            where: and(eq(authorities.code, code), isNull(authorities.deletedAt)),
+            columns,
+          })) ?? null
+        );
+    }
+  },
+
   /** True if an entity of `type` with `code` exists and is live. */
   async exists(type: EntityType, code: string): Promise<boolean> {
     switch (type) {

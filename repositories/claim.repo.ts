@@ -1,12 +1,14 @@
 import { and, eq, inArray, isNull, lte } from 'drizzle-orm';
 import { db } from '@/db';
 import {
+  authorities,
   claimEvidence,
   claimExceptions,
   claimFacts,
   claimVersions,
   claims,
   evidence,
+  sources,
 } from '@/db/schema';
 import { AppError } from '@/lib/errors';
 import { deriveConfidence } from '@/lib/knowledge/confidence';
@@ -221,5 +223,33 @@ export const claimRepository = {
         .returning(),
       'claim',
     );
+  },
+
+  /** Cited evidence for a claim, joined to its source + owning authority. */
+  async evidenceWithSource(claimId: string) {
+    return db
+      .select({
+        evidenceId: evidence.id,
+        evidenceLevel: evidence.evidenceLevel,
+        sourceId: sources.id,
+        sourceTitle: sources.title,
+        sourceUrl: sources.url,
+        publishedAt: sources.publishedAt,
+        archivedUrl: sources.archivedUrl,
+        authorityName: authorities.name,
+        authorityCode: authorities.code,
+      })
+      .from(claimEvidence)
+      .innerJoin(evidence, eq(claimEvidence.evidenceId, evidence.id))
+      .innerJoin(sources, eq(evidence.sourceId, sources.id))
+      .innerJoin(authorities, eq(sources.authorityId, authorities.id))
+      .where(and(eq(claimEvidence.claimId, claimId), isNull(evidence.deletedAt)));
+  },
+
+  /** Profile-specific exceptions attached to a claim. */
+  async exceptions(claimId: string) {
+    return db.query.claimExceptions.findMany({
+      where: and(eq(claimExceptions.claimId, claimId), isNull(claimExceptions.deletedAt)),
+    });
   },
 };

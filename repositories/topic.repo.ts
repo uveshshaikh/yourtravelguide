@@ -1,6 +1,6 @@
 import { and, eq, isNull } from 'drizzle-orm';
 import { db } from '@/db';
-import { topicClaims, topicEdges, topics } from '@/db/schema';
+import { claims, topicClaims, topicEdges, topics } from '@/db/schema';
 import { AppError } from '@/lib/errors';
 import { isForwardTransition } from '@/lib/knowledge/journey';
 import type { TopicEdge } from '@/lib/knowledge/types';
@@ -77,5 +77,31 @@ export const topicRepository = {
       where: and(eq(topicEdges.fromTopicId, fromTopicId), eq(topicEdges.edgeType, edgeType)),
       orderBy: (e, { asc }) => [asc(e.position)],
     });
+  },
+
+  /** Published, live claims answering this topic (via the topic_claims junction). */
+  async publishedClaims(topicId: string) {
+    const rows = await db
+      .select({ claim: claims })
+      .from(topicClaims)
+      .innerJoin(claims, eq(topicClaims.claimId, claims.id))
+      .where(
+        and(
+          eq(topicClaims.topicId, topicId),
+          eq(claims.state, 'published'),
+          isNull(claims.deletedAt),
+        ),
+      );
+    return rows.map((r) => r.claim);
+  },
+
+  /** Related topics (all edge types) with the target's slug/question, for links. */
+  async relatedTargets(topicId: string) {
+    return db
+      .select({ slug: topics.slug, question: topics.question, edgeType: topicEdges.edgeType })
+      .from(topicEdges)
+      .innerJoin(topics, eq(topicEdges.toTopicId, topics.id))
+      .where(and(eq(topicEdges.fromTopicId, topicId), isNull(topics.deletedAt)))
+      .orderBy(topicEdges.position);
   },
 };
