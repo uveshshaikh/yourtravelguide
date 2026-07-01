@@ -16,7 +16,11 @@ export default defineConfig({
   out: './drizzle',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL ?? '',
+    // Migrations run over the DIRECT/session connection (Supabase port 5432),
+    // never the transaction pooler (6543): pooler transaction mode can't run
+    // DDL + advisory locks reliably. Falls back to DATABASE_URL for local/non-
+    // Supabase setups where a single connection string serves both roles.
+    url: process.env.DIRECT_URL ?? process.env.DATABASE_URL ?? '',
   },
   strict: true,
   verbose: true,
