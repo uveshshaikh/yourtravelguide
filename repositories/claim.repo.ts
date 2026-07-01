@@ -200,6 +200,18 @@ export const claimRepository = {
     );
   },
 
+  /** Transition a claim to `published` so it enters the resolution pool. */
+  async publish(id: string, actor?: Actor) {
+    return firstOrThrow(
+      await db
+        .update(claims)
+        .set({ state: 'published', updatedBy: actor, updatedAt: new Date() })
+        .where(and(eq(claims.id, id), isNull(claims.deletedAt)))
+        .returning(),
+      'claim',
+    );
+  },
+
   async retire(id: string, actor?: Actor) {
     return firstOrThrow(
       await db

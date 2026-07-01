@@ -11,4 +11,5 @@ export { entityRepository } from '@/repositories/entity.repo';
 export { factRepository } from '@/repositories/fact.repo';
 export { claimRepository } from '@/repositories/claim.repo';
 export { topicRepository } from '@/repositories/topic.repo';
+export { journeyRepository } from '@/repositories/journey.repo';
 export { reviewRepository } from '@/repositories/review.repo';

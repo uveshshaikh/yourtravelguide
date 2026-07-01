@@ -147,4 +147,29 @@ export const entityRepository = {
       'travel item',
     );
   },
+
+  async createDocument(input: { code: string; name: string; category?: string }, actor?: Actor) {
+    const base = createEntitySchema.parse({ code: input.code, name: input.name });
+    return firstOrThrow(
+      await db
+        .insert(documents)
+        .values({ ...base, category: input.category, createdBy: actor, updatedBy: actor })
+        .returning(),
+      'document',
+    );
+  },
+
+  async createTravellerProfile(
+    input: { code: string; name: string; description?: string },
+    actor?: Actor,
+  ) {
+    const base = createEntitySchema.parse({ code: input.code, name: input.name });
+    return firstOrThrow(
+      await db
+        .insert(travellerProfiles)
+        .values({ ...base, description: input.description, createdBy: actor, updatedBy: actor })
+        .returning(),
+      'traveller profile',
+    );
+  },
 };

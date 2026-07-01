@@ -150,11 +150,31 @@ export const createReviewSchema = z.object({
   scheduledFor: z.coerce.date(),
 });
 
+// --- Composition: journeys ---
+export const createJourneySchema = z.object({
+  slug: z
+    .string()
+    .min(1)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'slug must be kebab-case'),
+  title: z.string().min(1),
+  description: z.string().nullish(),
+});
+
+export const createJourneyStageSchema = z.object({
+  journeyId: uuid,
+  stageKey: z.string().min(1),
+  title: z.string().min(1),
+  position: z.number().int().nonnegative(),
+});
+
 // --- Entity references ---
 export const createEntitySchema = z.object({
   code,
   name: z.string().min(1),
 });
+
+export type CreateJourneyInput = z.infer<typeof createJourneySchema>;
+export type CreateJourneyStageInput = z.infer<typeof createJourneyStageSchema>;
 
 export type CreateAuthorityInput = z.infer<typeof createAuthoritySchema>;
 export type CreateSourceInput = z.infer<typeof createSourceSchema>;
