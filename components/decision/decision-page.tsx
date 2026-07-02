@@ -1,168 +1,104 @@
-import type { BreadcrumbItemView, DecisionView, TocItemView } from '@/lib/knowledge/view';
-import { decisionTypeLabel, riskLabel } from '@/lib/knowledge/labels';
+import { ArrowLeft, BadgeCheck, Info } from 'lucide-react';
+import type { BreadcrumbItemView, DecisionView } from '@/lib/knowledge/view';
 import { Container } from '@/components/layout/container';
-import { Badge } from '@/components/ui/badge';
-import { Breadcrumb } from '@/components/content/breadcrumb';
-import { TableOfContents } from '@/components/content/table-of-contents';
-import { FeedbackWidget } from '@/components/content/feedback-widget';
-import { PrintButton } from '@/components/content/print-button';
-import { FaqAccordion } from '@/components/content/faq-accordion';
-import { RelatedQuestions, RelatedTopics } from '@/components/content/related';
-import { DecisionAnswerBox } from '@/components/decision/decision-answer-box';
-import { AppliesToPanel } from '@/components/decision/applies-to-panel';
-import { ExceptionsPanel } from '@/components/decision/exceptions-panel';
-import { WarningList } from '@/components/decision/important-warning';
-import { TrustPanel } from '@/components/trust/trust-panel';
-import { EvidencePanel } from '@/components/trust/evidence-panel';
-import { OfficialSourcesList } from '@/components/trust/official-sources-list';
-import { VersionHistory } from '@/components/trust/version-history';
+import { VerdictBanner } from '@/components/decision/verdict-banner';
+import { RelatedQuestions } from '@/components/content/related';
+import { formatDate } from '@/lib/format';
 
 /**
- * DecisionPage — the definitive, reusable template for every travel question.
- *
- * Hierarchy (answer-first). We merge the brief's "one-sentence answer",
- * "verdict banner", "last verified" and "confidence" into a single answer block
- * so trust travels *with* the answer, above the fold. Critical warnings are
- * raised directly under the answer (highest stakes first) rather than below
- * "applies to". Everything is driven by the typed `DecisionView`.
+ * DecisionPage — one calm, scannable answer. Deliberately minimal: the verdict,
+ * the few details that matter, any real exception, related questions, and a
+ * single quiet "verified · source" line. No route/airline/traveller panels, no
+ * trust dashboards — a rushed traveller sees only what they need to decide.
  */
 export function DecisionPage({
   decision,
-  breadcrumb = [],
 }: {
   decision: DecisionView;
+  /** Accepted for route compatibility; the visible nav is the back link. */
   breadcrumb?: BreadcrumbItemView[];
 }) {
   const d = decision;
-
-  // Build the table of contents from the sections that actually exist.
-  const toc: TocItemView[] = [
-    { id: 'answer', label: 'Answer' },
-    { id: 'applies-to', label: 'Applies to' },
-    ...(d.exceptions?.length ? [{ id: 'exceptions', label: 'Exceptions' }] : []),
-    { id: 'trust', label: 'Why trust this' },
-    ...(d.sources.length ? [{ id: 'sources', label: 'Official sources' }] : []),
-    ...(d.overview?.length ? [{ id: 'details', label: 'Details' }] : []),
-    ...(d.faqs?.length ? [{ id: 'faq', label: 'FAQ' }] : []),
-    ...(d.relatedQuestions?.length ? [{ id: 'related', label: 'Related' }] : []),
-    ...(d.versions?.length ? [{ id: 'history', label: 'History' }] : []),
-  ];
-
-  const showRisk = d.riskLevel === 'high' || d.riskLevel === 'critical';
+  const source = d.sources[0];
 
   return (
-    <Container className="py-8">
-      {breadcrumb.length ? <Breadcrumb items={breadcrumb} className="mb-6" /> : null}
+    <Container className="max-w-2xl py-8 sm:py-10">
+      <a
+        href="/search"
+        className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm transition-colors"
+      >
+        <ArrowLeft className="size-4" aria-hidden />
+        All questions
+      </a>
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-12">
-        <article className="min-w-0 space-y-10">
-          {/* 1–3, 9–10: Question + answer-first block */}
-          <section id="answer" className="scroll-mt-24">
-            <div className="flex flex-wrap items-center gap-2">
-              {d.decisionType ? (
-                <Badge variant="neutral">{decisionTypeLabel[d.decisionType]}</Badge>
-              ) : null}
-              {showRisk && d.riskLevel ? (
-                <Badge variant="conditional">{riskLabel[d.riskLevel]}</Badge>
-              ) : null}
-            </div>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
-              {d.question}
-            </h1>
-            <div className="mt-5">
-              <DecisionAnswerBox
-                verdict={d.verdict}
-                answer={d.answer}
-                validity={d.trust.validity}
-                conditions={d.conditions}
-                trust={d.trust}
-              />
-            </div>
-          </section>
+      <h1 className="mt-5 text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
+        {d.question}
+      </h1>
 
-          {/* 6: Critical warnings — raised to just under the answer */}
-          {d.warnings?.length ? <WarningList warnings={d.warnings} /> : null}
-
-          {/* 4: Applies to */}
-          <section id="applies-to" className="scroll-mt-24">
-            <AppliesToPanel appliesTo={d.appliesTo} />
-          </section>
-
-          {/* 5: Exceptions */}
-          {d.exceptions?.length ? (
-            <section id="exceptions" className="scroll-mt-24">
-              <ExceptionsPanel exceptions={d.exceptions} />
-            </section>
-          ) : null}
-
-          {/* 7: Why trust this answer */}
-          <section id="trust" className="scroll-mt-24 space-y-4">
-            <TrustPanel trust={d.trust} sourceCount={d.sources.length} />
-            <EvidencePanel evidenceLevel={d.trust.evidenceLevel} />
-          </section>
-
-          {/* 8: Official sources */}
-          {d.sources.length ? (
-            <section id="sources" className="scroll-mt-24">
-              <OfficialSourcesList sources={d.sources} />
-            </section>
-          ) : null}
-
-          {/* 11–12: Detailed explanation + examples */}
-          {d.overview?.length ? (
-            <section id="details" className="scroll-mt-24">
-              <h2 className="text-lg font-semibold">Details</h2>
-              <div className="text-muted-foreground mt-3 max-w-prose space-y-3 text-pretty">
-                {d.overview.map((p, i) => (
-                  <p key={i}>{p}</p>
-                ))}
-              </div>
-              {d.examples?.length ? (
-                <div className="border-border bg-subtle mt-4 rounded-xl border p-4">
-                  <h3 className="text-sm font-semibold">Examples</h3>
-                  <ul className="text-muted-foreground mt-2 list-inside list-disc space-y-1 text-sm">
-                    {d.examples.map((ex, i) => (
-                      <li key={i}>{ex}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-            </section>
-          ) : null}
-
-          {/* 13: FAQ */}
-          {d.faqs?.length ? (
-            <section id="faq" className="scroll-mt-24">
-              <FaqAccordion faqs={d.faqs} />
-            </section>
-          ) : null}
-
-          {/* 14–15: Related */}
-          {d.relatedQuestions?.length || d.relatedTopics?.length ? (
-            <section id="related" className="scroll-mt-24 space-y-6">
-              {d.relatedQuestions?.length ? <RelatedQuestions items={d.relatedQuestions} /> : null}
-              {d.relatedTopics?.length ? <RelatedTopics items={d.relatedTopics} /> : null}
-            </section>
-          ) : null}
-
-          {/* 16: Version history */}
-          {d.versions?.length ? (
-            <section id="history" className="scroll-mt-24">
-              <VersionHistory versions={d.versions} />
-            </section>
-          ) : null}
-
-          <FeedbackWidget />
-        </article>
-
-        {/* Sticky sidebar: navigation + print (desktop only) */}
-        <aside className="hidden lg:block">
-          <div className="sticky top-20 space-y-6">
-            <TableOfContents items={toc} />
-            <PrintButton className="w-full justify-center" />
-          </div>
-        </aside>
+      {/* The answer — front and centre. */}
+      <div className="mt-5">
+        <VerdictBanner verdict={d.verdict} answer={d.answer} validity={d.trust.validity} />
       </div>
+
+      {/* The few details that matter. */}
+      {d.conditions?.length ? (
+        <section className="mt-8">
+          <h2 className="text-sm font-semibold tracking-wide uppercase">Key details</h2>
+          <dl className="border-border divide-border mt-3 divide-y rounded-xl border">
+            {d.conditions.map((c) => (
+              <div key={c.label} className="flex items-baseline justify-between gap-4 px-4 py-3">
+                <dt className="text-muted-foreground text-sm">{c.label}</dt>
+                <dd className="text-right text-sm font-medium">{c.value ?? '—'}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ) : null}
+
+      {/* Genuinely useful exceptions only (e.g. medical travellers). */}
+      {d.exceptions?.length ? (
+        <section className="mt-6 space-y-3">
+          {d.exceptions.map((ex) => (
+            <div
+              key={ex.id}
+              className="border-border bg-subtle flex gap-3 rounded-xl border p-4 text-sm"
+            >
+              <Info className="text-muted-foreground mt-0.5 size-4 shrink-0" aria-hidden />
+              <p className="text-pretty">
+                <span className="font-medium capitalize">{ex.appliesTo} travellers: </span>
+                <span className="text-muted-foreground">{ex.detail}</span>
+              </p>
+            </div>
+          ))}
+        </section>
+      ) : null}
+
+      {/* Related questions — simple next steps. */}
+      {d.relatedQuestions?.length ? (
+        <RelatedQuestions items={d.relatedQuestions} className="mt-10" />
+      ) : null}
+
+      {/* One quiet trust line — verified date + official source. */}
+      <footer className="border-border text-muted-foreground mt-10 flex flex-wrap items-center gap-x-2 gap-y-1 border-t pt-5 text-xs">
+        <BadgeCheck className="text-primary size-4" aria-hidden />
+        <span>Verified {formatDate(d.trust.lastVerified)}</span>
+        {source ? (
+          <>
+            <span aria-hidden>·</span>
+            <span>
+              Source:{' '}
+              <a
+                href={source.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground underline underline-offset-2"
+              >
+                {source.authority}
+              </a>
+            </span>
+          </>
+        ) : null}
+      </footer>
     </Container>
   );
 }
