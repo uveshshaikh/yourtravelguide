@@ -49,3 +49,15 @@ export type ReviewTarget = (typeof reviewTargetEnum.enumValues)[number];
 export type ReviewStatus = (typeof reviewStatusEnum.enumValues)[number];
 export type TopicEdge = (typeof topicEdgeEnum.enumValues)[number];
 export type FactValueType = (typeof factValueTypeEnum.enumValues)[number];
+
+/**
+ * AnswerKind — the traveller-facing DECISION TYPE that determines the verdict
+ * VOCABULARY. The underlying `Verdict` enum stays a small, closed polarity
+ * (allowed / conditional / not-allowed / depends); AnswerKind reshapes how that
+ * polarity is *worded and coloured* so it matches the user's intent. A carry
+ * question reads "Allowed / Not allowed"; a requirement reads "Required / Not
+ * required"; validity reads "Valid / Minimum required"; etc. Never show
+ * "Not allowed" for a requirement, validity, acceptance or eligibility question.
+ */
+export type AnswerKind =
+  'carry' | 'requirement' | 'validity' | 'acceptance' | 'recommendation' | 'eligibility';

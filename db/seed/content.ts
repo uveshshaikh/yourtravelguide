@@ -1,4 +1,5 @@
 import type {
+  AnswerKind,
   DecisionType,
   EntityType,
   EvidenceLevel,
@@ -55,6 +56,9 @@ export interface SeedQuestion {
   question: string;
   subject: SeedSubject;
   authority: AuthorityCode;
+  /** Decision type — drives the verdict VOCABULARY (see AnswerKind). Default 'carry'. */
+  answerKind?: AnswerKind;
+  /** Stored polarity — reshaped into the right words by `answerKind`. */
   verdict: Verdict;
   /** One-sentence, answer-first summary. */
   summary: string;
@@ -219,6 +223,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
       itemCategory: 'Travel document',
     },
     authority: 'mea',
+    answerKind: 'validity',
     verdict: 'allowed_with_conditions',
     summary:
       'Most countries require your passport to be valid for at least 6 months beyond your travel dates.',
@@ -251,7 +256,8 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     question: 'Do I need a visa to travel abroad?',
     subject: { type: 'document', code: 'visa', name: 'Visa', itemCategory: 'Travel document' },
     authority: 'boi',
-    verdict: 'unresolved',
+    answerKind: 'requirement',
+    verdict: 'allowed_with_conditions',
     summary:
       'It depends on your destination — some countries are visa-free or visa-on-arrival for Indian passport holders, others need a visa in advance.',
     conditions: {
@@ -281,9 +287,10 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
       itemCategory: 'Travel document',
     },
     authority: 'bcas',
-    verdict: 'allowed_with_conditions',
+    answerKind: 'requirement',
+    verdict: 'allowed',
     summary:
-      'You need one original government-issued photo ID that matches the name on your ticket.',
+      'Yes — you need one original government-issued photo ID that matches the name on your ticket.',
     conditions: {
       Accepted: 'Passport, Aadhaar, driving licence, voter ID, PAN',
       'Must match': 'The name on your ticket',
@@ -315,9 +322,10 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
       itemCategory: 'Travel document',
     },
     authority: 'mea',
-    verdict: 'not_allowed',
+    answerKind: 'requirement',
+    verdict: 'allowed',
     summary:
-      'No exceptions — every traveller, including infants, needs their own valid passport to fly abroad.',
+      'Yes — every traveller, including infants, needs their own valid passport to fly abroad.',
     conditions: {
       Infants: 'Need their own passport',
       Visa: 'May also be required for the child',
@@ -344,6 +352,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
       itemCategory: 'Travel document',
     },
     authority: 'bcas',
+    answerKind: 'acceptance',
     verdict: 'allowed_with_conditions',
     summary:
       'Yes — Aadhaar in the mAadhaar or DigiLocker app is accepted as photo ID for domestic flights.',
@@ -752,9 +761,10 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     question: 'How early should I reach the airport?',
     subject: GENERAL,
     authority: 'dgca',
-    verdict: 'allowed_with_conditions',
+    answerKind: 'recommendation',
+    verdict: 'allowed',
     summary:
-      'Reach about 2 hours before domestic flights and 3 hours before international departures.',
+      'Recommended — reach about 2 hours before domestic flights and 3 hours before international departures.',
     conditions: {
       Domestic: '~2 hours before departure',
       International: '~3 hours before departure',
@@ -777,9 +787,10 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     question: 'Is web check-in mandatory for flights?',
     subject: GENERAL,
     authority: 'dgca',
-    verdict: 'allowed_with_conditions',
+    answerKind: 'requirement',
+    verdict: 'not_allowed',
     summary:
-      'Web check-in isn’t legally mandatory, but many airlines strongly prefer it and may charge for airport counter check-in.',
+      'Not mandatory — web check-in isn’t legally required, but many airlines prefer it and may charge for airport counter check-in.',
     conditions: {
       When: 'Opens ~48 h, closes ~60–90 min before departure',
       Bags: 'Drop checked luggage at the counter',
@@ -805,6 +816,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     question: 'Can I use DigiYatra for domestic flights?',
     subject: GENERAL,
     authority: 'bcas',
+    answerKind: 'eligibility',
     verdict: 'allowed_with_conditions',
     summary:
       'Yes — DigiYatra offers paperless, face-recognition entry at many major Indian airports, and it’s optional.',
@@ -916,6 +928,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
       itemCategory: 'Health document',
     },
     authority: 'mohfw',
+    answerKind: 'requirement',
     verdict: 'allowed_with_conditions',
     summary:
       'A yellow fever vaccination certificate is required only if you’re arriving from or transiting a yellow-fever risk country.',
@@ -966,6 +979,13 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
 /** slug → category, for the homepage/search grouping (single source of truth). */
 export const categoryForSlug = (slug: string): Category | undefined =>
   TRAVEL_QUESTIONS.find((q) => q.slug === slug)?.category;
+
+/**
+ * slug → decision type (AnswerKind), which determines the verdict VOCABULARY.
+ * Defaults to 'carry' for anything not in the registry.
+ */
+export const answerKindForSlug = (slug: string): AnswerKind =>
+  TRAVEL_QUESTIONS.find((q) => q.slug === slug)?.answerKind ?? 'carry';
 
 /**
  * slug → short applicability label ("Domestic flights", "International travel"…).

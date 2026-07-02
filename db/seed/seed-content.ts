@@ -21,9 +21,14 @@ import {
  * Category is stored on the Topic's `journeyStage` field so the homepage/search
  * grouping is data-driven from the database (grows as content grows).
  */
-export async function seedContent(): Promise<{ seeded: string[]; total: number }> {
+export async function seedContent(): Promise<{
+  seeded: string[];
+  revised: string[];
+  total: number;
+}> {
   const now = new Date();
   const seeded: string[] = [];
+  const revised: string[] = [];
 
   // 1) Authorities (cached by code).
   const authorityId = new Map<AuthorityCode, string>();
@@ -75,21 +80,26 @@ export async function seedContent(): Promise<{ seeded: string[]; total: number }
     // it would make the resolver hide the page from anyone without a matching
     // travel context. The domestic/international label is surfaced in the UI from
     // the content registry instead (see content.ts `appliesToLabel`).
-    const created = await ensureAnswer(topic.id, {
-      subjectType: q.subject.type,
-      subjectCode: q.subject.code,
-      question: q.question,
-      verdict: q.verdict,
-      resolverDimensions: q.verdict === 'unresolved' ? ['destination'] : undefined,
-      summary: q.summary,
-      conditions: q.conditions,
-      ownerAuthorityId,
-      evidenceIds: [evidenceId],
-      volatility: q.volatility ?? 'medium',
-      riskLevel: q.riskLevel,
-      lastVerifiedAt: now,
-    });
-    if (created) seeded.push(q.slug);
+    const outcome = await syncAnswer(
+      topic.id,
+      {
+        subjectType: q.subject.type,
+        subjectCode: q.subject.code,
+        question: q.question,
+        verdict: q.verdict,
+        resolverDimensions: q.verdict === 'unresolved' ? ['destination'] : undefined,
+        summary: q.summary,
+        conditions: q.conditions,
+        ownerAuthorityId,
+        evidenceIds: [evidenceId],
+        volatility: q.volatility ?? 'medium',
+        riskLevel: q.riskLevel,
+        lastVerifiedAt: now,
+      },
+      now,
+    );
+    if (outcome === 'created') seeded.push(q.slug);
+    if (outcome === 'revised') revised.push(q.slug);
   }
 
   // 3) Related links (bidirectional "you should also know"), idempotent.
@@ -104,7 +114,7 @@ export async function seedContent(): Promise<{ seeded: string[]; total: number }
     }
   }
 
-  return { seeded, total: TRAVEL_QUESTIONS.length };
+  return { seeded, revised, total: TRAVEL_QUESTIONS.length };
 }
 
 async function ensureEntity(q: SeedQuestion) {
@@ -145,14 +155,46 @@ async function ensureEvidence(q: SeedQuestion, ownerAuthorityId: string): Promis
   return evidence.id;
 }
 
-/** Publish a claim for a topic if it has none yet. Returns true if created. */
-async function ensureAnswer(topicIdValue: string, input: CreateClaimInput): Promise<boolean> {
+type SyncOutcome = 'created' | 'revised' | 'unchanged';
+
+/**
+ * Publish a claim for a topic if it has none; otherwise reconcile the published
+ * answer with the registry — if the verdict, summary or conditions changed, revise
+ * it in place (new version). Keeps Supabase in step with content edits.
+ */
+async function syncAnswer(
+  topicIdValue: string,
+  input: CreateClaimInput,
+  now: Date,
+): Promise<SyncOutcome> {
   const existing = await topicRepository.publishedClaims(topicIdValue);
-  if (existing.length > 0) return false;
-  const claim = await claimRepository.record(input);
-  await claimRepository.publish(claim.id);
-  await topicRepository.answerWith(topicIdValue, claim.id);
-  return true;
+  const current = existing[0];
+  if (!current) {
+    const claim = await claimRepository.record(input);
+    await claimRepository.publish(claim.id);
+    await topicRepository.answerWith(topicIdValue, claim.id);
+    return 'created';
+  }
+  const conditionsChanged = stableJson(current.conditions) !== stableJson(input.conditions);
+  if (current.verdict !== input.verdict || current.summary !== input.summary || conditionsChanged) {
+    await claimRepository.revise(current.id, {
+      verdict: input.verdict,
+      summary: input.summary,
+      conditions: input.conditions,
+      lastVerifiedAt: now,
+    });
+    return 'revised';
+  }
+  return 'unchanged';
+}
+
+/** Order-insensitive JSON for comparing jsonb conditions (avoids churn). */
+function stableJson(value: unknown): string {
+  if (value === null || value === undefined) return 'null';
+  if (typeof value !== 'object') return JSON.stringify(value);
+  const obj = value as Record<string, unknown>;
+  const keys = Object.keys(obj).sort();
+  return JSON.stringify(keys.map((k) => [k, obj[k]]));
 }
 
 async function ensureLink(fromId: string, toId: string) {

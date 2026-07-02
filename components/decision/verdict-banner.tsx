@@ -1,26 +1,29 @@
-import type { Verdict } from '@/lib/knowledge/types';
+import type { AnswerKind, Verdict } from '@/lib/knowledge/types';
 import type { Validity } from '@/lib/knowledge/types';
 import { validityLabel } from '@/lib/knowledge/labels';
-import { verdictVisuals } from '@/components/decision/verdict-config';
+import { verdictDisplay } from '@/components/decision/verdict-config';
 import { cn } from '@/lib/utils';
 
 /**
  * VerdictBanner — the answer, front and centre. The single most important
- * element on any decision page: colour-coded verdict + the one-sentence answer,
- * readable in a glance on a phone in a security queue.
+ * element on any decision page: the verdict worded for its decision type
+ * (AnswerKind) + the one-sentence answer, readable in a glance on a phone in a
+ * security queue.
  */
 export function VerdictBanner({
   verdict,
+  answerKind,
   answer,
   validity,
   className,
 }: {
   verdict: Verdict;
+  answerKind?: AnswerKind;
   answer: string;
   validity?: Validity;
   className?: string;
 }) {
-  const v = verdictVisuals[verdict];
+  const v = verdictDisplay(answerKind, verdict);
   const showValidity = validity && validity !== 'stable';
   return (
     <div

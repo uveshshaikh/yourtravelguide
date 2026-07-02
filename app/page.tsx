@@ -17,7 +17,7 @@ import { Container } from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { QuestionSearch } from '@/components/search/question-search';
 import { LastVerifiedBadge } from '@/components/trust/trust-badges';
-import { verdictVisuals } from '@/components/decision/verdict-config';
+import { verdictDisplay } from '@/components/decision/verdict-config';
 import { listVerifiedByCategory, listVerifiedQuestions } from '@/services/resolver/catalog';
 
 export const dynamic = 'force-dynamic';
@@ -136,7 +136,7 @@ export default async function HomePage() {
             >
               <div className="flex flex-wrap items-center gap-2">
                 {(() => {
-                  const v = verdictVisuals[featured.verdict];
+                  const v = verdictDisplay(featured.answerKind, featured.verdict);
                   return (
                     <Badge variant={v.badge}>
                       <v.Icon className="size-3.5" aria-hidden />
@@ -203,7 +203,7 @@ export default async function HomePage() {
                     </div>
                     <ul className="mt-4 space-y-1">
                       {questions.map((q) => {
-                        const v = verdictVisuals[q.verdict];
+                        const v = verdictDisplay(q.answerKind, q.verdict);
                         return (
                           <li key={q.slug}>
                             <a

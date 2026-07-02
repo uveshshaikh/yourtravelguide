@@ -35,9 +35,14 @@ export function DecisionPage({
         {d.question}
       </h1>
 
-      {/* The answer — front and centre. */}
+      {/* The answer — front and centre, worded for its decision type. */}
       <div className="mt-5">
-        <VerdictBanner verdict={d.verdict} answer={d.answer} validity={d.trust.validity} />
+        <VerdictBanner
+          verdict={d.verdict}
+          answerKind={d.answerKind}
+          answer={d.answer}
+          validity={d.trust.validity}
+        />
       </div>
 
       {/* The few details that matter. */}

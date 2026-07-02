@@ -1,27 +1,33 @@
 import { ArrowRight } from 'lucide-react';
-import type { Verdict } from '@/lib/knowledge/types';
+import type { AnswerKind, Verdict } from '@/lib/knowledge/types';
 import { Badge } from '@/components/ui/badge';
-import { verdictVisuals } from '@/components/decision/verdict-config';
+import { verdictDisplay } from '@/components/decision/verdict-config';
+import { answerKindForSlug } from '@/db/seed/content';
 import { cn } from '@/lib/utils';
 
 /**
  * VerdictCard — a compact question + verdict, for lists, related questions and
- * search results. Optionally a link (whole card is the target).
+ * search results. Optionally a link (whole card is the target). The verdict is
+ * worded for its decision type; when `answerKind` isn't passed it's inferred
+ * from the linked question's slug.
  */
 export function VerdictCard({
   question,
   verdict,
+  answerKind,
   answer,
   href,
   className,
 }: {
   question: string;
   verdict: Verdict;
+  answerKind?: AnswerKind;
   answer?: string;
   href?: string;
   className?: string;
 }) {
-  const v = verdictVisuals[verdict];
+  const slug = href?.split('/question/')[1];
+  const v = verdictDisplay(answerKind ?? (slug ? answerKindForSlug(slug) : undefined), verdict);
   const body = (
     <>
       <div className="flex items-start justify-between gap-3">

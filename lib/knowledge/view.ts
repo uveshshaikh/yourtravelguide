@@ -1,4 +1,5 @@
 import type {
+  AnswerKind,
   Confidence,
   DecisionType,
   EvidenceLevel,
@@ -130,6 +131,8 @@ export interface DecisionView {
   versions?: VersionEntryView[];
   intent?: Intent;
   decisionType?: DecisionType;
+  /** Decision type that determines the verdict vocabulary/tone. */
+  answerKind?: AnswerKind;
   riskLevel?: RiskLevel;
 }
 
@@ -212,6 +215,8 @@ export interface QuestionSummaryView {
   riskLevel: RiskLevel;
   /** Traveller-facing category, e.g. "Baggage & items". */
   category: string;
+  /** Decision type that determines the verdict vocabulary/tone. */
+  answerKind: AnswerKind;
 }
 
 export interface QuestionResultView {

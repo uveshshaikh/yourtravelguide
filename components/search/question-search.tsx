@@ -6,7 +6,7 @@ import { Search } from 'lucide-react';
 import type { QuestionSummaryView } from '@/lib/knowledge/view';
 import { searchQuestions } from '@/lib/search';
 import { Badge } from '@/components/ui/badge';
-import { verdictVisuals } from '@/components/decision/verdict-config';
+import { verdictDisplay } from '@/components/decision/verdict-config';
 import { Kbd } from '@/components/ui/kbd';
 import { cn } from '@/lib/utils';
 
@@ -119,7 +119,7 @@ export function QuestionSearch({
           onMouseDown={(e) => e.preventDefault()}
         >
           {results.map((r, i) => {
-            const v = verdictVisuals[r.verdict];
+            const v = verdictDisplay(r.answerKind, r.verdict);
             return (
               <li
                 key={r.slug}

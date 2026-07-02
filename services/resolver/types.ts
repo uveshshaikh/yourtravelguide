@@ -117,7 +117,12 @@ export interface RawDecisionInputs {
 
 // ── The three-state refusal contract ────────────────────────────────────────
 
-export type IncompleteReason = 'no_published_claim' | 'no_evidence' | 'missing_trust_fields';
+export type IncompleteReason =
+  | 'no_published_claim'
+  | 'no_evidence'
+  | 'missing_trust_fields'
+  /** The verdict and the explanation disagree — never render a contradiction. */
+  | 'verdict_incoherent';
 
 /** STATE 2 — topic identified, but not enough verified knowledge to publish. */
 export interface InsufficientKnowledge {

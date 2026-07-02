@@ -2,7 +2,7 @@ import { ArrowRight } from 'lucide-react';
 import type { QuestionSummaryView } from '@/lib/knowledge/view';
 import { Badge } from '@/components/ui/badge';
 import { LastVerifiedBadge } from '@/components/trust/trust-badges';
-import { verdictVisuals } from '@/components/decision/verdict-config';
+import { verdictDisplay } from '@/components/decision/verdict-config';
 
 /**
  * VerifiedQuestionResult — a search/browse result for a VERIFIED question.
@@ -10,7 +10,7 @@ import { verdictVisuals } from '@/components/decision/verdict-config';
  * verdict, last-verified date, applicability. Links to the full answer.
  */
 export function VerifiedQuestionResult({ item }: { item: QuestionSummaryView }) {
-  const v = verdictVisuals[item.verdict];
+  const v = verdictDisplay(item.answerKind, item.verdict);
   return (
     <a
       href={`/question/${item.slug}`}

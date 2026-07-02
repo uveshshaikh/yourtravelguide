@@ -121,7 +121,9 @@ describe('verified-question catalog · full content seed', () => {
       ['can-i-carry-an-e-cigarette-or-vape-on-a-flight', 'not_allowed'],
       ['how-much-liquid-can-i-carry-in-hand-baggage', 'allowed_with_conditions'],
       ['can-i-carry-a-laptop-in-hand-baggage', 'allowed'],
-      ['do-i-need-a-visa-to-travel-abroad', 'unresolved'],
+      // Requirement questions store an affirmative polarity, worded "Required".
+      ['do-children-need-a-passport-to-fly-internationally', 'allowed'],
+      ['do-i-need-a-visa-to-travel-abroad', 'allowed_with_conditions'],
     ];
     for (const [slug, verdict] of cases) {
       const result = await resolve(slug);

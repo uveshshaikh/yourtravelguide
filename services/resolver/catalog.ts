@@ -1,7 +1,7 @@
 import 'server-only';
 import { topicRepository } from '@/repositories/topic.repo';
 import type { QuestionSummaryView } from '@/lib/knowledge/view';
-import { appliesToLabel, CATEGORIES, categoryForSlug } from '@/db/seed/content';
+import { answerKindForSlug, appliesToLabel, CATEGORIES, categoryForSlug } from '@/db/seed/content';
 
 /**
  * The verified-question catalog — the search index + homepage source.
@@ -49,6 +49,7 @@ export async function listVerifiedQuestions(): Promise<QuestionSummaryView[]> {
       // Registry questions carry a descriptive label; unknown DB-only rows fall
       // back to their stored scope columns.
       appliesTo: categoryForSlug(r.slug) ? appliesToLabel(r.slug) : appliesToSummary(r),
+      answerKind: answerKindForSlug(r.slug),
       riskLevel: r.riskLevel,
       // Category from the content registry (authoritative), then the DB field,
       // then a safe fallback — so nothing is ever ungrouped.

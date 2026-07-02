@@ -202,6 +202,62 @@ export const claimRepository = {
     );
   },
 
+  /**
+   * Revise a published claim's answer in place (verdict / summary / conditions),
+   * appending a new immutable version. Used when the content registry changes the
+   * wording or polarity of an existing answer — history is preserved (Rule: keep
+   * version history from day one).
+   */
+  async revise(
+    id: string,
+    input: {
+      verdict: CreateClaimInput['verdict'];
+      summary: string;
+      conditions?: CreateClaimInput['conditions'];
+      lastVerifiedAt?: Date | null;
+    },
+    actor?: Actor,
+  ) {
+    const existing = await this.getById(id);
+    if (!existing) throw AppError.notFound('Claim not found.');
+    const nextVersion = existing.currentVersion + 1;
+    const lastVerifiedAt = input.lastVerifiedAt ?? existing.lastVerifiedAt;
+    const conditions = input.conditions ?? existing.conditions ?? null;
+
+    return db.transaction(async (tx) => {
+      const updated = firstOrThrow(
+        await tx
+          .update(claims)
+          .set({
+            verdict: input.verdict,
+            summary: input.summary,
+            conditions,
+            lastVerifiedAt,
+            currentVersion: nextVersion,
+            updatedBy: actor,
+            updatedAt: new Date(),
+          })
+          .where(and(eq(claims.id, id), isNull(claims.deletedAt)))
+          .returning(),
+        'claim',
+      );
+      await tx.insert(claimVersions).values({
+        claimId: id,
+        version: nextVersion,
+        verdict: updated.verdict,
+        validity: updated.validity,
+        summary: updated.summary,
+        conditions,
+        evidenceLevel: updated.evidenceLevel,
+        confidence: updated.confidence,
+        verifiedAt: lastVerifiedAt,
+        changeReason: 'content revision',
+        createdBy: actor,
+      });
+      return updated;
+    });
+  },
+
   /** Transition a claim to `published` so it enters the resolution pool. */
   async publish(id: string, actor?: Actor) {
     return firstOrThrow(
