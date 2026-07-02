@@ -1,4 +1,4 @@
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, desc, eq, isNotNull, isNull } from 'drizzle-orm';
 import { db } from '@/db';
 import { claims, topicClaims, topicEdges, topics } from '@/db/schema';
 import { AppError } from '@/lib/errors';
@@ -95,13 +95,77 @@ export const topicRepository = {
     return rows.map((r) => r.claim);
   },
 
-  /** Related topics (all edge types) with the target's slug/question, for links. */
+  /**
+   * Related topics that are actually answerable — targets with a PUBLISHED claim
+   * only, so a "related question" link can never dead-end on unverified content.
+   * De-duplicated by slug.
+   */
   async relatedTargets(topicId: string) {
-    return db
-      .select({ slug: topics.slug, question: topics.question, edgeType: topicEdges.edgeType })
+    const rows = await db
+      .select({
+        slug: topics.slug,
+        question: topics.question,
+        edgeType: topicEdges.edgeType,
+        position: topicEdges.position,
+      })
       .from(topicEdges)
       .innerJoin(topics, eq(topicEdges.toTopicId, topics.id))
+      .innerJoin(topicClaims, eq(topicClaims.topicId, topics.id))
+      .innerJoin(
+        claims,
+        and(
+          eq(topicClaims.claimId, claims.id),
+          eq(claims.state, 'published'),
+          isNull(claims.deletedAt),
+        ),
+      )
       .where(and(eq(topicEdges.fromTopicId, topicId), isNull(topics.deletedAt)))
       .orderBy(topicEdges.position);
+
+    const seen = new Set<string>();
+    const out: { slug: string; question: string; edgeType: (typeof rows)[number]['edgeType'] }[] =
+      [];
+    for (const r of rows) {
+      if (seen.has(r.slug)) continue;
+      seen.add(r.slug);
+      out.push({ slug: r.slug, question: r.question, edgeType: r.edgeType });
+    }
+    return out;
+  },
+
+  /**
+   * The verified-question catalog — every topic with a PUBLISHED, verified claim.
+   * Powers homepage popular/featured and the search index. Data-driven: it grows
+   * automatically as verified questions are added. Newest verification first.
+   */
+  async listVerifiedQuestions() {
+    return db
+      .select({
+        slug: topics.slug,
+        question: topics.question,
+        category: topics.journeyStage,
+        verdict: claims.verdict,
+        lastVerifiedAt: claims.lastVerifiedAt,
+        riskLevel: claims.riskLevel,
+        scopeAirlines: claims.scopeAirlines,
+        scopeAirports: claims.scopeAirports,
+        scopeTravelType: claims.scopeTravelType,
+        scopeProfiles: claims.scopeProfiles,
+        scopeOrigin: claims.scopeOrigin,
+        scopeDestination: claims.scopeDestination,
+      })
+      .from(topics)
+      .innerJoin(topicClaims, eq(topicClaims.topicId, topics.id))
+      .innerJoin(
+        claims,
+        and(
+          eq(topicClaims.claimId, claims.id),
+          eq(claims.state, 'published'),
+          isNull(claims.deletedAt),
+          isNotNull(claims.lastVerifiedAt),
+        ),
+      )
+      .where(isNull(topics.deletedAt))
+      .orderBy(desc(claims.lastVerifiedAt));
   },
 };

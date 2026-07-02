@@ -18,6 +18,8 @@ export interface VerdictVisual {
   accent: string;
   /** Left-accent border colour. */
   bar: string;
+  /** Solid background for a small status dot. */
+  dot: string;
 }
 
 export const verdictVisuals: Record<Verdict, VerdictVisual> = {
@@ -28,6 +30,7 @@ export const verdictVisuals: Record<Verdict, VerdictVisual> = {
     banner: 'border-allowed/25 bg-allowed-subtle text-allowed-subtle-foreground',
     accent: 'text-allowed',
     bar: 'border-l-allowed',
+    dot: 'bg-allowed',
   },
   allowed_with_conditions: {
     label: verdictLabel.allowed_with_conditions,
@@ -36,6 +39,7 @@ export const verdictVisuals: Record<Verdict, VerdictVisual> = {
     banner: 'border-conditional/25 bg-conditional-subtle text-conditional-subtle-foreground',
     accent: 'text-conditional',
     bar: 'border-l-conditional',
+    dot: 'bg-conditional',
   },
   not_allowed: {
     label: verdictLabel.not_allowed,
@@ -44,6 +48,7 @@ export const verdictVisuals: Record<Verdict, VerdictVisual> = {
     banner: 'border-denied/25 bg-denied-subtle text-denied-subtle-foreground',
     accent: 'text-denied',
     bar: 'border-l-denied',
+    dot: 'bg-denied',
   },
   unresolved: {
     label: verdictLabel.unresolved,
@@ -52,5 +57,6 @@ export const verdictVisuals: Record<Verdict, VerdictVisual> = {
     banner: 'border-info/25 bg-info-subtle text-info-subtle-foreground',
     accent: 'text-info',
     bar: 'border-l-info',
+    dot: 'bg-info',
   },
 };

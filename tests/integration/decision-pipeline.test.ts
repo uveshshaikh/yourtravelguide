@@ -19,6 +19,8 @@ vi.mock('@/db', () => ({
 }));
 
 import { POWER_BANK_SLUG, seedPowerBank } from '@/db/seed/power-bank';
+import { seedContent } from '@/db/seed/seed-content';
+import { categoryForSlug, TRAVEL_QUESTIONS } from '@/db/seed/content';
 import { topicRepository } from '@/repositories/topic.repo';
 import { gatherDecisionInputs } from '@/services/resolver/gather';
 import { buildDecision } from '@/services/resolver/build-decision';
@@ -39,6 +41,7 @@ beforeAll(async () => {
   await client.exec(migration);
 
   await seedPowerBank();
+  await seedContent();
   // A topic with no published claim → must resolve to "incomplete".
   await topicRepository.create({
     slug: 'topic-without-answer',
@@ -47,7 +50,7 @@ beforeAll(async () => {
     intent: 'verdict',
     decisionType: 'verdict',
   });
-}, 60_000);
+}, 120_000);
 
 afterAll(async () => {
   if (client) await client.close();
@@ -81,8 +84,8 @@ describe('decision pipeline · real Postgres', () => {
     expect(v.appliesTo.dependsOn).toContain('carriage');
     expect(v.exceptions?.some((e) => e.appliesTo === 'medical')).toBe(true);
     expect(v.versions?.length).toBeGreaterThan(0);
-    expect(v.relatedQuestions?.length).toBeGreaterThan(0);
-    expect(v.relatedTopics?.length).toBeGreaterThan(0);
+    // Related links point only to OTHER verified questions (no dead ends).
+    expect(v.relatedQuestions?.some((r) => r.href.includes('checked-baggage'))).toBe(true);
 
     // NO fabricated fields (not present in the Knowledge Core schema).
     expect(v.overview).toBeUndefined();
@@ -97,5 +100,47 @@ describe('decision pipeline · real Postgres', () => {
 
   it('returns not_found for an unknown topic', async () => {
     expect((await resolve('this-topic-does-not-exist')).state).toBe('not_found');
+  });
+});
+
+describe('verified-question catalog · full content seed', () => {
+  it('publishes every content question so the catalog is fully answerable', async () => {
+    const verified = await topicRepository.listVerifiedQuestions();
+    const verifiedSlugs = new Set(verified.map((r) => r.slug));
+    // Every registry question resolves to a published, verified answer (fail-closed).
+    const missing = TRAVEL_QUESTIONS.filter((q) => !verifiedSlugs.has(q.slug)).map((q) => q.slug);
+    expect(missing).toEqual([]);
+    expect(verified.length).toBeGreaterThanOrEqual(TRAVEL_QUESTIONS.length);
+    // Every verified question maps to a category for browse grouping (registry
+    // first, DB journeyStage as fallback) — so nothing is ever ungrouped.
+    expect(verified.every((r) => Boolean(categoryForSlug(r.slug) ?? r.category))).toBe(true);
+  });
+
+  it('resolves real answers across categories with the expected verdicts', async () => {
+    const cases: Array<[string, string]> = [
+      ['can-i-carry-an-e-cigarette-or-vape-on-a-flight', 'not_allowed'],
+      ['how-much-liquid-can-i-carry-in-hand-baggage', 'allowed_with_conditions'],
+      ['can-i-carry-a-laptop-in-hand-baggage', 'allowed'],
+      ['do-i-need-a-visa-to-travel-abroad', 'unresolved'],
+    ];
+    for (const [slug, verdict] of cases) {
+      const result = await resolve(slug);
+      expect(result.state).toBe('available');
+      if (result.state !== 'available') continue;
+      expect(result.view.verdict).toBe(verdict);
+      expect(result.view.sources.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('links related questions only to other verified answers (no dead ends)', async () => {
+    const result = await resolve('how-much-liquid-can-i-carry-in-hand-baggage');
+    expect(result.state).toBe('available');
+    if (result.state !== 'available') return;
+    expect(result.view.relatedQuestions?.some((r) => r.href.includes('medicines'))).toBe(true);
+  });
+
+  it('is idempotent — re-seeding adds nothing', async () => {
+    const again = await seedContent();
+    expect(again.seeded).toHaveLength(0);
   });
 });

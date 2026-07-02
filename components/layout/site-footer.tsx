@@ -3,12 +3,12 @@ import { Logo } from '@/components/layout/logo';
 import { footerColumns } from '@/config/navigation';
 import { siteConfig } from '@/config/site';
 
-/** Permanent footer: sitemap by domain + trust/legal + honest positioning line. */
+/** Permanent footer: only working destinations + honest positioning line. */
 export function SiteFooter() {
   return (
     <footer className="border-border bg-subtle border-t">
       <Container className="py-12">
-        <div className="grid gap-10 md:grid-cols-[1.4fr_repeat(4,1fr)]">
+        <div className="flex flex-col justify-between gap-10 sm:flex-row">
           <div className="max-w-xs">
             <Logo />
             <p className="text-muted-foreground mt-3 text-sm">

@@ -200,6 +200,20 @@ export interface JourneyView {
 
 // ── Search view-models ──────────────────────────────────────────────────────
 
+/** A verified question in the search/browse catalog (search index entry). */
+export interface QuestionSummaryView {
+  slug: string;
+  question: string;
+  verdict: Verdict;
+  /** ISO date the answer was last verified. */
+  lastVerified: string;
+  /** Short applicability summary, e.g. "All airlines · Domestic & international". */
+  appliesTo: string;
+  riskLevel: RiskLevel;
+  /** Traveller-facing category, e.g. "Baggage & items". */
+  category: string;
+}
+
 export interface QuestionResultView {
   id: string;
   question: string;

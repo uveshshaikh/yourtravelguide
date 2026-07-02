@@ -2,25 +2,36 @@ import {
   ArrowRight,
   BadgeCheck,
   Compass,
-  FileSearch,
+  FileText,
+  HeartPulse,
   Landmark,
   ListChecks,
+  Luggage,
+  Plane,
   ShieldCheck,
+  Wallet,
   Zap,
+  type LucideIcon,
 } from 'lucide-react';
 import { Container } from '@/components/layout/container';
-import { SearchTrigger } from '@/components/layout/search-trigger';
 import { Badge } from '@/components/ui/badge';
+import { QuestionSearch } from '@/components/search/question-search';
+import { LastVerifiedBadge } from '@/components/trust/trust-badges';
+import { verdictVisuals } from '@/components/decision/verdict-config';
+import { listVerifiedByCategory, listVerifiedQuestions } from '@/services/resolver/catalog';
 
-/** Real Search-Console queries — shown as example questions, not fabricated answers. */
-const popularQuestions = [
-  'Can I carry a power bank?',
-  'Is my passport valid for travel?',
-  'DigiLocker for flights',
-  'Cabin baggage size & weight',
-  'Liquids in hand luggage',
-  'ID accepted for domestic flights',
-];
+export const dynamic = 'force-dynamic';
+
+/** Icon per category (falls back to a compass for anything new). */
+const categoryIcon: Record<string, LucideIcon> = {
+  'Documents & visas': FileText,
+  'Baggage & items': Luggage,
+  'Security & screening': ShieldCheck,
+  'Customs & duty-free': Landmark,
+  'At the airport': Plane,
+  'Money & currency': Wallet,
+  'Health & vaccines': HeartPulse,
+};
 
 const benefits = [
   {
@@ -36,7 +47,7 @@ const benefits = [
   {
     icon: Compass,
     title: 'Made for your trip',
-    body: 'Answers say exactly who and where they apply to — your airline, route, and traveller type.',
+    body: 'Answers say exactly who and where they apply to — your route and traveller type.',
   },
 ];
 
@@ -47,10 +58,15 @@ const trustPoints = [
   { icon: ListChecks, label: 'Plain language' },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Data-driven: everything below grows automatically as verified questions land.
+  const [catalog, groups] = await Promise.all([listVerifiedQuestions(), listVerifiedByCategory()]);
+  const popular = catalog.slice(0, 6);
+  const featured = catalog[0];
+
   return (
     <>
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      {/* ── Hero + real search ───────────────────────────────────────────── */}
       <section className="border-border border-b">
         <Container className="py-16 sm:py-24">
           <div className="mx-auto max-w-2xl text-center">
@@ -59,30 +75,33 @@ export default function HomePage() {
               Travel answers you can trust — in seconds
             </h1>
             <p className="text-muted-foreground mt-5 text-lg text-pretty">
-              Can I carry a power bank? Is my passport still valid? Get one clear, source-verified
-              answer for every travel question — before, during, and after your trip.
+              Search a question and get one clear, source-verified answer — before, during, and
+              after your trip.
             </p>
 
             <div className="mx-auto mt-8 max-w-xl">
-              <SearchTrigger size="hero" />
+              <QuestionSearch catalog={catalog} />
             </div>
 
-            {/* Popular questions placeholder (real queries; search wired in a later sprint) */}
-            <div className="mt-6">
-              <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-                Popular questions
-              </p>
-              <ul className="mt-3 flex flex-wrap justify-center gap-2">
-                {popularQuestions.map((q) => (
-                  <li
-                    key={q}
-                    className="border-border bg-card text-muted-foreground rounded-full border px-3 py-1.5 text-sm"
-                  >
-                    {q}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {popular.length > 0 ? (
+              <div className="mt-6">
+                <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                  Popular questions
+                </p>
+                <ul className="mt-3 flex flex-wrap justify-center gap-2">
+                  {popular.map((q) => (
+                    <li key={q.slug}>
+                      <a
+                        href={`/question/${q.slug}`}
+                        className="border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground inline-flex rounded-full border px-3 py-1.5 text-sm transition-colors"
+                      >
+                        {q.question}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
           </div>
         </Container>
       </section>
@@ -101,8 +120,120 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* ── Benefits ─────────────────────────────────────────────────────── */}
-      <section aria-labelledby="benefits-heading">
+      {/* ── Featured verified answer (real, from the Knowledge Core) ──────── */}
+      {featured ? (
+        <section aria-labelledby="featured-heading">
+          <Container className="py-14 sm:py-16">
+            <p
+              id="featured-heading"
+              className="text-muted-foreground text-center text-xs font-semibold tracking-wide uppercase"
+            >
+              Featured verified answer
+            </p>
+            <a
+              href={`/question/${featured.slug}`}
+              className="border-border bg-card hover:border-primary/40 mx-auto mt-4 block max-w-3xl rounded-2xl border p-6 transition-colors sm:p-8"
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                {(() => {
+                  const v = verdictVisuals[featured.verdict];
+                  return (
+                    <Badge variant={v.badge}>
+                      <v.Icon className="size-3.5" aria-hidden />
+                      {v.label}
+                    </Badge>
+                  );
+                })()}
+                {featured.lastVerified ? <LastVerifiedBadge date={featured.lastVerified} /> : null}
+                <span className="text-muted-foreground text-xs">{featured.appliesTo}</span>
+              </div>
+              <h2 className="mt-3 text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
+                {featured.question}
+              </h2>
+              <p className="text-muted-foreground mt-2 text-pretty">
+                Backed by official sources and recently verified — the kind of answer you can act on
+                with confidence.
+              </p>
+              <span className="text-primary mt-5 inline-flex items-center gap-1.5 text-sm font-medium">
+                Read the full answer <ArrowRight className="size-4" aria-hidden />
+              </span>
+            </a>
+          </Container>
+        </section>
+      ) : null}
+
+      {/* ── Browse by category (real verified questions, grouped) ─────────── */}
+      {groups.length > 0 ? (
+        <section aria-labelledby="browse-heading" className="border-border bg-subtle border-t">
+          <Container className="py-16 sm:py-20">
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <h2 id="browse-heading" className="text-2xl font-semibold tracking-tight">
+                  Browse by category
+                </h2>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  {catalog.length} verified {catalog.length === 1 ? 'answer' : 'answers'} and
+                  growing — every one backed by an official source.
+                </p>
+              </div>
+              <a
+                href="/search"
+                className="text-primary inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
+              >
+                See all questions <ArrowRight className="size-4" aria-hidden />
+              </a>
+            </div>
+
+            <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {groups.map(({ category, questions }) => {
+                const Icon = categoryIcon[category] ?? Compass;
+                return (
+                  <div
+                    key={category}
+                    className="border-border bg-card flex flex-col rounded-2xl border p-5"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className="bg-accent text-accent-foreground grid size-9 place-items-center rounded-lg">
+                        <Icon className="size-5" aria-hidden />
+                      </span>
+                      <h3 className="font-semibold">{category}</h3>
+                      <span className="text-muted-foreground ml-auto text-xs">
+                        {questions.length}
+                      </span>
+                    </div>
+                    <ul className="mt-4 space-y-1">
+                      {questions.map((q) => {
+                        const v = verdictVisuals[q.verdict];
+                        return (
+                          <li key={q.slug}>
+                            <a
+                              href={`/question/${q.slug}`}
+                              className="group hover:bg-muted -mx-2 flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors"
+                            >
+                              <span
+                                className={`size-1.5 shrink-0 rounded-full ${v.dot}`}
+                                aria-hidden
+                              />
+                              <span className="min-w-0 flex-1 truncate text-sm">{q.question}</span>
+                              <ArrowRight
+                                className="text-muted-foreground size-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+                                aria-hidden
+                              />
+                            </a>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
+          </Container>
+        </section>
+      ) : null}
+
+      {/* ── Why it helps ─────────────────────────────────────────────────── */}
+      <section aria-labelledby="benefits-heading" className="border-border border-t">
         <Container className="py-16 sm:py-20">
           <h2 id="benefits-heading" className="sr-only">
             Why YourTravelGuide
@@ -118,76 +249,6 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-        </Container>
-      </section>
-
-      {/* ── How it works ─────────────────────────────────────────────────── */}
-      <section aria-labelledby="how-heading" className="border-border bg-subtle border-t">
-        <Container className="py-16 sm:py-20">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 id="how-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl">
-              How it helps you decide
-            </h2>
-            <p className="text-muted-foreground mt-3 text-pretty">
-              Ask in your own words, get the verdict up front, and see exactly where it comes from.
-            </p>
-          </div>
-
-          <ol className="mx-auto mt-12 grid max-w-4xl gap-6 md:grid-cols-3">
-            <li className="border-border bg-card rounded-xl border p-6">
-              <span className="text-muted-foreground font-mono text-sm">01</span>
-              <span className="bg-muted mt-3 flex size-10 items-center justify-center rounded-lg">
-                <FileSearch className="text-foreground size-5" aria-hidden />
-              </span>
-              <h3 className="mt-4 font-semibold">Ask your question</h3>
-              <p className="text-muted-foreground mt-2 text-sm">
-                Type it the way you&apos;d say it — “Can I carry a razor?”, not keywords.
-              </p>
-            </li>
-
-            <li className="border-border bg-card rounded-xl border p-6">
-              <span className="text-muted-foreground font-mono text-sm">02</span>
-              <span className="bg-muted mt-3 flex size-10 items-center justify-center rounded-lg">
-                <BadgeCheck className="text-foreground size-5" aria-hidden />
-              </span>
-              <h3 className="mt-4 font-semibold">Get a clear verdict</h3>
-              <p className="text-muted-foreground mt-2 text-sm">
-                A colour-coded answer, up front — with the conditions that apply.
-              </p>
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                <Badge variant="allowed">Allowed</Badge>
-                <Badge variant="conditional">With conditions</Badge>
-                <Badge variant="denied">Not allowed</Badge>
-              </div>
-            </li>
-
-            <li className="border-border bg-card rounded-xl border p-6">
-              <span className="text-muted-foreground font-mono text-sm">03</span>
-              <span className="bg-muted mt-3 flex size-10 items-center justify-center rounded-lg">
-                <ShieldCheck className="text-foreground size-5" aria-hidden />
-              </span>
-              <h3 className="mt-4 font-semibold">See the source &amp; date</h3>
-              <p className="text-muted-foreground mt-2 text-sm">
-                Who says so, and when we last verified it — so you can trust and check it.
-              </p>
-            </li>
-          </ol>
-        </Container>
-      </section>
-
-      {/* ── Closing note ─────────────────────────────────────────────────── */}
-      <section>
-        <Container className="py-16 text-center sm:py-20">
-          <h2 className="text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
-            Built to be the answer you don&apos;t second-guess
-          </h2>
-          <p className="text-muted-foreground mx-auto mt-3 max-w-xl text-pretty">
-            More travel questions, tools, and step-by-step guides are on the way. Search goes live
-            as we roll out verified answers.
-          </p>
-          <p className="text-primary mt-8 inline-flex items-center gap-1.5 text-sm font-medium">
-            Coming soon <ArrowRight className="size-4" aria-hidden />
-          </p>
         </Container>
       </section>
     </>

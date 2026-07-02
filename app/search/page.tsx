@@ -1,0 +1,96 @@
+import type { Metadata } from 'next';
+import { Container } from '@/components/layout/container';
+import { QuestionSearch } from '@/components/search/question-search';
+import { VerifiedQuestionResult } from '@/components/search/verified-question-result';
+import { SearchNoResults } from '@/components/search/search-states';
+import { listVerifiedByCategory, listVerifiedQuestions } from '@/services/resolver/catalog';
+import { searchQuestions } from '@/lib/search';
+
+export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = { title: 'Search' };
+
+/**
+ * /search — results come ONLY from the verified-question catalog (published,
+ * evidence-backed). No unpublished content is ever exposed. Empty query browses
+ * every verified question, grouped by category.
+ */
+export default async function SearchPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q } = await searchParams;
+  const query = (q ?? '').trim();
+  const catalog = await listVerifiedQuestions();
+
+  return (
+    <Container className="py-10">
+      <h1 className="text-2xl font-semibold tracking-tight">
+        {query ? `Results for “${query}”` : 'Browse verified questions'}
+      </h1>
+
+      <div className="mt-5 max-w-2xl">
+        <QuestionSearch catalog={catalog} size="bar" />
+      </div>
+
+      {query ? <SearchResults catalog={catalog} query={query} /> : <BrowseAll />}
+    </Container>
+  );
+}
+
+function SearchResults({
+  catalog,
+  query,
+}: {
+  catalog: Awaited<ReturnType<typeof listVerifiedQuestions>>;
+  query: string;
+}) {
+  const results = searchQuestions(catalog, query, 50);
+  if (results.length === 0) {
+    return (
+      <div className="mt-8">
+        <SearchNoResults query={query} />
+      </div>
+    );
+  }
+  return (
+    <div className="mt-8">
+      <p className="text-muted-foreground mb-3 text-sm">
+        {results.length} verified {results.length === 1 ? 'answer' : 'answers'}
+      </p>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {results.map((r) => (
+          <VerifiedQuestionResult key={r.slug} item={r} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+async function BrowseAll() {
+  const groups = await listVerifiedByCategory();
+  if (groups.length === 0) {
+    return (
+      <div className="mt-8">
+        <SearchNoResults />
+      </div>
+    );
+  }
+  return (
+    <div className="mt-8 space-y-10">
+      {groups.map(({ category, questions }) => (
+        <section key={category} aria-label={category}>
+          <h2 className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+            {category} · {questions.length}
+          </h2>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {questions.map((q) => (
+              <VerifiedQuestionResult key={q.slug} item={q} />
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
+}
