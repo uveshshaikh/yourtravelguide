@@ -2,252 +2,344 @@ import {
   ArrowRight,
   BadgeCheck,
   Compass,
-  FileText,
-  HeartPulse,
+  FileSearch,
   Landmark,
-  ListChecks,
-  Luggage,
-  Plane,
+  Lock,
+  MessagesSquare,
+  ScrollText,
   ShieldCheck,
-  Wallet,
-  Zap,
-  type LucideIcon,
 } from 'lucide-react';
 import { Container } from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { QuestionSearch } from '@/components/search/question-search';
-import { LastVerifiedBadge } from '@/components/trust/trust-badges';
+import { QuestionCard } from '@/components/home/question-card';
+import { CategoryCard } from '@/components/home/category-card';
 import { verdictDisplay } from '@/components/decision/verdict-config';
-import { listVerifiedByCategory, listVerifiedQuestions } from '@/services/resolver/catalog';
+import {
+  listVerifiedByCategory,
+  listVerifiedQuestions,
+  recentlyVerified,
+} from '@/services/resolver/catalog';
+import { authoritiesCovered, CATEGORY_META, type Category } from '@/db/seed/content';
+import type { QuestionSummaryView } from '@/lib/knowledge/view';
+import { formatDate } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 
-/** Icon per category (falls back to a compass for anything new). */
-const categoryIcon: Record<string, LucideIcon> = {
-  'Documents & visas': FileText,
-  'Baggage & items': Luggage,
-  'Security & screening': ShieldCheck,
-  'Customs & duty-free': Landmark,
-  'At the airport': Plane,
-  'Money & currency': Wallet,
-  'Health & vaccines': HeartPulse,
-};
-
-const benefits = [
-  {
-    icon: Zap,
-    title: 'One clear answer',
-    body: 'The verdict comes first — not after 500 words. Decide in seconds, not minutes.',
-  },
+const trustPoints = [
   {
     icon: ShieldCheck,
-    title: 'Backed by official sources',
-    body: 'Every answer cites the authority behind it — DGCA, BCAS, CBIC, Passport Seva and more.',
+    title: 'Official sources only',
+    body: 'Every answer is built from a named authority — DGCA, BCAS, CBIC, Passport Seva, RBI.',
+  },
+  {
+    icon: BadgeCheck,
+    title: 'Verified & dated',
+    body: 'Each answer shows when it was last checked, so you know it’s current.',
   },
   {
     icon: Compass,
     title: 'Made for your trip',
-    body: 'Answers say exactly who and where they apply to — your route and traveller type.',
+    body: 'Answers say who and where they apply to — domestic or international.',
+  },
+  {
+    icon: Lock,
+    title: 'Nothing unverified',
+    body: 'If we can’t confirm it against an official source, we don’t publish it.',
   },
 ];
 
-const trustPoints = [
-  { icon: Landmark, label: 'Official sources' },
-  { icon: BadgeCheck, label: 'Last-verified dates' },
-  { icon: Compass, label: 'Applies-to clarity' },
-  { icon: ListChecks, label: 'Plain language' },
+const steps = [
+  {
+    icon: MessagesSquare,
+    title: 'Ask in plain words',
+    body: 'Type your question the way you’d say it. Search is instant and forgiving of typos.',
+  },
+  {
+    icon: FileSearch,
+    title: 'We map it to verified knowledge',
+    body: 'Your question is matched to an answer built from official authorities — never guessed.',
+  },
+  {
+    icon: BadgeCheck,
+    title: 'Get one clear verdict',
+    body: 'The answer leads with a plain verdict — Allowed, Required, Accepted — not 500 words.',
+  },
 ];
 
+/** Consistent section heading with an optional "see all" action. */
+function SectionHeading({
+  title,
+  description,
+  href,
+  linkLabel = 'See all',
+}: {
+  title: string;
+  description?: string;
+  href?: string;
+  linkLabel?: string;
+}) {
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="max-w-xl">
+        <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">{title}</h2>
+        {description ? <p className="text-muted-foreground mt-1.5 text-sm">{description}</p> : null}
+      </div>
+      {href ? (
+        <a
+          href={href}
+          className="text-primary inline-flex shrink-0 items-center gap-1.5 text-sm font-medium hover:underline"
+        >
+          {linkLabel} <ArrowRight className="size-4" aria-hidden />
+        </a>
+      ) : null}
+    </div>
+  );
+}
+
 export default async function HomePage() {
-  // Data-driven: everything below grows automatically as verified questions land.
-  const [catalog, groups] = await Promise.all([listVerifiedQuestions(), listVerifiedByCategory()]);
-  const popular = catalog.slice(0, 6);
-  const featured = catalog[0];
+  // Everything below is real Knowledge Core data — grows as content grows.
+  const [catalog, groups, recent] = await Promise.all([
+    listVerifiedQuestions(),
+    listVerifiedByCategory(),
+    recentlyVerified(9),
+  ]);
+  const authorities = authoritiesCovered();
+
+  // Popular = one representative question per category (variety, not repetition).
+  const popular = groups
+    .map((g) => g.questions[0])
+    .filter((qn): qn is QuestionSummaryView => Boolean(qn))
+    .slice(0, 6);
+  const popularSlugs = new Set(popular.map((p) => p.slug));
+  const latest = recent.filter((r) => !popularSlugs.has(r.slug)).slice(0, 5);
+  const answerCount = catalog.length;
 
   return (
     <>
-      {/* ── Hero + real search ───────────────────────────────────────────── */}
-      <section className="border-border border-b">
-        <Container className="py-16 sm:py-24">
+      {/* ── 1 & 2 & 3 · Who we are · why trust · search ──────────────────── */}
+      <section className="relative overflow-hidden">
+        <div
+          className="from-accent/60 pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-gradient-to-b to-transparent"
+          aria-hidden
+        />
+        <Container className="pt-16 pb-14 sm:pt-24 sm:pb-20">
           <div className="mx-auto max-w-2xl text-center">
-            <Badge variant="brand">Travel Decision Platform · India</Badge>
-            <h1 className="mt-5 text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
+            <Badge variant="brand" className="mb-5">
+              <ShieldCheck className="size-3.5" aria-hidden />
+              Travel Decision Platform · India
+            </Badge>
+            <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-[3.25rem] sm:leading-[1.05]">
               Travel answers you can trust — in seconds
             </h1>
-            <p className="text-muted-foreground mt-5 text-lg text-pretty">
-              Search a question and get one clear, source-verified answer — before, during, and
-              after your trip.
+            <p className="text-muted-foreground mx-auto mt-5 max-w-xl text-lg text-pretty">
+              Ask a question, get one clear answer — backed by an official source and dated so you
+              know it’s current. Before, during, and after your trip.
             </p>
 
-            <div className="mx-auto mt-8 max-w-xl">
+            <div className="mx-auto mt-8 max-w-xl text-left">
               <QuestionSearch catalog={catalog} />
             </div>
 
+            {/* Quick actions — real popular questions. */}
             {popular.length > 0 ? (
-              <div className="mt-6">
-                <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-                  Popular questions
-                </p>
-                <ul className="mt-3 flex flex-wrap justify-center gap-2">
-                  {popular.map((q) => (
-                    <li key={q.slug}>
-                      <a
-                        href={`/question/${q.slug}`}
-                        className="border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground inline-flex rounded-full border px-3 py-1.5 text-sm transition-colors"
-                      >
-                        {q.question}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <ul className="mt-5 flex flex-wrap justify-center gap-2">
+                {popular.slice(0, 4).map((qn) => (
+                  <li key={qn.slug}>
+                    <a
+                      href={`/question/${qn.slug}`}
+                      className="border-border bg-card/60 text-muted-foreground hover:border-primary/40 hover:text-foreground inline-flex rounded-full border px-3 py-1.5 text-sm transition-colors"
+                    >
+                      {qn.question}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             ) : null}
+
+            {/* Trust line — real authorities. */}
+            <p className="text-muted-foreground/80 mt-6 text-xs">
+              Sources include{' '}
+              <span className="text-foreground/70 font-medium">
+                {authorities
+                  .slice(0, 5)
+                  .map((a) => a.code)
+                  .join(' · ')}
+              </span>
+            </p>
           </div>
         </Container>
       </section>
 
-      {/* ── Trust strip ──────────────────────────────────────────────────── */}
-      <section className="border-border bg-subtle border-b">
-        <Container className="py-4">
-          <ul className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-sm">
-            {trustPoints.map(({ icon: Icon, label }) => (
-              <li key={label} className="inline-flex items-center gap-2">
-                <Icon className="text-primary size-4" aria-hidden />
-                {label}
-              </li>
+      {/* ── 2 · Why trust us ─────────────────────────────────────────────── */}
+      <section aria-labelledby="trust-heading" className="border-border bg-subtle border-y">
+        <Container className="py-12 sm:py-14">
+          <h2 id="trust-heading" className="sr-only">
+            Why you can trust these answers
+          </h2>
+          <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
+            {trustPoints.map(({ icon: Icon, title, body }) => (
+              <div key={title} className="flex gap-3">
+                <span className="bg-accent text-accent-foreground grid size-9 shrink-0 place-items-center rounded-lg">
+                  <Icon className="size-5" aria-hidden />
+                </span>
+                <div>
+                  <h3 className="text-sm font-semibold">{title}</h3>
+                  <p className="text-muted-foreground mt-0.5 text-sm text-pretty">{body}</p>
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
         </Container>
       </section>
 
-      {/* ── Featured verified answer (real, from the Knowledge Core) ──────── */}
-      {featured ? (
-        <section aria-labelledby="featured-heading">
-          <Container className="py-14 sm:py-16">
-            <p
-              id="featured-heading"
-              className="text-muted-foreground text-center text-xs font-semibold tracking-wide uppercase"
-            >
-              Featured verified answer
-            </p>
-            <a
-              href={`/question/${featured.slug}`}
-              className="border-border bg-card hover:border-primary/40 mx-auto mt-4 block max-w-3xl rounded-2xl border p-6 transition-colors sm:p-8"
-            >
-              <div className="flex flex-wrap items-center gap-2">
-                {(() => {
-                  const v = verdictDisplay(featured.answerKind, featured.verdict);
-                  return (
-                    <Badge variant={v.badge}>
-                      <v.Icon className="size-3.5" aria-hidden />
-                      {v.label}
-                    </Badge>
-                  );
-                })()}
-                {featured.lastVerified ? <LastVerifiedBadge date={featured.lastVerified} /> : null}
-                <span className="text-muted-foreground text-xs">{featured.appliesTo}</span>
-              </div>
-              <h2 className="mt-3 text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
-                {featured.question}
-              </h2>
-              <p className="text-muted-foreground mt-2 text-pretty">
-                Backed by official sources and recently verified — the kind of answer you can act on
-                with confidence.
-              </p>
-              <span className="text-primary mt-5 inline-flex items-center gap-1.5 text-sm font-medium">
-                Read the full answer <ArrowRight className="size-4" aria-hidden />
-              </span>
-            </a>
+      {/* ── 4 · Popular questions ────────────────────────────────────────── */}
+      {popular.length > 0 ? (
+        <section aria-labelledby="popular-heading">
+          <Container className="py-16 sm:py-20">
+            <SectionHeading
+              title="Popular questions"
+              description="The things travellers ask most, answered with a clear verdict."
+              href="/search"
+            />
+            <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {popular.map((qn) => (
+                <QuestionCard key={qn.slug} item={qn} />
+              ))}
+            </div>
           </Container>
         </section>
       ) : null}
 
-      {/* ── Browse by category (real verified questions, grouped) ─────────── */}
+      {/* ── 5 · Popular categories ───────────────────────────────────────── */}
       {groups.length > 0 ? (
-        <section aria-labelledby="browse-heading" className="border-border bg-subtle border-t">
+        <section aria-labelledby="categories-heading" className="border-border bg-subtle border-y">
           <Container className="py-16 sm:py-20">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <h2 id="browse-heading" className="text-2xl font-semibold tracking-tight">
-                  Browse by category
-                </h2>
-                <p className="text-muted-foreground mt-1 text-sm">
-                  {catalog.length} verified {catalog.length === 1 ? 'answer' : 'answers'} and
-                  growing — every one backed by an official source.
-                </p>
-              </div>
-              <a
-                href="/search"
-                className="text-primary inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
-              >
-                See all questions <ArrowRight className="size-4" aria-hidden />
-              </a>
+            <SectionHeading
+              title="Browse by category"
+              description={`${answerCount} verified answers across ${groups.length} areas of your journey.`}
+              href="/search"
+              linkLabel="All questions"
+            />
+            <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {groups.map((g) => (
+                <CategoryCard
+                  key={g.category}
+                  category={g.category}
+                  description={CATEGORY_META[g.category as Category] ?? ''}
+                  count={g.questions.length}
+                />
+              ))}
             </div>
+          </Container>
+        </section>
+      ) : null}
 
-            <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {groups.map(({ category, questions }) => {
-                const Icon = categoryIcon[category] ?? Compass;
+      {/* ── 6 · Recently verified ────────────────────────────────────────── */}
+      {latest.length > 0 ? (
+        <section aria-labelledby="recent-heading">
+          <Container className="py-16 sm:py-20">
+            <SectionHeading
+              title="Recently verified"
+              description="The latest answers we’ve checked against official sources."
+            />
+            <ul className="border-border divide-border mt-7 divide-y overflow-hidden rounded-2xl border">
+              {latest.map((r) => {
+                const v = verdictDisplay(r.answerKind, r.verdict);
                 return (
-                  <div
-                    key={category}
-                    className="border-border bg-card flex flex-col rounded-2xl border p-5"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className="bg-accent text-accent-foreground grid size-9 place-items-center rounded-lg">
-                        <Icon className="size-5" aria-hidden />
+                  <li key={r.slug}>
+                    <a
+                      href={`/question/${r.slug}`}
+                      className="group hover:bg-muted/50 flex items-center gap-4 px-5 py-3.5 transition-colors"
+                    >
+                      <span className={`size-2 shrink-0 rounded-full ${v.dot}`} aria-hidden />
+                      <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                        {r.question}
                       </span>
-                      <h3 className="font-semibold">{category}</h3>
-                      <span className="text-muted-foreground ml-auto text-xs">
-                        {questions.length}
-                      </span>
-                    </div>
-                    <ul className="mt-4 space-y-1">
-                      {questions.map((q) => {
-                        const v = verdictDisplay(q.answerKind, q.verdict);
-                        return (
-                          <li key={q.slug}>
-                            <a
-                              href={`/question/${q.slug}`}
-                              className="group hover:bg-muted -mx-2 flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors"
-                            >
-                              <span
-                                className={`size-1.5 shrink-0 rounded-full ${v.dot}`}
-                                aria-hidden
-                              />
-                              <span className="min-w-0 flex-1 truncate text-sm">{q.question}</span>
-                              <ArrowRight
-                                className="text-muted-foreground size-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
-                                aria-hidden
-                              />
-                            </a>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
+                      <Badge variant={v.badge} className="hidden sm:inline-flex">
+                        {v.label}
+                      </Badge>
+                      {r.lastVerified ? (
+                        <span className="text-muted-foreground hidden shrink-0 text-xs md:inline">
+                          {formatDate(r.lastVerified)}
+                        </span>
+                      ) : null}
+                      <ArrowRight
+                        className="text-muted-foreground/50 group-hover:text-primary size-4 shrink-0 transition-all group-hover:translate-x-0.5"
+                        aria-hidden
+                      />
+                    </a>
+                  </li>
                 );
               })}
+            </ul>
+          </Container>
+        </section>
+      ) : null}
+
+      {/* ── 7 · Official authorities covered ─────────────────────────────── */}
+      {authorities.length > 0 ? (
+        <section aria-labelledby="authorities-heading" className="border-border bg-subtle border-y">
+          <Container className="py-16 sm:py-20">
+            <SectionHeading
+              title="Official authorities we cite"
+              description="Every answer traces back to one of these regulators — no anonymous advice."
+            />
+            <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {authorities.map((a) => (
+                <div
+                  key={a.code}
+                  className="border-border bg-card flex items-start gap-3 rounded-2xl border p-5"
+                >
+                  <span className="bg-info-subtle text-info-subtle-foreground grid size-10 shrink-0 place-items-center rounded-xl">
+                    <Landmark className="size-5" aria-hidden />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="font-mono text-sm font-semibold">{a.code}</p>
+                    <p className="mt-0.5 text-sm font-medium">{a.name}</p>
+                    <p className="text-muted-foreground mt-1 text-xs text-pretty">
+                      {a.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </Container>
         </section>
       ) : null}
 
-      {/* ── Why it helps ─────────────────────────────────────────────────── */}
-      <section aria-labelledby="benefits-heading" className="border-border border-t">
+      {/* ── 8 · How answers work ─────────────────────────────────────────── */}
+      <section aria-labelledby="how-heading">
         <Container className="py-16 sm:py-20">
-          <h2 id="benefits-heading" className="sr-only">
-            Why YourTravelGuide
-          </h2>
-          <div className="grid gap-6 md:grid-cols-3">
-            {benefits.map(({ icon: Icon, title, body }) => (
-              <div key={title} className="border-border bg-card rounded-xl border p-6">
-                <span className="bg-accent text-accent-foreground grid size-10 place-items-center rounded-lg">
-                  <Icon className="size-5" aria-hidden />
-                </span>
+          <SectionHeading
+            title="How our answers work"
+            description="A simple, honest pipeline — no AI guessing, no filler."
+          />
+          <ol className="mt-8 grid gap-6 md:grid-cols-3">
+            {steps.map(({ icon: Icon, title, body }, i) => (
+              <li key={title} className="relative">
+                <div className="flex items-center gap-3">
+                  <span className="border-border bg-card text-muted-foreground grid size-8 shrink-0 place-items-center rounded-full border text-sm font-semibold">
+                    {i + 1}
+                  </span>
+                  <span className="text-primary">
+                    <Icon className="size-5" aria-hidden />
+                  </span>
+                </div>
                 <h3 className="mt-4 font-semibold">{title}</h3>
-                <p className="text-muted-foreground mt-2 text-sm">{body}</p>
-              </div>
+                <p className="text-muted-foreground mt-1.5 text-sm text-pretty">{body}</p>
+              </li>
             ))}
+          </ol>
+          <div className="border-border bg-subtle text-muted-foreground mt-8 flex items-start gap-3 rounded-2xl border p-5 text-sm">
+            <ScrollText className="text-primary mt-0.5 size-5 shrink-0" aria-hidden />
+            <p className="text-pretty">
+              We publish nothing we can’t verify. When the evidence isn’t strong enough yet, the
+              page stays in review rather than showing a guess —{' '}
+              <span className="text-foreground font-medium">
+                we’d rather show nothing than something wrong.
+              </span>
+            </p>
           </div>
         </Container>
       </section>

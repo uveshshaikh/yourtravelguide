@@ -987,6 +987,32 @@ export const categoryForSlug = (slug: string): Category | undefined =>
 export const answerKindForSlug = (slug: string): AnswerKind =>
   TRAVEL_QUESTIONS.find((q) => q.slug === slug)?.answerKind ?? 'carry';
 
+/** One honest line describing what each category covers (for the category cards). */
+export const CATEGORY_META: Record<Category, string> = {
+  'Documents & visas': 'Passports, visas and the ID you need to fly.',
+  'Baggage & items': 'What you can pack in cabin and checked bags.',
+  'Security & screening': 'Prohibited items and what to expect at screening.',
+  'Customs & duty-free': 'Allowances and what to declare on arrival.',
+  'At the airport': 'Check-in, timing and getting through faster.',
+  'Money & currency': 'Cash, foreign exchange and currency limits.',
+  'Health & vaccines': 'Vaccination rules and travelling with medicines.',
+};
+
+/**
+ * The official authorities that actually back published answers — derived from
+ * the content registry, never a hardcoded marketing list. Ordered as declared.
+ */
+export function authoritiesCovered(): { code: string; name: string; description: string }[] {
+  const used = new Set(TRAVEL_QUESTIONS.map((q) => q.authority));
+  return (Object.keys(AUTHORITIES) as AuthorityCode[])
+    .filter((code) => used.has(code))
+    .map((code) => ({
+      code: code.toUpperCase(),
+      name: AUTHORITIES[code].name,
+      description: AUTHORITIES[code].description,
+    }));
+}
+
 /**
  * slug → short applicability label ("Domestic flights", "International travel"…).
  * Descriptive only — travelType is deliberately kept out of the claim scope so

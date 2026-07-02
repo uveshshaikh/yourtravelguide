@@ -59,6 +59,12 @@ export async function listVerifiedQuestions(): Promise<QuestionSummaryView[]> {
   return out;
 }
 
+/** The N most recently verified questions (already ordered newest-first). */
+export async function recentlyVerified(limit = 6): Promise<QuestionSummaryView[]> {
+  const all = await listVerifiedQuestions();
+  return all.slice(0, limit);
+}
+
 export interface CategoryGroup {
   category: string;
   questions: QuestionSummaryView[];

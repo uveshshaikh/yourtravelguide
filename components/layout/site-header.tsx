@@ -7,15 +7,15 @@ import { MobileNav } from '@/components/layout/mobile-nav';
 import { primaryNav } from '@/config/navigation';
 
 /**
- * Permanent application header. Sticky, calm, minimal. Renders primary nav +
- * mobile menu ONLY when there are real destinations (no dead links) — until
- * domain hubs exist, search is the primary navigation.
+ * Permanent application header. Sticky, calm, minimal. Search is the primary
+ * navigation, so it gets the most prominent slot. Primary nav + mobile menu
+ * render ONLY when there are real destinations (no dead links).
  */
 export function SiteHeader() {
   const hasNav = primaryNav.length > 0;
   return (
-    <header className="border-border bg-background/90 supports-[backdrop-filter]:bg-background/75 sticky top-0 z-40 border-b backdrop-blur">
-      <Container className="relative flex h-16 items-center gap-4">
+    <header className="border-border bg-background/80 supports-[backdrop-filter]:bg-background/65 sticky top-0 z-40 border-b backdrop-blur-lg">
+      <Container className="flex h-16 items-center gap-4">
         <Logo />
 
         {hasNav ? (
@@ -32,14 +32,16 @@ export function SiteHeader() {
           </nav>
         ) : null}
 
-        <div className="ml-auto flex items-center gap-1.5">
-          <div className="hidden w-56 sm:block lg:w-64">
-            <SearchTrigger />
-          </div>
+        {/* Search — the prominent, primary action. */}
+        <div className="ml-auto hidden max-w-sm flex-1 sm:block">
+          <SearchTrigger />
+        </div>
+
+        <div className="ml-auto flex items-center gap-1 sm:ml-0">
           <a
             href="/search"
             aria-label="Search questions"
-            className="text-muted-foreground hover:bg-muted hover:text-foreground inline-grid size-9 place-items-center rounded-md transition-colors sm:hidden"
+            className="text-muted-foreground hover:bg-muted hover:text-foreground inline-grid size-9 place-items-center rounded-lg transition-colors sm:hidden"
           >
             <Search className="size-5" aria-hidden />
           </a>
