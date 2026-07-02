@@ -2,11 +2,10 @@ import {
   ArrowRight,
   BadgeCheck,
   Compass,
-  FileSearch,
   Landmark,
   Lock,
-  MessagesSquare,
-  ScrollText,
+  Plane,
+  Search,
   ShieldCheck,
 } from 'lucide-react';
 import { Container } from '@/components/layout/container';
@@ -18,10 +17,10 @@ import { verdictDisplay } from '@/components/decision/verdict-config';
 import {
   listVerifiedByCategory,
   listVerifiedQuestions,
+  popularQuestions,
   recentlyVerified,
 } from '@/services/resolver/catalog';
 import { authoritiesCovered, CATEGORY_META, type Category } from '@/db/seed/content';
-import type { QuestionSummaryView } from '@/lib/knowledge/view';
 import { formatDate } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -51,19 +50,19 @@ const trustPoints = [
 
 const steps = [
   {
-    icon: MessagesSquare,
-    title: 'Ask in plain words',
-    body: 'Type your question the way you’d say it. Search is instant and forgiving of typos.',
-  },
-  {
-    icon: FileSearch,
-    title: 'We map it to verified knowledge',
-    body: 'Your question is matched to an answer built from official authorities — never guessed.',
+    icon: Search,
+    title: 'Search',
+    body: 'Type your question in plain words. Instant, typo-tolerant, and verified-only.',
   },
   {
     icon: BadgeCheck,
-    title: 'Get one clear verdict',
-    body: 'The answer leads with a plain verdict — Allowed, Required, Accepted — not 500 words.',
+    title: 'Read the decision',
+    body: 'One clear verdict — Allowed, Required, Accepted — with just the details that matter.',
+  },
+  {
+    icon: Plane,
+    title: 'Travel with confidence',
+    body: 'Every answer is backed by an official source and dated, so you can act on it.',
   },
 ];
 
@@ -99,18 +98,14 @@ function SectionHeading({
 
 export default async function HomePage() {
   // Everything below is real Knowledge Core data — grows as content grows.
-  const [catalog, groups, recent] = await Promise.all([
+  const [catalog, groups, popular, recent] = await Promise.all([
     listVerifiedQuestions(),
     listVerifiedByCategory(),
+    popularQuestions(6),
     recentlyVerified(9),
   ]);
   const authorities = authoritiesCovered();
 
-  // Popular = one representative question per category (variety, not repetition).
-  const popular = groups
-    .map((g) => g.questions[0])
-    .filter((qn): qn is QuestionSummaryView => Boolean(qn))
-    .slice(0, 6);
   const popularSlugs = new Set(popular.map((p) => p.slug));
   const latest = recent.filter((r) => !popularSlugs.has(r.slug)).slice(0, 5);
   const answerCount = catalog.length;
@@ -308,39 +303,39 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      {/* ── 8 · How answers work ─────────────────────────────────────────── */}
+      {/* ── 8 · How YourTravelGuide works (three steps) ──────────────────── */}
       <section aria-labelledby="how-heading">
         <Container className="py-16 sm:py-20">
-          <SectionHeading
-            title="How our answers work"
-            description="A simple, honest pipeline — no AI guessing, no filler."
-          />
-          <ol className="mt-8 grid gap-6 md:grid-cols-3">
+          <h2
+            id="how-heading"
+            className="text-center text-xl font-semibold tracking-tight sm:text-2xl"
+          >
+            How YourTravelGuide works
+          </h2>
+          <ol className="mx-auto mt-10 grid max-w-4xl items-start gap-8 md:grid-cols-3 md:gap-4">
             {steps.map(({ icon: Icon, title, body }, i) => (
-              <li key={title} className="relative">
-                <div className="flex items-center gap-3">
-                  <span className="border-border bg-card text-muted-foreground grid size-8 shrink-0 place-items-center rounded-full border text-sm font-semibold">
+              <li key={title} className="relative flex flex-col items-center text-center">
+                <span className="bg-accent text-accent-foreground ring-accent/40 grid size-14 place-items-center rounded-2xl ring-8">
+                  <Icon className="size-6" aria-hidden />
+                </span>
+                <h3 className="mt-5 font-semibold">
+                  <span className="text-muted-foreground mr-1.5 text-sm font-normal tabular-nums">
                     {i + 1}
                   </span>
-                  <span className="text-primary">
-                    <Icon className="size-5" aria-hidden />
-                  </span>
-                </div>
-                <h3 className="mt-4 font-semibold">{title}</h3>
-                <p className="text-muted-foreground mt-1.5 text-sm text-pretty">{body}</p>
+                  {title}
+                </h3>
+                <p className="text-muted-foreground mt-1.5 max-w-[26ch] text-sm text-pretty">
+                  {body}
+                </p>
+                {i < steps.length - 1 ? (
+                  <ArrowRight
+                    className="text-border absolute top-6 -right-2 hidden size-5 md:block"
+                    aria-hidden
+                  />
+                ) : null}
               </li>
             ))}
           </ol>
-          <div className="border-border bg-subtle text-muted-foreground mt-8 flex items-start gap-3 rounded-2xl border p-5 text-sm">
-            <ScrollText className="text-primary mt-0.5 size-5 shrink-0" aria-hidden />
-            <p className="text-pretty">
-              We publish nothing we can’t verify. When the evidence isn’t strong enough yet, the
-              page stays in review rather than showing a guess —{' '}
-              <span className="text-foreground font-medium">
-                we’d rather show nothing than something wrong.
-              </span>
-            </p>
-          </div>
         </Container>
       </section>
     </>

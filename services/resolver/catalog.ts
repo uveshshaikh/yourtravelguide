@@ -1,7 +1,13 @@
 import 'server-only';
 import { topicRepository } from '@/repositories/topic.repo';
 import type { QuestionSummaryView } from '@/lib/knowledge/view';
-import { answerKindForSlug, appliesToLabel, CATEGORIES, categoryForSlug } from '@/db/seed/content';
+import {
+  answerKindForSlug,
+  appliesToLabel,
+  CATEGORIES,
+  categoryForSlug,
+  PREFERRED_POPULAR,
+} from '@/db/seed/content';
 
 /**
  * The verified-question catalog — the search index + homepage source.
@@ -63,6 +69,28 @@ export async function listVerifiedQuestions(): Promise<QuestionSummaryView[]> {
 export async function recentlyVerified(limit = 6): Promise<QuestionSummaryView[]> {
   const all = await listVerifiedQuestions();
   return all.slice(0, limit);
+}
+
+/**
+ * Homepage "Popular" — known traveller demand first (only verified slugs that
+ * exist), then filled from the rest of the catalog. Grows automatically.
+ */
+export async function popularQuestions(limit = 8): Promise<QuestionSummaryView[]> {
+  const all = await listVerifiedQuestions();
+  const bySlug = new Map(all.map((q) => [q.slug, q]));
+  const out: QuestionSummaryView[] = [];
+  for (const slug of PREFERRED_POPULAR) {
+    const q = bySlug.get(slug);
+    if (q) {
+      out.push(q);
+      bySlug.delete(slug);
+    }
+  }
+  for (const q of bySlug.values()) {
+    if (out.length >= limit) break;
+    out.push(q);
+  }
+  return out.slice(0, limit);
 }
 
 export interface CategoryGroup {

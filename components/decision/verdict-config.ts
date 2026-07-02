@@ -65,6 +65,16 @@ export const verdictVisuals: Record<Verdict, VerdictVisual> = {
  * Tone = the visual polarity a verdict carries once worded for its AnswerKind.
  * It reuses the verdict colour tokens so the whole platform shares one palette.
  */
+/** Human-readable decision-type name (shown as a small tag on cards). */
+export const answerKindLabel: Record<AnswerKind, string> = {
+  carry: 'Carry rule',
+  requirement: 'Requirement',
+  validity: 'Validity',
+  acceptance: 'Acceptance',
+  recommendation: 'Recommendation',
+  eligibility: 'Eligibility',
+};
+
 export type VerdictTone = 'positive' | 'conditional' | 'negative' | 'neutral';
 
 const toneToVerdict: Record<VerdictTone, Verdict> = {

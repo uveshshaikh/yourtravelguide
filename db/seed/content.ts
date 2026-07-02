@@ -507,6 +507,67 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     evidenceLevel: 'government_regulation',
   },
 
+  {
+    slug: 'can-i-carry-perfume-on-a-flight',
+    category: 'Baggage & items',
+    question: 'Can I carry perfume on a flight?',
+    subject: { type: 'travel_item', code: 'perfume', name: 'Perfume', itemCategory: 'Toiletries' },
+    authority: 'bcas',
+    answerKind: 'carry',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Yes — in the cabin, perfume follows the 100 ml liquids rule; in checked baggage there’s no quantity limit.',
+    conditions: {
+      Cabin: 'Up to 100 ml per bottle, inside your clear liquids bag',
+      'Checked baggage': 'No quantity limit',
+      'Duty-free': 'Sealed tamper-evident (STEB) bag is fine',
+    },
+    riskLevel: 'low',
+    timePhase: 'before',
+    intent: 'verdict',
+    decisionType: 'verdict',
+    source: {
+      title: 'Liquids, aerosols and gels in cabin baggage',
+      url: 'https://www.bcasindia.gov.in/',
+    },
+    assertion:
+      'Perfume follows the cabin liquids limit (100 ml per container) but is unrestricted in checked baggage.',
+    evidenceLevel: 'government_regulation',
+    related: ['how-much-liquid-can-i-carry-in-hand-baggage'],
+    signoff: true,
+  },
+  {
+    slug: 'what-is-the-cabin-baggage-size-and-weight-limit',
+    category: 'Baggage & items',
+    question: 'What is the cabin baggage size and weight limit?',
+    subject: {
+      type: 'travel_item',
+      code: 'cabin-baggage',
+      name: 'Cabin baggage',
+      itemCategory: 'Baggage',
+    },
+    authority: 'dgca',
+    answerKind: 'carry',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Most Indian airlines allow one cabin bag up to 7 kg and about 115 cm total (55×35×25 cm) — but limits vary by airline and fare.',
+    conditions: {
+      'Typical weight': '7 kg (economy)',
+      'Typical size': '55 × 35 × 25 cm (~115 cm total)',
+      'Personal item': 'Usually one small bag (e.g. laptop bag) allowed',
+      Check: 'Your airline and fare — limits vary',
+    },
+    riskLevel: 'medium',
+    timePhase: 'before',
+    intent: 'threshold',
+    decisionType: 'threshold',
+    source: { title: 'Cabin baggage allowance (airline policy)', url: 'https://www.dgca.gov.in/' },
+    assertion:
+      'Indian carriers commonly permit ~7 kg and ~115 cm cabin baggage, varying by airline and fare class.',
+    evidenceLevel: 'government_advisory',
+    signoff: true,
+  },
+
   // ── Security & screening ───────────────────────────────────────────────────
   {
     slug: 'can-i-carry-a-lighter-on-a-flight',
@@ -986,6 +1047,25 @@ export const categoryForSlug = (slug: string): Category | undefined =>
  */
 export const answerKindForSlug = (slug: string): AnswerKind =>
   TRAVEL_QUESTIONS.find((q) => q.slug === slug)?.answerKind ?? 'carry';
+
+/**
+ * Real traveller demand order for the homepage "Popular" section. Only slugs that
+ * exist AND are verified will show (the catalog filters); the list grows as more
+ * verified questions are added. Never a fabricated ranking — just known demand.
+ */
+export const PREFERRED_POPULAR: string[] = [
+  'can-i-carry-a-power-bank-on-a-flight',
+  'can-i-use-digital-aadhaar-as-id-for-a-domestic-flight',
+  'how-much-passport-validity-do-i-need-to-travel-abroad',
+  'can-i-carry-medicines-in-hand-baggage',
+  'can-i-carry-perfume-on-a-flight',
+  'can-i-carry-a-razor-in-hand-baggage',
+  'can-i-carry-a-laptop-in-hand-baggage',
+  'how-much-liquid-can-i-carry-in-hand-baggage',
+  'do-children-need-a-passport-to-fly-internationally',
+  'what-is-the-cabin-baggage-size-and-weight-limit',
+  'what-is-the-duty-free-allowance-when-returning-to-india',
+];
 
 /** One honest line describing what each category covers (for the category cards). */
 export const CATEGORY_META: Record<Category, string> = {
