@@ -1,146 +1,79 @@
-import {
-  ArrowRight,
-  BadgeCheck,
-  Compass,
-  Landmark,
-  Lock,
-  Plane,
-  Search,
-  ShieldCheck,
-} from 'lucide-react';
+import { ArrowRight, BadgeCheck, Lock, Plane, Search, ShieldCheck } from 'lucide-react';
 import { Container } from '@/components/layout/container';
-import { Badge } from '@/components/ui/badge';
 import { QuestionSearch } from '@/components/search/question-search';
 import { QuestionCard } from '@/components/home/question-card';
-import { IntentCard } from '@/components/home/intent-card';
-import { verdictDisplay } from '@/components/decision/verdict-config';
 import {
   listByIntentGroup,
   listVerifiedQuestions,
   popularQuestions,
-  recentlyVerified,
 } from '@/services/resolver/catalog';
 import { authoritiesCovered } from '@/db/seed/content';
-import { formatDate } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 
 const trustPoints = [
-  {
-    icon: ShieldCheck,
-    title: 'Official sources only',
-    body: 'Every answer is built from a named authority — DGCA, BCAS, CBIC, Passport Seva, RBI.',
-  },
-  {
-    icon: BadgeCheck,
-    title: 'Verified & dated',
-    body: 'Each answer shows when it was last checked, so you know it’s current.',
-  },
-  {
-    icon: Compass,
-    title: 'Made for your trip',
-    body: 'Answers say who and where they apply to — domestic or international.',
-  },
-  {
-    icon: Lock,
-    title: 'Nothing unverified',
-    body: 'If we can’t confirm it against an official source, we don’t publish it.',
-  },
+  { icon: ShieldCheck, label: 'Official sources only' },
+  { icon: BadgeCheck, label: 'Last-verified dates' },
+  { icon: Lock, label: 'Nothing unverified' },
 ];
 
 const steps = [
   {
     icon: Search,
     title: 'Search',
-    body: 'Type your question in plain words. Instant, typo-tolerant, and verified-only.',
+    body: 'Type your question in plain words — instant and verified-only.',
   },
   {
     icon: BadgeCheck,
     title: 'Read the decision',
-    body: 'One clear verdict — Allowed, Required, Accepted — with just the details that matter.',
+    body: 'One clear verdict with only the details that matter.',
   },
   {
     icon: Plane,
     title: 'Travel with confidence',
-    body: 'Every answer is backed by an official source and dated, so you can act on it.',
+    body: 'Backed by an official source and dated, so you can act on it.',
   },
 ];
 
-/** Consistent section heading with an optional "see all" action. */
-function SectionHeading({
-  title,
-  description,
-  href,
-  linkLabel = 'See all',
-}: {
-  title: string;
-  description?: string;
-  href?: string;
-  linkLabel?: string;
-}) {
-  return (
-    <div className="flex flex-wrap items-end justify-between gap-3">
-      <div className="max-w-xl">
-        <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">{title}</h2>
-        {description ? <p className="text-muted-foreground mt-1.5 text-sm">{description}</p> : null}
-      </div>
-      {href ? (
-        <a
-          href={href}
-          className="text-primary inline-flex shrink-0 items-center gap-1.5 text-sm font-medium hover:underline"
-        >
-          {linkLabel} <ArrowRight className="size-4" aria-hidden />
-        </a>
-      ) : null}
-    </div>
-  );
-}
-
 export default async function HomePage() {
-  // Everything below is real Knowledge Core data — grows as content grows.
-  const [catalog, intentGroups, popular, recent] = await Promise.all([
+  const [catalog, popular, intentGroups] = await Promise.all([
     listVerifiedQuestions(),
-    listByIntentGroup(),
     popularQuestions(6),
-    recentlyVerified(9),
+    listByIntentGroup(),
   ]);
   const authorities = authoritiesCovered();
-
-  const popularSlugs = new Set(popular.map((p) => p.slug));
-  const latest = recent.filter((r) => !popularSlugs.has(r.slug)).slice(0, 5);
-  const answerCount = catalog.length;
+  const journeys = intentGroups.map((g) => g.group);
 
   return (
     <>
-      {/* ── 1 & 2 & 3 · Who we are · why trust · search ──────────────────── */}
+      {/* ── Hero — search is the hero ────────────────────────────────────── */}
       <section className="relative isolate overflow-hidden">
-        {/* Soft, premium glow behind the search — calm, not a hard band. */}
         <div
-          className="bg-primary/10 pointer-events-none absolute top-[-14%] left-1/2 -z-10 h-[380px] w-[760px] max-w-[120vw] -translate-x-1/2 rounded-full blur-3xl"
+          className="bg-primary/10 pointer-events-none absolute top-[-18%] left-1/2 -z-10 h-[420px] w-[820px] max-w-[130vw] -translate-x-1/2 rounded-full blur-3xl"
           aria-hidden
         />
-        <Container className="pt-16 pb-16 sm:pt-24 sm:pb-24">
-          <div className="mx-auto max-w-2xl text-center">
-            <Badge variant="brand" className="mb-6">
-              <ShieldCheck className="size-3.5" aria-hidden />
-              Travel Decision Platform · India
-            </Badge>
-            <h1 className="text-[2.5rem] leading-[1.08] font-semibold tracking-tight text-balance sm:text-[3.25rem]">
-              Travel answers you can <span className="text-primary">trust</span> — in seconds
+        <Container className="pt-20 pb-14 sm:pt-28 sm:pb-20">
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="border-border bg-card text-muted-foreground mx-auto inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium shadow-sm">
+              <ShieldCheck className="text-primary size-3.5" aria-hidden />
+              Verified travel answers for India
+            </span>
+
+            <h1 className="mt-6 text-[2.75rem] leading-[1.05] font-semibold tracking-tight text-balance sm:text-6xl">
+              Clear answers to <span className="text-primary">every travel question</span>
             </h1>
-            <p className="text-muted-foreground mx-auto mt-5 max-w-lg text-lg text-pretty">
-              One clear answer, backed by an official source and dated — before, during, and after
-              your trip.
+            <p className="text-muted-foreground mx-auto mt-5 max-w-xl text-lg text-pretty">
+              Can I carry it? Do I need it? Get one plain answer — backed by an official source and
+              dated so you know it’s current.
             </p>
 
-            <div className="mx-auto mt-9 max-w-xl text-left">
+            <div className="mx-auto mt-9 max-w-2xl text-left">
               <QuestionSearch catalog={catalog} />
             </div>
 
-            {/* Quick actions — real popular questions. */}
             {popular.length > 0 ? (
               <ul className="mt-5 flex flex-wrap justify-center gap-2">
-                {popular.slice(0, 4).map((qn) => (
+                {popular.slice(0, 5).map((qn) => (
                   <li key={qn.slug}>
                     <a
                       href={`/question/${qn.slug}`}
@@ -153,8 +86,7 @@ export default async function HomePage() {
               </ul>
             ) : null}
 
-            {/* Trust line — real authorities. */}
-            <p className="text-muted-foreground mt-7 text-xs">
+            <p className="text-muted-foreground mt-8 text-xs">
               Sources include{' '}
               <span className="text-foreground font-medium">
                 {authorities
@@ -167,38 +99,22 @@ export default async function HomePage() {
         </Container>
       </section>
 
-      {/* ── 2 · Why trust us ─────────────────────────────────────────────── */}
-      <section aria-labelledby="trust-heading" className="border-border bg-subtle border-t">
-        <Container className="py-14 sm:py-16">
-          <h2 id="trust-heading" className="sr-only">
-            Why you can trust these answers
-          </h2>
-          <div className="grid gap-x-8 gap-y-7 sm:grid-cols-2 lg:grid-cols-4">
-            {trustPoints.map(({ icon: Icon, title, body }) => (
-              <div key={title} className="flex gap-3.5">
-                <span className="bg-muted text-primary grid size-10 shrink-0 place-items-center rounded-xl">
-                  <Icon className="size-5" aria-hidden />
-                </span>
-                <div>
-                  <h3 className="text-sm font-semibold">{title}</h3>
-                  <p className="text-muted-foreground mt-1 text-sm text-pretty">{body}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Container>
-      </section>
-
-      {/* ── 4 · Popular questions ────────────────────────────────────────── */}
+      {/* ── Popular answers — the fast path & proof of value ─────────────── */}
       {popular.length > 0 ? (
         <section aria-labelledby="popular-heading">
-          <Container className="py-16 sm:py-20">
-            <SectionHeading
-              title="Popular questions"
-              description="The things travellers ask most, answered with a clear verdict."
-              href="/search"
-            />
-            <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <Container className="pb-4">
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <h2 id="popular-heading" className="text-xl font-semibold tracking-tight sm:text-2xl">
+                Popular questions
+              </h2>
+              <a
+                href="/search"
+                className="text-primary inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
+              >
+                Browse all <ArrowRight className="size-4" aria-hidden />
+              </a>
+            </div>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {popular.map((qn) => (
                 <QuestionCard key={qn.slug} item={qn} />
               ))}
@@ -207,106 +123,73 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      {/* ── 5 · Discover by journey stage (traveller intent) ─────────────── */}
-      {intentGroups.length > 0 ? (
-        <section aria-labelledby="intent-heading" className="border-border bg-subtle border-y">
-          <Container className="py-16 sm:py-20">
-            <SectionHeading
-              title="Find answers for your journey"
-              description={`${answerCount} verified answers, organised by where you are — from packing to arrival.`}
-              href="/search"
-              linkLabel="All questions"
-            />
-            <div className="mt-7 grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {intentGroups.map((g) => (
-                <IntentCard
-                  key={g.group}
-                  group={g.group}
-                  description={g.description}
-                  questions={g.questions}
-                />
-              ))}
+      {/* ── Explore by journey — lightweight discovery ───────────────────── */}
+      {journeys.length > 0 ? (
+        <section aria-labelledby="journeys-heading">
+          <Container className="py-14 sm:py-16">
+            <div className="border-border bg-subtle rounded-3xl border p-6 sm:p-8">
+              <h2 id="journeys-heading" className="text-base font-semibold">
+                Explore by where you are in your journey
+              </h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                From packing to arrival — find the questions that matter at each step.
+              </p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {journeys.map((j) => (
+                  <a
+                    key={j}
+                    href="/search"
+                    className="border-border bg-card hover:border-primary/40 hover:text-primary inline-flex items-center rounded-full border px-3.5 py-1.5 text-sm font-medium shadow-sm transition-colors"
+                  >
+                    {j}
+                  </a>
+                ))}
+              </div>
             </div>
           </Container>
         </section>
       ) : null}
 
-      {/* ── 6 · Recently verified ────────────────────────────────────────── */}
-      {latest.length > 0 ? (
-        <section aria-labelledby="recent-heading">
-          <Container className="py-16 sm:py-20">
-            <SectionHeading
-              title="Recently verified"
-              description="The latest answers we’ve checked against official sources."
-            />
-            <ul className="border-border divide-border bg-card mt-7 divide-y overflow-hidden rounded-2xl border shadow-sm">
-              {latest.map((r) => {
-                const v = verdictDisplay(r.answerKind, r.verdict);
-                return (
-                  <li key={r.slug}>
-                    <a
-                      href={`/question/${r.slug}`}
-                      className="group hover:bg-muted/50 flex items-center gap-4 px-5 py-3.5 transition-colors"
-                    >
-                      <span className={`size-2 shrink-0 rounded-full ${v.dot}`} aria-hidden />
-                      <span className="min-w-0 flex-1 truncate text-sm font-medium">
-                        {r.question}
-                      </span>
-                      <Badge variant={v.badge} className="hidden sm:inline-flex">
-                        {v.label}
-                      </Badge>
-                      {r.lastVerified ? (
-                        <span className="text-muted-foreground hidden shrink-0 text-xs md:inline">
-                          {formatDate(r.lastVerified)}
-                        </span>
-                      ) : null}
-                      <ArrowRight
-                        className="text-muted-foreground/50 group-hover:text-primary size-4 shrink-0 transition-all group-hover:translate-x-0.5"
-                        aria-hidden
-                      />
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </Container>
-        </section>
-      ) : null}
+      {/* ── Trust + authorities (one calm band) ──────────────────────────── */}
+      <section aria-labelledby="trust-heading" className="border-border bg-subtle border-y">
+        <Container className="py-14 sm:py-16">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 id="trust-heading" className="text-xl font-semibold tracking-tight sm:text-2xl">
+              Every answer is backed by an official source
+            </h2>
+            <p className="text-muted-foreground mx-auto mt-2 max-w-lg text-sm text-pretty">
+              No anonymous advice. Each answer traces to a named Indian authority and shows when it
+              was last verified.
+            </p>
 
-      {/* ── 7 · Official authorities covered ─────────────────────────────── */}
-      {authorities.length > 0 ? (
-        <section aria-labelledby="authorities-heading" className="border-border bg-subtle border-y">
-          <Container className="py-16 sm:py-20">
-            <SectionHeading
-              title="Official authorities we cite"
-              description="Every answer traces back to one of these regulators — no anonymous advice."
-            />
-            <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {authorities.map((a) => (
-                <div
-                  key={a.code}
-                  className="border-border bg-card flex items-start gap-3.5 rounded-2xl border p-5 shadow-sm transition-shadow hover:shadow-md"
+            <ul className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2">
+              {trustPoints.map(({ icon: Icon, label }) => (
+                <li
+                  key={label}
+                  className="text-muted-foreground inline-flex items-center gap-2 text-sm"
                 >
-                  <span className="bg-muted text-primary grid size-10 shrink-0 place-items-center rounded-xl">
-                    <Landmark className="size-5" aria-hidden />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="text-primary font-mono text-xs font-semibold tracking-wide">
-                      {a.code}
-                    </p>
-                    <p className="mt-1 text-sm font-semibold">{a.name}</p>
-                    <p className="text-muted-foreground mt-1 text-xs leading-relaxed text-pretty">
-                      {a.description}
-                    </p>
-                  </div>
-                </div>
+                  <Icon className="text-primary size-4" aria-hidden />
+                  {label}
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-7 flex flex-wrap justify-center gap-2">
+              {authorities.map((a) => (
+                <span
+                  key={a.code}
+                  title={a.name}
+                  className="border-border bg-card text-foreground rounded-lg border px-3 py-1.5 font-mono text-xs font-semibold shadow-sm"
+                >
+                  {a.code}
+                </span>
               ))}
             </div>
-          </Container>
-        </section>
-      ) : null}
+          </div>
+        </Container>
+      </section>
 
-      {/* ── 8 · How YourTravelGuide works (three steps) ──────────────────── */}
+      {/* ── How it works (three steps) ───────────────────────────────────── */}
       <section aria-labelledby="how-heading">
         <Container className="py-16 sm:py-20">
           <h2
@@ -318,7 +201,7 @@ export default async function HomePage() {
           <ol className="mx-auto mt-10 grid max-w-4xl items-start gap-8 md:grid-cols-3 md:gap-4">
             {steps.map(({ icon: Icon, title, body }, i) => (
               <li key={title} className="relative flex flex-col items-center text-center">
-                <span className="bg-accent text-accent-foreground ring-accent/40 grid size-14 place-items-center rounded-2xl ring-8">
+                <span className="bg-accent text-primary ring-accent/50 grid size-14 place-items-center rounded-2xl ring-8">
                   <Icon className="size-6" aria-hidden />
                 </span>
                 <h3 className="mt-5 font-semibold">
