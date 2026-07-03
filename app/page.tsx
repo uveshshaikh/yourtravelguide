@@ -2,10 +2,13 @@ import { ArrowRight, BadgeCheck, Lock, Plane, Search, ShieldCheck } from 'lucide
 import { Container } from '@/components/layout/container';
 import { QuestionSearch } from '@/components/search/question-search';
 import { QuestionCard } from '@/components/home/question-card';
+import { IntentCard } from '@/components/home/intent-card';
+import { PreflightChecklist } from '@/components/home/preflight-checklist';
 import {
   listByIntentGroup,
   listVerifiedQuestions,
   popularQuestions,
+  preflightChecklist,
 } from '@/services/resolver/catalog';
 import { authoritiesCovered } from '@/db/seed/content';
 
@@ -36,13 +39,13 @@ const steps = [
 ];
 
 export default async function HomePage() {
-  const [catalog, popular, intentGroups] = await Promise.all([
+  const [catalog, popular, intentGroups, checklist] = await Promise.all([
     listVerifiedQuestions(),
     popularQuestions(6),
     listByIntentGroup(),
+    preflightChecklist(),
   ]);
   const authorities = authoritiesCovered();
-  const journeys = intentGroups.map((g) => g.group);
 
   return (
     <>
@@ -100,10 +103,21 @@ export default async function HomePage() {
         </Container>
       </section>
 
+      {/* ── Signature: Before you leave for the airport ──────────────────── */}
+      {checklist.length > 0 ? (
+        <section aria-label="Before you leave for the airport">
+          <Container className="pb-4">
+            <div className="mx-auto max-w-3xl">
+              <PreflightChecklist items={checklist} />
+            </div>
+          </Container>
+        </section>
+      ) : null}
+
       {/* ── Popular answers — the fast path & proof of value ─────────────── */}
       {popular.length > 0 ? (
         <section aria-labelledby="popular-heading">
-          <Container className="pb-4">
+          <Container className="pt-14 pb-4 sm:pt-16">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <h2 id="popular-heading" className="text-xl font-semibold tracking-tight sm:text-2xl">
                 Popular questions
@@ -124,28 +138,38 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      {/* ── Explore by journey — lightweight discovery ───────────────────── */}
-      {journeys.length > 0 ? (
-        <section aria-labelledby="journeys-heading">
-          <Container className="py-14 sm:py-16">
-            <div className="border-border bg-subtle rounded-3xl border p-6 sm:p-8">
-              <h2 id="journeys-heading" className="text-base font-semibold">
-                Explore by where you are in your journey
-              </h2>
-              <p className="text-muted-foreground mt-1 text-sm">
-                From packing to arrival — find the questions that matter at each step.
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {journeys.map((j) => (
-                  <a
-                    key={j}
-                    href={`/search?intent=${encodeURIComponent(j)}`}
-                    className="border-border bg-card hover:border-primary/40 hover:text-primary inline-flex items-center rounded-full border px-3.5 py-1.5 text-sm font-medium shadow-sm transition-colors"
-                  >
-                    {j}
-                  </a>
-                ))}
+      {/* ── Explore by journey — discovery cards (count + real questions) ── */}
+      {intentGroups.length > 0 ? (
+        <section aria-labelledby="journeys-heading" className="border-border bg-subtle border-y">
+          <Container className="py-16 sm:py-20">
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div className="max-w-xl">
+                <h2
+                  id="journeys-heading"
+                  className="text-xl font-semibold tracking-tight sm:text-2xl"
+                >
+                  Explore by where you are in your journey
+                </h2>
+                <p className="text-muted-foreground mt-1.5 text-sm">
+                  From packing to arrival — discover the questions that matter at each step.
+                </p>
               </div>
+              <a
+                href="/search"
+                className="text-primary inline-flex shrink-0 items-center gap-1.5 text-sm font-medium hover:underline"
+              >
+                All questions <ArrowRight className="size-4" aria-hidden />
+              </a>
+            </div>
+            <div className="mt-7 grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {intentGroups.map((g) => (
+                <IntentCard
+                  key={g.group}
+                  group={g.group}
+                  description={g.description}
+                  questions={g.questions}
+                />
+              ))}
             </div>
           </Container>
         </section>

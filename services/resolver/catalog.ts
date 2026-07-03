@@ -10,7 +10,9 @@ import {
   INTENT_GROUPS,
   intentGroupForSlug,
   PREFERRED_POPULAR,
+  PREFLIGHT_CHECKLIST,
 } from '@/db/seed/content';
+import type { AnswerKind, Verdict } from '@/lib/knowledge/types';
 
 /**
  * The verified-question catalog — the search index + homepage source.
@@ -73,6 +75,30 @@ export async function listVerifiedQuestions(): Promise<QuestionSummaryView[]> {
 export async function recentlyVerified(limit = 6): Promise<QuestionSummaryView[]> {
   const all = await listVerifiedQuestions();
   return all.slice(0, limit);
+}
+
+export interface ChecklistItemView {
+  slug: string;
+  /** Action-worded prompt, e.g. "Is my passport valid enough?". */
+  label: string;
+  verdict: Verdict;
+  answerKind: AnswerKind;
+}
+
+/**
+ * The "Before you leave for the airport" checklist — action-worded last-minute
+ * questions mapped to their REAL verified answers. Only verified items appear
+ * (fail-closed), so the signature feature never links to an unpublished page.
+ */
+export async function preflightChecklist(): Promise<ChecklistItemView[]> {
+  const all = await listVerifiedQuestions();
+  const bySlug = new Map(all.map((q) => [q.slug, q]));
+  const out: ChecklistItemView[] = [];
+  for (const { slug, label } of PREFLIGHT_CHECKLIST) {
+    const q = bySlug.get(slug);
+    if (q) out.push({ slug, label, verdict: q.verdict, answerKind: q.answerKind });
+  }
+  return out;
 }
 
 /**
