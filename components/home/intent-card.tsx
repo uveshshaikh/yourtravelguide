@@ -99,7 +99,7 @@ export function IntentCard({
 
       {remaining > 0 ? (
         <a
-          href="/search"
+          href={`/search?intent=${encodeURIComponent(group)}`}
           className="text-primary mt-3 inline-flex items-center gap-1 text-xs font-medium hover:underline"
         >
           +{remaining} more <ArrowRight className="size-3" aria-hidden />

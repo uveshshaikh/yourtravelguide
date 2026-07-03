@@ -139,7 +139,7 @@ export default async function HomePage() {
                 {journeys.map((j) => (
                   <a
                     key={j}
-                    href="/search"
+                    href={`/search?intent=${encodeURIComponent(j)}`}
                     className="border-border bg-card hover:border-primary/40 hover:text-primary inline-flex items-center rounded-full border px-3.5 py-1.5 text-sm font-medium shadow-sm transition-colors"
                   >
                     {j}

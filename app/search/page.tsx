@@ -5,6 +5,7 @@ import { VerifiedQuestionResult } from '@/components/search/verified-question-re
 import { SearchNoResults } from '@/components/search/search-states';
 import { listByIntentGroup, listVerifiedQuestions } from '@/services/resolver/catalog';
 import { searchQuestions } from '@/lib/search';
+import { cn } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,29 +13,43 @@ export const metadata: Metadata = { title: 'Search' };
 
 /**
  * /search — results come ONLY from the verified-question catalog (published,
- * evidence-backed). No unpublished content is ever exposed. Empty query browses
- * every verified question, grouped by category.
+ * evidence-backed). No unpublished content is ever exposed.
+ *  • ?q=…       → search results
+ *  • ?intent=…  → browse ONE journey stage (what the traveller clicked)
+ *  • (neither)  → browse every stage
  */
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; intent?: string }>;
 }) {
-  const { q } = await searchParams;
+  const { q, intent } = await searchParams;
   const query = (q ?? '').trim();
-  const catalog = await listVerifiedQuestions();
+  const [catalog, groups] = await Promise.all([listVerifiedQuestions(), listByIntentGroup()]);
+
+  // Resolve the requested stage to its canonical name (case-insensitive).
+  const active = intent
+    ? (groups.find((g) => g.group.toLowerCase() === intent.trim().toLowerCase())?.group ?? null)
+    : null;
+
+  const heading = query ? `Results for “${query}”` : active ? active : 'Browse verified questions';
 
   return (
     <Container className="py-10">
-      <h1 className="text-2xl font-semibold tracking-tight">
-        {query ? `Results for “${query}”` : 'Browse verified questions'}
-      </h1>
+      <h1 className="text-2xl font-semibold tracking-tight">{heading}</h1>
 
       <div className="mt-5 max-w-2xl">
         <QuestionSearch catalog={catalog} size="bar" />
       </div>
 
-      {query ? <SearchResults catalog={catalog} query={query} /> : <BrowseAll />}
+      {query ? (
+        <SearchResults catalog={catalog} query={query} />
+      ) : (
+        <>
+          <IntentFilterBar groups={groups} active={active} />
+          <BrowseGroups groups={active ? groups.filter((g) => g.group === active) : groups} />
+        </>
+      )}
     </Container>
   );
 }
@@ -68,8 +83,60 @@ function SearchResults({
   );
 }
 
-async function BrowseAll() {
-  const groups = await listByIntentGroup();
+/** A chip row to switch journey stages — the clicked stage is highlighted. */
+function IntentFilterBar({
+  groups,
+  active,
+}: {
+  groups: Awaited<ReturnType<typeof listByIntentGroup>>;
+  active: string | null;
+}) {
+  if (groups.length === 0) return null;
+  const chip = 'inline-flex items-center rounded-full border px-3 py-1.5 text-sm transition-colors';
+  return (
+    <div
+      className="mt-6 flex flex-wrap gap-2"
+      role="navigation"
+      aria-label="Filter by journey stage"
+    >
+      <a
+        href="/search"
+        aria-current={active === null ? 'page' : undefined}
+        className={cn(
+          chip,
+          active === null
+            ? 'border-primary bg-primary text-primary-foreground'
+            : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground',
+        )}
+      >
+        All
+      </a>
+      {groups.map(({ group, questions }) => {
+        const isActive = group === active;
+        return (
+          <a
+            key={group}
+            href={`/search?intent=${encodeURIComponent(group)}`}
+            aria-current={isActive ? 'page' : undefined}
+            className={cn(
+              chip,
+              isActive
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground',
+            )}
+          >
+            {group}
+            <span className={cn('ml-1.5 text-xs', isActive ? 'opacity-80' : 'opacity-60')}>
+              {questions.length}
+            </span>
+          </a>
+        );
+      })}
+    </div>
+  );
+}
+
+function BrowseGroups({ groups }: { groups: Awaited<ReturnType<typeof listByIntentGroup>> }) {
   if (groups.length === 0) {
     return (
       <div className="mt-8">

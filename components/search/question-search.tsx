@@ -237,7 +237,7 @@ export function QuestionSearch({
                 {intentGroups.map((g) => (
                   <a
                     key={g}
-                    href="/search"
+                    href={`/search?intent=${encodeURIComponent(g)}`}
                     className="border-border bg-card text-muted-foreground hover:text-foreground hover:border-primary/40 rounded-full border px-2.5 py-1 text-xs transition-colors"
                   >
                     {g}
