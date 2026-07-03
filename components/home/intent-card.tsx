@@ -37,10 +37,9 @@ const intentIcon: Record<string, LucideIcon> = {
 };
 
 /**
- * IntentCard — a discovery tile for one journey stage / situation. Shows the
- * stage, a one-line description, and its real verified questions so travellers
- * discover things they didn't know to ask. Each question links straight to its
- * answer; the card is data-driven (auto-populated from the Knowledge Core).
+ * IntentCard — a discovery tile for one journey stage. Neutral surface, one calm
+ * brand-tinted icon, and its real verified questions so travellers discover what
+ * they didn't know to ask. Data-driven (auto-populated from the Knowledge Core).
  */
 export function IntentCard({
   group,
@@ -60,20 +59,22 @@ export function IntentCard({
   return (
     <section
       aria-label={group}
-      className="border-border bg-card flex flex-col rounded-2xl border p-5"
+      className="border-border bg-card flex flex-col rounded-2xl border p-5 shadow-sm transition-shadow hover:shadow-md"
     >
       <div className="flex items-center gap-3">
-        <span className="bg-accent text-accent-foreground grid size-10 shrink-0 place-items-center rounded-xl">
+        <span className="bg-muted text-primary grid size-10 shrink-0 place-items-center rounded-xl">
           <Icon className="size-5" aria-hidden />
         </span>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <h3 className="leading-tight font-semibold">{group}</h3>
           <p className="text-muted-foreground truncate text-xs">{description}</p>
         </div>
-        <span className="text-muted-foreground ml-auto shrink-0 text-xs">{questions.length}</span>
+        <span className="bg-muted text-muted-foreground shrink-0 rounded-full px-2 py-0.5 text-xs font-medium">
+          {questions.length}
+        </span>
       </div>
 
-      <ul className="mt-4 space-y-0.5">
+      <ul className="border-border/70 mt-4 space-y-0.5 border-t pt-3">
         {shown.map((q) => {
           const v = verdictDisplay(q.answerKind, q.verdict);
           return (
@@ -83,7 +84,9 @@ export function IntentCard({
                 className="group hover:bg-muted -mx-2 flex items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors"
               >
                 <span className={`size-1.5 shrink-0 rounded-full ${v.dot}`} aria-hidden />
-                <span className="min-w-0 flex-1 truncate text-sm">{q.question}</span>
+                <span className="group-hover:text-foreground text-muted-foreground min-w-0 flex-1 truncate text-sm transition-colors">
+                  {q.question}
+                </span>
                 <ArrowRight
                   className="text-muted-foreground/50 group-hover:text-primary size-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
                   aria-hidden

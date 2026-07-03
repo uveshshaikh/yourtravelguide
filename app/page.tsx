@@ -113,26 +113,27 @@ export default async function HomePage() {
   return (
     <>
       {/* ── 1 & 2 & 3 · Who we are · why trust · search ──────────────────── */}
-      <section className="relative overflow-hidden">
+      <section className="relative isolate overflow-hidden">
+        {/* Soft, premium glow behind the search — calm, not a hard band. */}
         <div
-          className="from-accent/60 pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-gradient-to-b to-transparent"
+          className="bg-primary/10 pointer-events-none absolute top-[-14%] left-1/2 -z-10 h-[380px] w-[760px] max-w-[120vw] -translate-x-1/2 rounded-full blur-3xl"
           aria-hidden
         />
-        <Container className="pt-16 pb-14 sm:pt-24 sm:pb-20">
+        <Container className="pt-16 pb-16 sm:pt-24 sm:pb-24">
           <div className="mx-auto max-w-2xl text-center">
-            <Badge variant="brand" className="mb-5">
+            <Badge variant="brand" className="mb-6">
               <ShieldCheck className="size-3.5" aria-hidden />
               Travel Decision Platform · India
             </Badge>
-            <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-[3.25rem] sm:leading-[1.05]">
-              Travel answers you can trust — in seconds
+            <h1 className="text-[2.5rem] leading-[1.08] font-semibold tracking-tight text-balance sm:text-[3.25rem]">
+              Travel answers you can <span className="text-primary">trust</span> — in seconds
             </h1>
-            <p className="text-muted-foreground mx-auto mt-5 max-w-xl text-lg text-pretty">
-              Ask a question, get one clear answer — backed by an official source and dated so you
-              know it’s current. Before, during, and after your trip.
+            <p className="text-muted-foreground mx-auto mt-5 max-w-lg text-lg text-pretty">
+              One clear answer, backed by an official source and dated — before, during, and after
+              your trip.
             </p>
 
-            <div className="mx-auto mt-8 max-w-xl text-left">
+            <div className="mx-auto mt-9 max-w-xl text-left">
               <QuestionSearch catalog={catalog} />
             </div>
 
@@ -143,7 +144,7 @@ export default async function HomePage() {
                   <li key={qn.slug}>
                     <a
                       href={`/question/${qn.slug}`}
-                      className="border-border bg-card/60 text-muted-foreground hover:border-primary/40 hover:text-foreground inline-flex rounded-full border px-3 py-1.5 text-sm transition-colors"
+                      className="border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground inline-flex rounded-full border px-3.5 py-1.5 text-sm shadow-sm transition-colors"
                     >
                       {qn.question}
                     </a>
@@ -153,9 +154,9 @@ export default async function HomePage() {
             ) : null}
 
             {/* Trust line — real authorities. */}
-            <p className="text-muted-foreground/80 mt-6 text-xs">
+            <p className="text-muted-foreground mt-7 text-xs">
               Sources include{' '}
-              <span className="text-foreground/70 font-medium">
+              <span className="text-foreground font-medium">
                 {authorities
                   .slice(0, 5)
                   .map((a) => a.code)
@@ -167,20 +168,20 @@ export default async function HomePage() {
       </section>
 
       {/* ── 2 · Why trust us ─────────────────────────────────────────────── */}
-      <section aria-labelledby="trust-heading" className="border-border bg-subtle border-y">
-        <Container className="py-12 sm:py-14">
+      <section aria-labelledby="trust-heading" className="border-border bg-subtle border-t">
+        <Container className="py-14 sm:py-16">
           <h2 id="trust-heading" className="sr-only">
             Why you can trust these answers
           </h2>
-          <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-x-8 gap-y-7 sm:grid-cols-2 lg:grid-cols-4">
             {trustPoints.map(({ icon: Icon, title, body }) => (
-              <div key={title} className="flex gap-3">
-                <span className="bg-accent text-accent-foreground grid size-9 shrink-0 place-items-center rounded-lg">
+              <div key={title} className="flex gap-3.5">
+                <span className="bg-muted text-primary grid size-10 shrink-0 place-items-center rounded-xl">
                   <Icon className="size-5" aria-hidden />
                 </span>
                 <div>
                   <h3 className="text-sm font-semibold">{title}</h3>
-                  <p className="text-muted-foreground mt-0.5 text-sm text-pretty">{body}</p>
+                  <p className="text-muted-foreground mt-1 text-sm text-pretty">{body}</p>
                 </div>
               </div>
             ))}
@@ -238,7 +239,7 @@ export default async function HomePage() {
               title="Recently verified"
               description="The latest answers we’ve checked against official sources."
             />
-            <ul className="border-border divide-border mt-7 divide-y overflow-hidden rounded-2xl border">
+            <ul className="border-border divide-border bg-card mt-7 divide-y overflow-hidden rounded-2xl border shadow-sm">
               {latest.map((r) => {
                 const v = verdictDisplay(r.answerKind, r.verdict);
                 return (
@@ -284,15 +285,17 @@ export default async function HomePage() {
               {authorities.map((a) => (
                 <div
                   key={a.code}
-                  className="border-border bg-card flex items-start gap-3 rounded-2xl border p-5"
+                  className="border-border bg-card flex items-start gap-3.5 rounded-2xl border p-5 shadow-sm transition-shadow hover:shadow-md"
                 >
-                  <span className="bg-info-subtle text-info-subtle-foreground grid size-10 shrink-0 place-items-center rounded-xl">
+                  <span className="bg-muted text-primary grid size-10 shrink-0 place-items-center rounded-xl">
                     <Landmark className="size-5" aria-hidden />
                   </span>
                   <div className="min-w-0">
-                    <p className="font-mono text-sm font-semibold">{a.code}</p>
-                    <p className="mt-0.5 text-sm font-medium">{a.name}</p>
-                    <p className="text-muted-foreground mt-1 text-xs text-pretty">
+                    <p className="text-primary font-mono text-xs font-semibold tracking-wide">
+                      {a.code}
+                    </p>
+                    <p className="mt-1 text-sm font-semibold">{a.name}</p>
+                    <p className="text-muted-foreground mt-1 text-xs leading-relaxed text-pretty">
                       {a.description}
                     </p>
                   </div>
