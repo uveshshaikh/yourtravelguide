@@ -47,11 +47,12 @@ export default async function HomePage() {
   return (
     <>
       {/* ── Hero — search is the hero ────────────────────────────────────── */}
-      <section className="relative isolate overflow-hidden">
-        <div
-          className="bg-primary/10 pointer-events-none absolute top-[-18%] left-1/2 -z-10 h-[420px] w-[820px] max-w-[130vw] -translate-x-1/2 rounded-full blur-3xl"
-          aria-hidden
-        />
+      <section className="relative">
+        {/* Glow lives in its own clipped layer so it never causes horizontal
+            scroll AND never clips the search dropdown that overflows the hero. */}
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden>
+          <div className="bg-primary/10 absolute top-[-18%] left-1/2 h-[420px] w-[820px] max-w-[130vw] -translate-x-1/2 rounded-full blur-3xl" />
+        </div>
         <Container className="pt-20 pb-14 sm:pt-28 sm:pb-20">
           <div className="mx-auto max-w-3xl text-center">
             <span className="border-border bg-card text-muted-foreground mx-auto inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium shadow-sm">

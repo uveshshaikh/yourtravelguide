@@ -153,7 +153,7 @@ export function QuestionSearch({
 
       {panelOpen ? (
         <div
-          className="border-border bg-popover absolute inset-x-0 top-full z-30 mt-2 overflow-hidden rounded-2xl border shadow-xl"
+          className="border-border bg-popover absolute inset-x-0 top-full z-50 mt-2 max-h-[min(70vh,32rem)] overflow-y-auto overscroll-contain rounded-2xl border shadow-xl"
           onMouseDown={(e) => e.preventDefault()}
         >
           {/* Recent searches (from this device only). */}
