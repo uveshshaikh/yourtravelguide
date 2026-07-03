@@ -14,28 +14,29 @@
    ========================================================================== */
 
 :root {
-  /* Neutrals (slate) */
-  --background: #ffffff;
-  --foreground: #0f172a; /* slate-900 ink */
+  /* Neutrals — a soft, layered off-white base (not stark white). Cards sit in
+     white ON the off-white page so surfaces read with quiet depth. */
+  --background: #f6f7fa; /* cool off-white page */
+  --foreground: #0f1729; /* slate-900 ink */
   --card: #ffffff;
-  --card-foreground: #0f172a;
+  --card-foreground: #0f1729;
   --popover: #ffffff;
-  --popover-foreground: #0f172a;
-  --muted: #f1f5f9; /* slate-100 */
-  --muted-foreground: #64748b; /* slate-500 */
-  --subtle: #f8fafc; /* slate-50 section wash */
-  --border: #e2e8f0; /* slate-200 */
-  --input: #e2e8f0;
-  --secondary: #f1f5f9; /* slate-100 surface */
-  --secondary-foreground: #0f172a;
+  --popover-foreground: #0f1729;
+  --muted: #eceef4; /* tiles / chips */
+  --muted-foreground: #5b6577; /* slate-500-ish */
+  --subtle: #eef0f6; /* alternating section wash */
+  --border: #e2e5ee; /* cool slate-200 */
+  --input: #e2e5ee;
+  --secondary: #eceef4;
+  --secondary-foreground: #0f1729;
 
-  /* Brand — teal. Primary uses teal-700 so white text is AA (≈4.6:1). */
-  --primary: #0f766e; /* teal-700 */
+  /* Brand — indigo. Primary uses indigo-600 so white text is AA (≈5.9:1). */
+  --primary: #4f46e5; /* indigo-600 */
   --primary-foreground: #ffffff;
-  --primary-hover: #115e59; /* teal-800 */
-  --accent: #f0fdfa; /* teal-50 subtle wash */
-  --accent-foreground: #115e59; /* teal-800 */
-  --ring: #0d9488; /* teal-600 focus ring */
+  --primary-hover: #4338ca; /* indigo-700 */
+  --accent: #eef2ff; /* indigo-50 subtle wash */
+  --accent-foreground: #3730a3; /* indigo-800 */
+  --ring: #6366f1; /* indigo-500 focus ring */
 
   /* Verdict system (Phase 1, locked) — solid + subtle pairings */
   --allowed: #15803d; /* green-700 */
@@ -79,12 +80,12 @@
   --secondary: #1e293b; /* slate-800 surface */
   --secondary-foreground: #e2e8f0;
 
-  --primary: #2dd4bf; /* teal-400 — light accent for dark bg */
-  --primary-foreground: #04211d;
-  --primary-hover: #5eead4;
-  --accent: #0b201e;
-  --accent-foreground: #99f6e4;
-  --ring: #2dd4bf;
+  --primary: #818cf8; /* indigo-400 — light accent for dark bg */
+  --primary-foreground: #1a1740; /* deep indigo ink */
+  --primary-hover: #a5b4fc;
+  --accent: #201d43; /* deep indigo wash */
+  --accent-foreground: #c7d2fe; /* indigo-200 */
+  --ring: #818cf8;
 
   --allowed: #4ade80;
   --allowed-foreground: #052e16;
