@@ -40,6 +40,30 @@ export const CATEGORIES = [
 
 export type Category = (typeof CATEGORIES)[number];
 
+/**
+ * Traveller-INTENT groups — the homepage's discovery axis (journey stage +
+ * situation), in canonical order. The homepage renders only the groups that
+ * actually contain verified questions, so it grows automatically and never shows
+ * an empty stage.
+ */
+export const INTENT_GROUPS = [
+  'Before you book',
+  'Before you fly',
+  'Packing',
+  'At the airport',
+  'Airport security',
+  'Boarding',
+  'International travel',
+  'Arrival',
+  'Family travel',
+  'Medical travel',
+  'Documents',
+  'Money & customs',
+  'Emergency situations',
+] as const;
+
+export type IntentGroup = (typeof INTENT_GROUPS)[number];
+
 /** A real-world subject an answer attaches to (referential integrity). */
 export interface SeedSubject {
   type: Extract<EntityType, 'travel_item' | 'document' | 'traveller_profile'>;
@@ -56,6 +80,12 @@ export interface SeedQuestion {
   question: string;
   subject: SeedSubject;
   authority: AuthorityCode;
+  /**
+   * Traveller-intent group — how the homepage DISCOVERS questions (by where you
+   * are in the journey / your situation), not by librarian category. Optional:
+   * defaults from the question's category (see CATEGORY_TO_INTENT).
+   */
+  intentGroup?: IntentGroup;
   /** Decision type — drives the verdict VOCABULARY (see AnswerKind). Default 'carry'. */
   answerKind?: AnswerKind;
   /** Stored polarity — reshaped into the right words by `answerKind`. */
@@ -322,6 +352,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
       itemCategory: 'Travel document',
     },
     authority: 'mea',
+    intentGroup: 'Family travel',
     answerKind: 'requirement',
     verdict: 'allowed',
     summary:
@@ -409,6 +440,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'can-i-carry-medicines-in-hand-baggage',
     category: 'Baggage & items',
+    intentGroup: 'Medical travel',
     question: 'Can I carry medicines in hand baggage?',
     subject: MEDICINES,
     authority: 'bcas',
@@ -1035,11 +1067,279 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     related: ['can-i-carry-medicines-in-hand-baggage'],
     signoff: true,
   },
+
+  // ── Electronics (Packing) — powers the discovery cluster ────────────────────
+  {
+    slug: 'can-i-carry-a-charger-on-a-flight',
+    category: 'Baggage & items',
+    intentGroup: 'Packing',
+    question: 'Can I carry a charger on a flight?',
+    subject: { type: 'travel_item', code: 'charger', name: 'Charger', itemCategory: 'Electronics' },
+    authority: 'bcas',
+    verdict: 'allowed',
+    summary: 'Yes — chargers and cables are allowed in both cabin and checked baggage.',
+    conditions: {
+      Cabin: 'Allowed',
+      Checked: 'Allowed',
+      Tip: 'Keep power banks in the cabin only',
+    },
+    riskLevel: 'low',
+    timePhase: 'before',
+    intent: 'verdict',
+    decisionType: 'verdict',
+    source: { title: 'Electronics in baggage', url: 'https://www.bcasindia.gov.in/' },
+    assertion: 'Chargers and charging cables are permitted in cabin and checked baggage.',
+    evidenceLevel: 'government_regulation',
+    related: ['can-i-carry-a-power-bank-on-a-flight', 'can-i-carry-spare-batteries-on-a-flight'],
+  },
+  {
+    slug: 'can-i-carry-spare-batteries-on-a-flight',
+    category: 'Baggage & items',
+    intentGroup: 'Packing',
+    question: 'Can I carry spare batteries on a flight?',
+    subject: {
+      type: 'travel_item',
+      code: 'spare-batteries',
+      name: 'Spare batteries',
+      itemCategory: 'Electronics',
+    },
+    authority: 'dgca',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Spare lithium batteries must go in the cabin only, terminals protected; ordinary AA/AAA cells are fine either way.',
+    conditions: {
+      'Lithium spares': 'Cabin only — never in checked baggage',
+      Protection: 'Tape terminals or keep in original packaging',
+      'AA / AAA': 'Allowed in cabin and checked',
+    },
+    riskLevel: 'high',
+    timePhase: 'before',
+    intent: 'verdict',
+    decisionType: 'verdict',
+    source: {
+      title: 'Carriage of lithium batteries and power banks',
+      url: 'https://www.dgca.gov.in/',
+    },
+    assertion:
+      'Spare lithium batteries are cabin-only with protected terminals; dry cells are unrestricted.',
+    evidenceLevel: 'government_regulation',
+    related: ['can-i-carry-a-power-bank-on-a-flight', 'can-i-carry-a-charger-on-a-flight'],
+    signoff: true,
+  },
+  {
+    slug: 'can-i-carry-a-bluetooth-speaker-on-a-flight',
+    category: 'Baggage & items',
+    intentGroup: 'Packing',
+    question: 'Can I carry a Bluetooth speaker on a flight?',
+    subject: {
+      type: 'travel_item',
+      code: 'bluetooth-speaker',
+      name: 'Bluetooth speaker',
+      itemCategory: 'Electronics',
+    },
+    authority: 'bcas',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Yes — carry it in the cabin (for its battery) and keep it switched off during the flight.',
+    conditions: {
+      Carriage: 'Cabin preferred (built-in lithium battery)',
+      Inflight: 'Keep it switched off — no playing music onboard',
+    },
+    riskLevel: 'low',
+    timePhase: 'before',
+    intent: 'verdict',
+    decisionType: 'verdict',
+    source: { title: 'Portable electronic devices', url: 'https://www.bcasindia.gov.in/' },
+    assertion:
+      'Bluetooth speakers are allowed, carried in the cabin for the battery and switched off in flight.',
+    evidenceLevel: 'government_regulation',
+    related: ['can-i-carry-a-power-bank-on-a-flight', 'can-i-carry-a-laptop-in-hand-baggage'],
+  },
+  {
+    slug: 'can-i-carry-a-hair-dryer-on-a-flight',
+    category: 'Baggage & items',
+    intentGroup: 'Packing',
+    question: 'Can I carry a hair dryer on a flight?',
+    subject: {
+      type: 'travel_item',
+      code: 'hair-dryer',
+      name: 'Hair dryer',
+      itemCategory: 'Electronics',
+    },
+    authority: 'bcas',
+    verdict: 'allowed',
+    summary:
+      'Yes — hair dryers and electric trimmers are allowed in both cabin and checked baggage.',
+    conditions: { Cabin: 'Allowed', Checked: 'Allowed' },
+    riskLevel: 'low',
+    timePhase: 'before',
+    intent: 'verdict',
+    decisionType: 'verdict',
+    source: { title: 'Personal electronic appliances', url: 'https://www.bcasindia.gov.in/' },
+    assertion:
+      'Hair dryers and electric grooming appliances are permitted in cabin and checked bags.',
+    evidenceLevel: 'government_regulation',
+  },
+  {
+    slug: 'can-i-carry-scissors-in-hand-baggage',
+    category: 'Security & screening',
+    intentGroup: 'Airport security',
+    question: 'Can I carry scissors in hand baggage?',
+    subject: {
+      type: 'travel_item',
+      code: 'scissors',
+      name: 'Scissors',
+      itemCategory: 'Restricted',
+    },
+    authority: 'bcas',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Small round-tipped scissors with blades under 6 cm are usually allowed in the cabin; larger or pointed ones must go in checked baggage.',
+    conditions: {
+      Cabin: 'Blades under 6 cm, round-tipped',
+      'Not in cabin': 'Long or pointed blades',
+      Larger: 'Pack in checked baggage',
+    },
+    riskLevel: 'medium',
+    timePhase: 'before',
+    intent: 'verdict',
+    decisionType: 'verdict',
+    source: { title: 'Sharp items in cabin baggage', url: 'https://www.bcasindia.gov.in/' },
+    assertion: 'Scissors with blades under 6 cm are permitted in the cabin; larger blades are not.',
+    evidenceLevel: 'government_regulation',
+    related: ['can-i-carry-a-razor-in-hand-baggage'],
+    signoff: true,
+  },
+
+  // ── Family travel ───────────────────────────────────────────────────────────
+  {
+    slug: 'can-i-carry-baby-food-on-a-flight',
+    category: 'Baggage & items',
+    intentGroup: 'Family travel',
+    question: 'Can I carry baby food on a flight?',
+    subject: { type: 'travel_item', code: 'baby-food', name: 'Baby food', itemCategory: 'Family' },
+    authority: 'bcas',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Yes — baby food and formula are allowed through security in reasonable quantities, even over 100 ml. Declare them.',
+    conditions: {
+      Allowed: 'Reasonable quantities for the journey',
+      'Over 100 ml': 'Exempt from the liquids limit for infants',
+      Security: 'Declare them for separate screening',
+    },
+    riskLevel: 'low',
+    timePhase: 'before',
+    intent: 'verdict',
+    decisionType: 'verdict',
+    source: { title: 'Liquids exemptions — baby food', url: 'https://www.bcasindia.gov.in/' },
+    assertion:
+      'Baby food and formula are exempt from the cabin liquids limit in reasonable amounts.',
+    evidenceLevel: 'government_regulation',
+    related: ['can-i-carry-breast-milk-on-a-flight', 'how-much-liquid-can-i-carry-in-hand-baggage'],
+    signoff: true,
+  },
+  {
+    slug: 'can-i-carry-breast-milk-on-a-flight',
+    category: 'Baggage & items',
+    intentGroup: 'Family travel',
+    question: 'Can I carry breast milk on a flight?',
+    subject: {
+      type: 'travel_item',
+      code: 'breast-milk',
+      name: 'Breast milk',
+      itemCategory: 'Family',
+    },
+    authority: 'bcas',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Yes — expressed breast milk is allowed through security in reasonable quantities, even over 100 ml. Declare it.',
+    conditions: {
+      Allowed: 'Reasonable quantities, with or without the baby',
+      'Over 100 ml': 'Exempt from the liquids limit',
+      Security: 'Declare it for separate screening',
+    },
+    riskLevel: 'low',
+    timePhase: 'before',
+    intent: 'verdict',
+    decisionType: 'verdict',
+    source: { title: 'Liquids exemptions — breast milk', url: 'https://www.bcasindia.gov.in/' },
+    assertion:
+      'Expressed breast milk is exempt from the cabin liquids limit in reasonable amounts.',
+    evidenceLevel: 'government_regulation',
+    related: ['can-i-carry-baby-food-on-a-flight'],
+    signoff: true,
+  },
+
+  // ── Medical travel ──────────────────────────────────────────────────────────
+  {
+    slug: 'can-i-carry-insulin-on-a-flight',
+    category: 'Health & vaccines',
+    intentGroup: 'Medical travel',
+    question: 'Can I carry insulin on a flight?',
+    subject: { type: 'travel_item', code: 'insulin', name: 'Insulin', itemCategory: 'Health' },
+    authority: 'bcas',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Yes — carry insulin and its syringes in the cabin with a prescription; they’re exempt from the liquids limit.',
+    conditions: {
+      Carriage: 'Cabin baggage, kept cool if possible',
+      Liquids: 'Exempt from the 100 ml rule',
+      Proof: 'Carry a prescription or doctor’s letter for syringes',
+    },
+    riskLevel: 'medium',
+    timePhase: 'before',
+    intent: 'verdict',
+    decisionType: 'verdict',
+    source: { title: 'Medicines and medical devices', url: 'https://www.bcasindia.gov.in/' },
+    assertion:
+      'Insulin and its delivery equipment are allowed in the cabin with documentation, exempt from the liquids limit.',
+    evidenceLevel: 'government_regulation',
+    related: ['can-i-carry-medicines-in-hand-baggage'],
+    signoff: true,
+  },
 ];
 
 /** slug → category, for the homepage/search grouping (single source of truth). */
 export const categoryForSlug = (slug: string): Category | undefined =>
   TRAVEL_QUESTIONS.find((q) => q.slug === slug)?.category;
+
+/** Default intent group when a question doesn't declare one — from its category. */
+const CATEGORY_TO_INTENT: Record<Category, IntentGroup> = {
+  'Documents & visas': 'Documents',
+  'Baggage & items': 'Packing',
+  'Security & screening': 'Airport security',
+  'Customs & duty-free': 'Money & customs',
+  'At the airport': 'At the airport',
+  'Money & currency': 'Money & customs',
+  'Health & vaccines': 'Medical travel',
+};
+
+/** One honest line describing each intent group (shown on discovery cards). */
+export const INTENT_GROUP_META: Record<IntentGroup, string> = {
+  'Before you book': 'Plan before you pay.',
+  'Before you fly': 'Get ready the day before.',
+  Packing: 'What you can bring, and where it goes.',
+  'At the airport': 'Check-in, timing and getting through.',
+  'Airport security': 'What passes screening — and what doesn’t.',
+  Boarding: 'Gates, boarding passes and last steps.',
+  'International travel': 'Crossing borders with confidence.',
+  Arrival: 'Landing, baggage and getting out.',
+  'Family travel': 'Flying with kids, infants and elders.',
+  'Medical travel': 'Medicines, devices and medical needs.',
+  Documents: 'Passports, visas and accepted IDs.',
+  'Money & customs': 'Cash, gold, currency and allowances.',
+  'Emergency situations': 'When something goes wrong.',
+};
+
+/**
+ * slug → traveller-intent group. Explicit on the question, else derived from its
+ * category. This is the homepage's discovery axis (auto-populated from the Core).
+ */
+export function intentGroupForSlug(slug: string): IntentGroup {
+  const q = TRAVEL_QUESTIONS.find((x) => x.slug === slug);
+  if (!q) return 'Packing';
+  return q.intentGroup ?? CATEGORY_TO_INTENT[q.category];
+}
 
 /**
  * slug → decision type (AnswerKind), which determines the verdict VOCABULARY.

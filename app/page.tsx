@@ -12,15 +12,15 @@ import { Container } from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { QuestionSearch } from '@/components/search/question-search';
 import { QuestionCard } from '@/components/home/question-card';
-import { CategoryCard } from '@/components/home/category-card';
+import { IntentCard } from '@/components/home/intent-card';
 import { verdictDisplay } from '@/components/decision/verdict-config';
 import {
-  listVerifiedByCategory,
+  listByIntentGroup,
   listVerifiedQuestions,
   popularQuestions,
   recentlyVerified,
 } from '@/services/resolver/catalog';
-import { authoritiesCovered, CATEGORY_META, type Category } from '@/db/seed/content';
+import { authoritiesCovered } from '@/db/seed/content';
 import { formatDate } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -98,9 +98,9 @@ function SectionHeading({
 
 export default async function HomePage() {
   // Everything below is real Knowledge Core data — grows as content grows.
-  const [catalog, groups, popular, recent] = await Promise.all([
+  const [catalog, intentGroups, popular, recent] = await Promise.all([
     listVerifiedQuestions(),
-    listVerifiedByCategory(),
+    listByIntentGroup(),
     popularQuestions(6),
     recentlyVerified(9),
   ]);
@@ -206,23 +206,23 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      {/* ── 5 · Popular categories ───────────────────────────────────────── */}
-      {groups.length > 0 ? (
-        <section aria-labelledby="categories-heading" className="border-border bg-subtle border-y">
+      {/* ── 5 · Discover by journey stage (traveller intent) ─────────────── */}
+      {intentGroups.length > 0 ? (
+        <section aria-labelledby="intent-heading" className="border-border bg-subtle border-y">
           <Container className="py-16 sm:py-20">
             <SectionHeading
-              title="Browse by category"
-              description={`${answerCount} verified answers across ${groups.length} areas of your journey.`}
+              title="Find answers for your journey"
+              description={`${answerCount} verified answers, organised by where you are — from packing to arrival.`}
               href="/search"
               linkLabel="All questions"
             />
-            <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {groups.map((g) => (
-                <CategoryCard
-                  key={g.category}
-                  category={g.category}
-                  description={CATEGORY_META[g.category as Category] ?? ''}
-                  count={g.questions.length}
+            <div className="mt-7 grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {intentGroups.map((g) => (
+                <IntentCard
+                  key={g.group}
+                  group={g.group}
+                  description={g.description}
+                  questions={g.questions}
                 />
               ))}
             </div>

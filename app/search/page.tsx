@@ -3,7 +3,7 @@ import { Container } from '@/components/layout/container';
 import { QuestionSearch } from '@/components/search/question-search';
 import { VerifiedQuestionResult } from '@/components/search/verified-question-result';
 import { SearchNoResults } from '@/components/search/search-states';
-import { listVerifiedByCategory, listVerifiedQuestions } from '@/services/resolver/catalog';
+import { listByIntentGroup, listVerifiedQuestions } from '@/services/resolver/catalog';
 import { searchQuestions } from '@/lib/search';
 
 export const dynamic = 'force-dynamic';
@@ -69,7 +69,7 @@ function SearchResults({
 }
 
 async function BrowseAll() {
-  const groups = await listVerifiedByCategory();
+  const groups = await listByIntentGroup();
   if (groups.length === 0) {
     return (
       <div className="mt-8">
@@ -79,11 +79,15 @@ async function BrowseAll() {
   }
   return (
     <div className="mt-8 space-y-10">
-      {groups.map(({ category, questions }) => (
-        <section key={category} aria-label={category}>
-          <h2 className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-            {category} · {questions.length}
-          </h2>
+      {groups.map(({ group, description, questions }) => (
+        <section key={group} aria-label={group}>
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 className="text-sm font-semibold">
+              {group}{' '}
+              <span className="text-muted-foreground font-normal">· {questions.length}</span>
+            </h2>
+            <p className="text-muted-foreground hidden text-xs sm:block">{description}</p>
+          </div>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             {questions.map((q) => (
               <VerifiedQuestionResult key={q.slug} item={q} />

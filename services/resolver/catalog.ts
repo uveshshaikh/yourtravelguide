@@ -6,6 +6,9 @@ import {
   appliesToLabel,
   CATEGORIES,
   categoryForSlug,
+  INTENT_GROUP_META,
+  INTENT_GROUPS,
+  intentGroupForSlug,
   PREFERRED_POPULAR,
 } from '@/db/seed/content';
 
@@ -56,6 +59,7 @@ export async function listVerifiedQuestions(): Promise<QuestionSummaryView[]> {
       // back to their stored scope columns.
       appliesTo: categoryForSlug(r.slug) ? appliesToLabel(r.slug) : appliesToSummary(r),
       answerKind: answerKindForSlug(r.slug),
+      intentGroup: intentGroupForSlug(r.slug),
       riskLevel: r.riskLevel,
       // Category from the content registry (authoritative), then the DB field,
       // then a safe fallback — so nothing is ever ungrouped.
@@ -91,6 +95,35 @@ export async function popularQuestions(limit = 8): Promise<QuestionSummaryView[]
     out.push(q);
   }
   return out.slice(0, limit);
+}
+
+export interface IntentGroupView {
+  group: string;
+  description: string;
+  questions: QuestionSummaryView[];
+}
+
+/**
+ * Verified questions grouped by traveller INTENT (the homepage discovery axis),
+ * in canonical journey order. Only non-empty groups are returned, so the page
+ * grows automatically and never shows an empty stage. Data-driven from the Core.
+ */
+export async function listByIntentGroup(): Promise<IntentGroupView[]> {
+  const all = await listVerifiedQuestions();
+  const byGroup = new Map<string, QuestionSummaryView[]>();
+  for (const q of all) {
+    const list = byGroup.get(q.intentGroup) ?? [];
+    list.push(q);
+    byGroup.set(q.intentGroup, list);
+  }
+  const out: IntentGroupView[] = [];
+  for (const group of INTENT_GROUPS) {
+    const questions = byGroup.get(group);
+    if (questions && questions.length > 0) {
+      out.push({ group, description: INTENT_GROUP_META[group], questions });
+    }
+  }
+  return out;
 }
 
 export interface CategoryGroup {

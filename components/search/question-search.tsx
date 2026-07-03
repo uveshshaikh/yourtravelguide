@@ -50,8 +50,8 @@ export function QuestionSearch({
   const isHero = size === 'hero';
   const results = useMemo(() => searchQuestions(catalog, query, 8), [catalog, query]);
   const popular = useMemo(() => catalog.slice(0, 5), [catalog]);
-  const categories = useMemo(
-    () => [...new Set(catalog.map((c) => c.category))].slice(0, 8),
+  const intentGroups = useMemo(
+    () => [...new Set(catalog.map((c) => c.intentGroup))].slice(0, 8),
     [catalog],
   );
 
@@ -227,20 +227,20 @@ export function QuestionSearch({
             ) : null}
           </ul>
 
-          {/* Category shortcuts (browse mode only). */}
+          {/* Intent (journey-stage) shortcuts (browse mode only). */}
           {showBrowse ? (
             <div className="border-border border-t p-3">
               <p className="text-muted-foreground px-1 pb-2 text-[0.7rem] font-semibold tracking-wide uppercase">
-                Browse by category
+                Explore by journey stage
               </p>
               <div className="flex flex-wrap gap-1.5">
-                {categories.map((c) => (
+                {intentGroups.map((g) => (
                   <a
-                    key={c}
+                    key={g}
                     href="/search"
                     className="border-border bg-card text-muted-foreground hover:text-foreground hover:border-primary/40 rounded-full border px-2.5 py-1 text-xs transition-colors"
                   >
-                    {c}
+                    {g}
                   </a>
                 ))}
               </div>

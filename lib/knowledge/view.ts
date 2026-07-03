@@ -215,6 +215,8 @@ export interface QuestionSummaryView {
   riskLevel: RiskLevel;
   /** Traveller-facing category, e.g. "Baggage & items". */
   category: string;
+  /** Traveller-intent group (discovery axis), e.g. "Packing", "Family travel". */
+  intentGroup: string;
   /** Decision type that determines the verdict vocabulary/tone. */
   answerKind: AnswerKind;
 }
