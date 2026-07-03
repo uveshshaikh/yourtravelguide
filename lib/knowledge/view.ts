@@ -217,6 +217,8 @@ export interface QuestionSummaryView {
   category: string;
   /** Traveller-intent group (discovery axis), e.g. "Packing", "Family travel". */
   intentGroup: string;
+  /** Second hierarchy level within the intent group, e.g. "Electronics". */
+  subcategory?: string;
   /** Decision type that determines the verdict vocabulary/tone. */
   answerKind: AnswerKind;
 }

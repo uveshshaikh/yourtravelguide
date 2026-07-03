@@ -27,7 +27,7 @@ import type {
  * publishing them for that editorial review. Never treat these as final law.
  */
 
-/** The seven traveller-facing categories, in display order. */
+/** The seven traveller-facing (librarian) categories, in display order. */
 export const CATEGORIES = [
   'Documents & visas',
   'Baggage & items',
@@ -45,11 +45,27 @@ export type Category = (typeof CATEGORIES)[number];
  * situation), in canonical order. The homepage renders only the groups that
  * actually contain verified questions, so it grows automatically and never shows
  * an empty stage.
+ *
+ * IA NOTE (scale-to-10,000 design): proposals like "Passport & Visa",
+ * "Documents & Identity", "Flights & Airlines" and "Electronics" were evaluated
+ * as candidate TOP-LEVEL categories and deliberately NOT added as such — they
+ * overlap with existing groups (Documents, At the airport, Packing) and adding
+ * them would fragment a traveller's single mental journey across near-duplicate
+ * buckets. Per the merge rule, they instead became SUBCATEGORIES (see
+ * `SUBCATEGORIES` below) — this is what keeps the top-level nav simple as the
+ * library grows into the thousands, instead of accumulating flat categories.
+ * "Baggage" is the one genuine addition: it answers a different question
+ * ("how big/heavy can my bag be") than "Packing" ("what can I put in it"), the
+ * same split real airline sites use, and it already has verified content.
+ * "Emergency situations" is broadened and renamed "Travel disruptions" to also
+ * cover flight delays/cancellations/missed flights (previously mis-scoped under
+ * a proposed, overlapping "Flights & Airlines" category).
  */
 export const INTENT_GROUPS = [
   'Before you book',
   'Before you fly',
   'Packing',
+  'Baggage',
   'At the airport',
   'Airport security',
   'Boarding',
@@ -59,10 +75,39 @@ export const INTENT_GROUPS = [
   'Medical travel',
   'Documents',
   'Money & customs',
-  'Emergency situations',
+  'Travel disruptions',
 ] as const;
 
 export type IntentGroup = (typeof INTENT_GROUPS)[number];
+
+/**
+ * Category → Subcategory → Question. Subcategories are plain strings (not a
+ * closed union) so the library scales to thousands of questions without a type
+ * change — this registry only documents the canonical DISPLAY ORDER per group;
+ * an unlisted subcategory is simply appended alphabetically, so nothing breaks
+ * as new subcategories are introduced.
+ */
+export const SUBCATEGORIES: Partial<Record<IntentGroup, readonly string[]>> = {
+  Packing: ['Electronics', 'Liquids & toiletries', 'Food', 'Alcohol & tobacco'],
+  Baggage: ['Cabin baggage', 'Checked baggage', 'Airline allowance'],
+  'Airport security': ['Sharp & restricted items', 'Prohibited items', 'Electronics'],
+  Documents: ['Passport & visa', 'Identity & digital ID'],
+  'Money & customs': ['Cash & currency limits', 'Duty-free allowance', 'Gold & jewellery'],
+  'At the airport': ['Check-in & timing', 'Boarding & entry'],
+  'Family travel': ['Infants & babies', 'Passport & visa'],
+  'Medical travel': [
+    'Medicines',
+    'Prescription medicines',
+    'Insulin & devices',
+    'Certificates & vaccination',
+  ],
+  'Travel disruptions': [
+    'Flight delays & cancellations',
+    'Lost & damaged baggage',
+    'Lost documents',
+    'Medical emergencies abroad',
+  ],
+};
 
 /** A real-world subject an answer attaches to (referential integrity). */
 export interface SeedSubject {
@@ -86,6 +131,8 @@ export interface SeedQuestion {
    * defaults from the question's category (see CATEGORY_TO_INTENT).
    */
   intentGroup?: IntentGroup;
+  /** Second hierarchy level within the intent group, e.g. "Electronics". */
+  subcategory?: string;
   /** Decision type — drives the verdict VOCABULARY (see AnswerKind). Default 'carry'. */
   answerKind?: AnswerKind;
   /** Stored polarity — reshaped into the right words by `answerKind`. */
@@ -191,6 +238,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'can-i-carry-a-power-bank-on-a-flight',
     category: 'Baggage & items',
+    subcategory: 'Electronics',
     question: 'Can I carry a power bank on a flight?',
     subject: {
       type: 'travel_item',
@@ -211,12 +259,21 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     },
     assertion: 'Power banks up to 100 Wh are allowed in cabin baggage only.',
     evidenceLevel: 'government_regulation',
+    // Realises the "Power bank → Laptop → Chargers → Batteries → Cabin baggage"
+    // discovery chain from real, already-verified questions.
+    related: [
+      'can-i-carry-a-laptop-in-hand-baggage',
+      'can-i-carry-a-charger-on-a-flight',
+      'can-i-carry-spare-batteries-on-a-flight',
+      'what-is-the-cabin-baggage-size-and-weight-limit',
+    ],
     seededElsewhere: true,
     signoff: true,
   },
   {
     slug: 'can-i-carry-a-power-bank-in-checked-baggage',
     category: 'Baggage & items',
+    subcategory: 'Electronics',
     question: 'Can I carry a power bank in checked baggage?',
     subject: {
       type: 'travel_item',
@@ -245,6 +302,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'how-much-passport-validity-do-i-need-to-travel-abroad',
     category: 'Documents & visas',
+    subcategory: 'Passport & visa',
     question: 'How much passport validity do I need to travel abroad?',
     subject: {
       type: 'document',
@@ -283,6 +341,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'do-i-need-a-visa-to-travel-abroad',
     category: 'Documents & visas',
+    subcategory: 'Passport & visa',
     question: 'Do I need a visa to travel abroad?',
     subject: { type: 'document', code: 'visa', name: 'Visa', itemCategory: 'Travel document' },
     authority: 'boi',
@@ -303,12 +362,19 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     source: { title: 'Visa requirements for Indian travellers', url: 'https://boi.gov.in/' },
     assertion: 'Visa requirements for Indian passport holders vary by destination country.',
     evidenceLevel: 'government_advisory',
-    related: ['how-much-passport-validity-do-i-need-to-travel-abroad'],
+    // Realises the "Passport → Visa → International travel → Customs" chain with
+    // the real international-travel questions that exist today.
+    related: [
+      'how-much-passport-validity-do-i-need-to-travel-abroad',
+      'do-i-need-a-yellow-fever-vaccine-to-travel',
+      'what-is-the-duty-free-allowance-when-returning-to-india',
+    ],
     signoff: true,
   },
   {
     slug: 'what-id-do-i-need-for-a-domestic-flight-in-india',
     category: 'Documents & visas',
+    subcategory: 'Identity & digital ID',
     question: 'What ID do I need for a domestic flight in India?',
     subject: {
       type: 'document',
@@ -344,6 +410,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'do-children-need-a-passport-to-fly-internationally',
     category: 'Documents & visas',
+    subcategory: 'Passport & visa',
     question: 'Do children need a passport to fly internationally?',
     subject: {
       type: 'document',
@@ -375,6 +442,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'can-i-use-digital-aadhaar-as-id-for-a-domestic-flight',
     category: 'Documents & visas',
+    subcategory: 'Identity & digital ID',
     question: 'Can I use digital Aadhaar as ID for a domestic flight?',
     subject: {
       type: 'document',
@@ -411,6 +479,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'how-much-liquid-can-i-carry-in-hand-baggage',
     category: 'Baggage & items',
+    subcategory: 'Liquids & toiletries',
     question: 'How much liquid can I carry in hand baggage?',
     subject: { type: 'travel_item', code: 'liquids', name: 'Liquids', itemCategory: 'Toiletries' },
     authority: 'bcas',
@@ -441,6 +510,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     slug: 'can-i-carry-medicines-in-hand-baggage',
     category: 'Baggage & items',
     intentGroup: 'Medical travel',
+    subcategory: 'Medicines',
     question: 'Can I carry medicines in hand baggage?',
     subject: MEDICINES,
     authority: 'bcas',
@@ -471,6 +541,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'can-i-carry-a-laptop-in-hand-baggage',
     category: 'Baggage & items',
+    subcategory: 'Electronics',
     question: 'Can I carry a laptop in hand baggage?',
     subject: { type: 'travel_item', code: 'laptop', name: 'Laptop', itemCategory: 'Electronics' },
     authority: 'bcas',
@@ -488,10 +559,12 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     source: { title: 'Electronics in cabin baggage', url: 'https://www.bcasindia.gov.in/' },
     assertion: 'Laptops are permitted in cabin baggage and screened separately.',
     evidenceLevel: 'government_regulation',
+    related: ['can-i-carry-a-power-bank-on-a-flight', 'can-i-carry-a-charger-on-a-flight'],
   },
   {
     slug: 'can-i-carry-alcohol-on-a-flight',
     category: 'Baggage & items',
+    subcategory: 'Alcohol & tobacco',
     question: 'Can I carry alcohol on a flight?',
     subject: ALCOHOL,
     authority: 'dgca',
@@ -517,6 +590,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'can-i-carry-food-in-hand-baggage-on-a-domestic-flight',
     category: 'Baggage & items',
+    subcategory: 'Food',
     question: 'Can I carry food in hand baggage on a domestic flight?',
     subject: { type: 'travel_item', code: 'food', name: 'Food', itemCategory: 'Consumables' },
     authority: 'bcas',
@@ -542,6 +616,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'can-i-carry-perfume-on-a-flight',
     category: 'Baggage & items',
+    subcategory: 'Liquids & toiletries',
     question: 'Can I carry perfume on a flight?',
     subject: { type: 'travel_item', code: 'perfume', name: 'Perfume', itemCategory: 'Toiletries' },
     authority: 'bcas',
@@ -571,6 +646,10 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'what-is-the-cabin-baggage-size-and-weight-limit',
     category: 'Baggage & items',
+    // First-class member of the new "Baggage" journey group (bag-level rules),
+    // distinct from "Packing" (item-level carry rules).
+    intentGroup: 'Baggage',
+    subcategory: 'Cabin baggage',
     question: 'What is the cabin baggage size and weight limit?',
     subject: {
       type: 'travel_item',
@@ -597,6 +676,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     assertion:
       'Indian carriers commonly permit ~7 kg and ~115 cm cabin baggage, varying by airline and fare class.',
     evidenceLevel: 'government_advisory',
+    related: ['can-i-carry-a-power-bank-on-a-flight'],
     signoff: true,
   },
 
@@ -604,6 +684,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'can-i-carry-a-lighter-on-a-flight',
     category: 'Security & screening',
+    subcategory: 'Sharp & restricted items',
     question: 'Can I carry a lighter on a flight?',
     subject: { type: 'travel_item', code: 'lighter', name: 'Lighter', itemCategory: 'Restricted' },
     authority: 'bcas',
@@ -631,6 +712,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'can-i-carry-a-razor-in-hand-baggage',
     category: 'Security & screening',
+    subcategory: 'Sharp & restricted items',
     question: 'Can I carry a razor in hand baggage?',
     subject: { type: 'travel_item', code: 'razor', name: 'Razor', itemCategory: 'Toiletries' },
     authority: 'bcas',
@@ -650,11 +732,13 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     assertion:
       'Cartridge/disposable razors are allowed in the cabin; loose blades and straight razors are not.',
     evidenceLevel: 'government_regulation',
+    related: ['can-i-carry-scissors-in-hand-baggage', 'can-i-carry-a-nail-cutter-in-hand-baggage'],
     signoff: true,
   },
   {
     slug: 'can-i-carry-a-knife-in-checked-baggage',
     category: 'Security & screening',
+    subcategory: 'Sharp & restricted items',
     question: 'Can I carry a knife in checked baggage?',
     subject: { type: 'travel_item', code: 'knife', name: 'Knife', itemCategory: 'Restricted' },
     authority: 'bcas',
@@ -679,6 +763,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'can-i-carry-a-drone-on-a-flight',
     category: 'Security & screening',
+    subcategory: 'Electronics',
     question: 'Can I carry a drone on a flight?',
     subject: { type: 'travel_item', code: 'drone', name: 'Drone', itemCategory: 'Electronics' },
     authority: 'dgca',
@@ -698,12 +783,13 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     assertion:
       'Drones are carried in cabin baggage subject to battery limits; operation needs DGCA compliance.',
     evidenceLevel: 'government_regulation',
-    related: ['can-i-carry-a-power-bank-on-a-flight'],
+    related: ['can-i-carry-a-power-bank-on-a-flight', 'can-i-carry-spare-batteries-on-a-flight'],
     signoff: true,
   },
   {
     slug: 'can-i-carry-an-e-cigarette-or-vape-on-a-flight',
     category: 'Security & screening',
+    subcategory: 'Prohibited items',
     question: 'Can I carry an e-cigarette or vape on a flight?',
     subject: {
       type: 'travel_item',
@@ -738,6 +824,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'how-much-gold-can-i-bring-into-india-from-abroad',
     category: 'Customs & duty-free',
+    subcategory: 'Gold & jewellery',
     question: 'How much gold can I bring into India from abroad?',
     subject: { type: 'travel_item', code: 'gold', name: 'Gold', itemCategory: 'Valuables' },
     authority: 'cbic',
@@ -768,6 +855,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'how-many-cigarettes-can-i-bring-into-india-duty-free',
     category: 'Customs & duty-free',
+    subcategory: 'Duty-free allowance',
     question: 'How many cigarettes can I bring into India duty-free?',
     subject: {
       type: 'travel_item',
@@ -799,6 +887,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'how-much-alcohol-can-i-bring-into-india-duty-free',
     category: 'Customs & duty-free',
+    subcategory: 'Duty-free allowance',
     question: 'How much alcohol can I bring into India duty-free?',
     subject: ALCOHOL,
     authority: 'cbic',
@@ -824,6 +913,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'what-is-the-duty-free-allowance-when-returning-to-india',
     category: 'Customs & duty-free',
+    subcategory: 'Duty-free allowance',
     question: 'What is the duty-free allowance when returning to India?',
     subject: GENERAL,
     authority: 'cbic',
@@ -851,6 +941,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'how-early-should-i-reach-the-airport',
     category: 'At the airport',
+    subcategory: 'Check-in & timing',
     question: 'How early should I reach the airport?',
     subject: GENERAL,
     authority: 'dgca',
@@ -877,6 +968,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'is-web-check-in-mandatory-for-flights',
     category: 'At the airport',
+    subcategory: 'Check-in & timing',
     question: 'Is web check-in mandatory for flights?',
     subject: GENERAL,
     authority: 'dgca',
@@ -906,6 +998,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'can-i-use-digiyatra-for-domestic-flights',
     category: 'At the airport',
+    subcategory: 'Boarding & entry',
     question: 'Can I use DigiYatra for domestic flights?',
     subject: GENERAL,
     authority: 'bcas',
@@ -934,6 +1027,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'how-much-cash-can-i-carry-on-a-domestic-flight',
     category: 'Money & currency',
+    subcategory: 'Cash & currency limits',
     question: 'How much cash can I carry on a domestic flight?',
     subject: GENERAL,
     authority: 'cbic',
@@ -959,6 +1053,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'how-much-foreign-currency-can-i-carry-abroad-from-india',
     category: 'Money & currency',
+    subcategory: 'Cash & currency limits',
     question: 'How much foreign currency can I carry abroad from India?',
     subject: GENERAL,
     authority: 'rbi',
@@ -985,6 +1080,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'how-much-indian-currency-can-i-carry-when-going-abroad',
     category: 'Money & currency',
+    subcategory: 'Cash & currency limits',
     question: 'How much Indian currency can I carry when going abroad?',
     subject: GENERAL,
     authority: 'rbi',
@@ -1013,6 +1109,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'do-i-need-a-yellow-fever-vaccine-to-travel',
     category: 'Health & vaccines',
+    subcategory: 'Certificates & vaccination',
     question: 'Do I need a yellow fever vaccine to travel?',
     subject: {
       type: 'document',
@@ -1044,6 +1141,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
   {
     slug: 'can-i-carry-prescription-medicines-abroad',
     category: 'Health & vaccines',
+    subcategory: 'Prescription medicines',
     question: 'Can I carry prescription medicines abroad?',
     subject: MEDICINES,
     authority: 'mohfw',
@@ -1073,6 +1171,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     slug: 'can-i-carry-a-charger-on-a-flight',
     category: 'Baggage & items',
     intentGroup: 'Packing',
+    subcategory: 'Electronics',
     question: 'Can I carry a charger on a flight?',
     subject: { type: 'travel_item', code: 'charger', name: 'Charger', itemCategory: 'Electronics' },
     authority: 'bcas',
@@ -1096,6 +1195,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     slug: 'can-i-carry-spare-batteries-on-a-flight',
     category: 'Baggage & items',
     intentGroup: 'Packing',
+    subcategory: 'Electronics',
     question: 'Can I carry spare batteries on a flight?',
     subject: {
       type: 'travel_item',
@@ -1130,6 +1230,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     slug: 'can-i-carry-a-bluetooth-speaker-on-a-flight',
     category: 'Baggage & items',
     intentGroup: 'Packing',
+    subcategory: 'Electronics',
     question: 'Can I carry a Bluetooth speaker on a flight?',
     subject: {
       type: 'travel_item',
@@ -1159,6 +1260,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     slug: 'can-i-carry-a-hair-dryer-on-a-flight',
     category: 'Baggage & items',
     intentGroup: 'Packing',
+    subcategory: 'Electronics',
     question: 'Can I carry a hair dryer on a flight?',
     subject: {
       type: 'travel_item',
@@ -1184,6 +1286,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     slug: 'can-i-carry-scissors-in-hand-baggage',
     category: 'Security & screening',
     intentGroup: 'Airport security',
+    subcategory: 'Sharp & restricted items',
     question: 'Can I carry scissors in hand baggage?',
     subject: {
       type: 'travel_item',
@@ -1207,7 +1310,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     source: { title: 'Sharp items in cabin baggage', url: 'https://www.bcasindia.gov.in/' },
     assertion: 'Scissors with blades under 6 cm are permitted in the cabin; larger blades are not.',
     evidenceLevel: 'government_regulation',
-    related: ['can-i-carry-a-razor-in-hand-baggage'],
+    related: ['can-i-carry-a-razor-in-hand-baggage', 'can-i-carry-a-nail-cutter-in-hand-baggage'],
     signoff: true,
   },
 
@@ -1216,6 +1319,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     slug: 'can-i-carry-baby-food-on-a-flight',
     category: 'Baggage & items',
     intentGroup: 'Family travel',
+    subcategory: 'Infants & babies',
     question: 'Can I carry baby food on a flight?',
     subject: { type: 'travel_item', code: 'baby-food', name: 'Baby food', itemCategory: 'Family' },
     authority: 'bcas',
@@ -1242,6 +1346,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     slug: 'can-i-carry-breast-milk-on-a-flight',
     category: 'Baggage & items',
     intentGroup: 'Family travel',
+    subcategory: 'Infants & babies',
     question: 'Can I carry breast milk on a flight?',
     subject: {
       type: 'travel_item',
@@ -1275,6 +1380,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     slug: 'can-i-carry-insulin-on-a-flight',
     category: 'Health & vaccines',
     intentGroup: 'Medical travel',
+    subcategory: 'Insulin & devices',
     question: 'Can I carry insulin on a flight?',
     subject: { type: 'travel_item', code: 'insulin', name: 'Insulin', itemCategory: 'Health' },
     authority: 'bcas',
@@ -1303,6 +1409,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     slug: 'can-i-carry-coconut-oil-on-a-flight',
     category: 'Baggage & items',
     intentGroup: 'Packing',
+    subcategory: 'Liquids & toiletries',
     question: 'Can I carry coconut oil on a flight?',
     subject: {
       type: 'travel_item',
@@ -1337,6 +1444,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     slug: 'can-i-carry-ghee-on-a-flight',
     category: 'Baggage & items',
     intentGroup: 'Packing',
+    subcategory: 'Food',
     question: 'Can I carry ghee on a flight?',
     subject: { type: 'travel_item', code: 'ghee', name: 'Ghee', itemCategory: 'Food' },
     authority: 'bcas',
@@ -1363,6 +1471,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     slug: 'can-i-carry-pickle-on-a-flight',
     category: 'Baggage & items',
     intentGroup: 'Packing',
+    subcategory: 'Food',
     question: 'Can I carry pickle on a flight?',
     subject: { type: 'travel_item', code: 'pickle', name: 'Pickle', itemCategory: 'Food' },
     authority: 'bcas',
@@ -1391,6 +1500,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     slug: 'can-i-carry-dry-fruits-on-a-flight',
     category: 'Baggage & items',
     intentGroup: 'Packing',
+    subcategory: 'Food',
     question: 'Can I carry dry fruits on a flight?',
     subject: { type: 'travel_item', code: 'dry-fruits', name: 'Dry fruits', itemCategory: 'Food' },
     authority: 'bcas',
@@ -1414,6 +1524,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     slug: 'can-i-carry-toothpaste-on-a-flight',
     category: 'Baggage & items',
     intentGroup: 'Packing',
+    subcategory: 'Liquids & toiletries',
     question: 'Can I carry toothpaste on a flight?',
     subject: {
       type: 'travel_item',
@@ -1444,6 +1555,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     slug: 'can-i-carry-shampoo-on-a-flight',
     category: 'Baggage & items',
     intentGroup: 'Packing',
+    subcategory: 'Liquids & toiletries',
     question: 'Can I carry shampoo on a flight?',
     subject: { type: 'travel_item', code: 'shampoo', name: 'Shampoo', itemCategory: 'Toiletries' },
     authority: 'bcas',
@@ -1468,6 +1580,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     slug: 'can-i-carry-deodorant-on-a-flight',
     category: 'Baggage & items',
     intentGroup: 'Packing',
+    subcategory: 'Liquids & toiletries',
     question: 'Can I carry deodorant on a flight?',
     subject: {
       type: 'travel_item',
@@ -1497,6 +1610,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     slug: 'can-i-carry-a-camera-on-a-flight',
     category: 'Baggage & items',
     intentGroup: 'Packing',
+    subcategory: 'Electronics',
     question: 'Can I carry a camera on a flight?',
     subject: { type: 'travel_item', code: 'camera', name: 'Camera', itemCategory: 'Electronics' },
     authority: 'bcas',
@@ -1522,6 +1636,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     slug: 'can-i-carry-a-smartwatch-on-a-flight',
     category: 'Baggage & items',
     intentGroup: 'Packing',
+    subcategory: 'Electronics',
     question: 'Can I carry a smartwatch on a flight?',
     subject: {
       type: 'travel_item',
@@ -1545,6 +1660,7 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     slug: 'can-i-carry-a-nail-cutter-in-hand-baggage',
     category: 'Security & screening',
     intentGroup: 'Airport security',
+    subcategory: 'Sharp & restricted items',
     question: 'Can I carry a nail cutter in hand baggage?',
     subject: {
       type: 'travel_item',
@@ -1594,7 +1710,8 @@ const CATEGORY_TO_INTENT: Record<Category, IntentGroup> = {
 export const INTENT_GROUP_META: Record<IntentGroup, string> = {
   'Before you book': 'Plan before you pay.',
   'Before you fly': 'Get ready the day before.',
-  Packing: 'What you can bring, and where it goes.',
+  Packing: 'What you can put in your bag — and what stays home.',
+  Baggage: 'Bag size, weight and airline allowances.',
   'At the airport': 'Check-in, timing and getting through.',
   'Airport security': 'What passes screening — and what doesn’t.',
   Boarding: 'Gates, boarding passes and last steps.',
@@ -1602,9 +1719,9 @@ export const INTENT_GROUP_META: Record<IntentGroup, string> = {
   Arrival: 'Landing, baggage and getting out.',
   'Family travel': 'Flying with kids, infants and elders.',
   'Medical travel': 'Medicines, devices and medical needs.',
-  Documents: 'Passports, visas and accepted IDs.',
+  Documents: 'Passports, visas and accepted IDs — from application to gate.',
   'Money & customs': 'Cash, gold, currency and allowances.',
-  'Emergency situations': 'When something goes wrong.',
+  'Travel disruptions': 'Delays, cancellations, and what to do if things go wrong.',
 };
 
 /**
@@ -1615,6 +1732,27 @@ export function intentGroupForSlug(slug: string): IntentGroup {
   const q = TRAVEL_QUESTIONS.find((x) => x.slug === slug);
   if (!q) return 'Packing';
   return q.intentGroup ?? CATEGORY_TO_INTENT[q.category];
+}
+
+/**
+ * slug → subcategory (second hierarchy level), if tagged. Used to break a large
+ * intent group into scannable clusters (e.g. Packing → Electronics / Liquids /
+ * Food) without adding more top-level nav.
+ */
+export function subcategoryForSlug(slug: string): string | undefined {
+  return TRAVEL_QUESTIONS.find((q) => q.slug === slug)?.subcategory;
+}
+
+/**
+ * Canonical display order for a group's subcategories (from SUBCATEGORIES);
+ * anything not listed is appended alphabetically, so new subcategories never
+ * require a code change as the library scales.
+ */
+export function orderSubcategories(group: string, names: readonly string[]): string[] {
+  const known = SUBCATEGORIES[group as IntentGroup] ?? [];
+  const knownPresent = known.filter((n) => names.includes(n));
+  const rest = names.filter((n) => !known.includes(n)).sort();
+  return [...knownPresent, ...rest];
 }
 
 /**
@@ -1664,6 +1802,101 @@ export const PREFLIGHT_CHECKLIST: { slug: string; label: string }[] = [
     label: 'Is my cabin bag within the limit?',
   },
   { slug: 'can-i-carry-a-power-bank-on-a-flight', label: 'Can I carry my power bank?' },
+];
+
+/**
+ * Curated traveller-type COLLECTIONS — a cross-cutting discovery axis, distinct
+ * from journey-stage categories. Each collection is hand-picked from EXISTING
+ * verified questions only (no new facts, just selection) — this is deliberately
+ * conservative: personas without enough real content today (students, business
+ * travellers, NRIs, OCI holders, foreign tourists, pet travellers, solo/female
+ * travellers) are NOT listed here yet. Adding their dedicated content is the
+ * natural way to "unlock" a real collection for them later; the catalog only
+ * renders a collection once it has a handful of real verified questions.
+ */
+export interface TravellerCollection {
+  id: string;
+  label: string;
+  description: string;
+  slugs: string[];
+}
+
+export const TRAVELLER_COLLECTIONS: TravellerCollection[] = [
+  {
+    id: 'first-time-flyers',
+    label: 'First-time flyers',
+    description: 'The basics every new flyer should know before their first trip.',
+    slugs: [
+      'what-id-do-i-need-for-a-domestic-flight-in-india',
+      'what-is-the-cabin-baggage-size-and-weight-limit',
+      'how-much-liquid-can-i-carry-in-hand-baggage',
+      'is-web-check-in-mandatory-for-flights',
+      'how-early-should-i-reach-the-airport',
+      'can-i-carry-a-lighter-on-a-flight',
+    ],
+  },
+  {
+    id: 'family-travellers',
+    label: 'Travelling with children',
+    description: 'What families flying with kids and infants need to know.',
+    slugs: [
+      'do-children-need-a-passport-to-fly-internationally',
+      'can-i-carry-baby-food-on-a-flight',
+      'can-i-carry-breast-milk-on-a-flight',
+      'how-much-liquid-can-i-carry-in-hand-baggage',
+      'what-is-the-cabin-baggage-size-and-weight-limit',
+    ],
+  },
+  {
+    id: 'medical-travellers',
+    label: 'Medical travellers',
+    description: 'Travelling with medicines, insulin or a health condition.',
+    slugs: [
+      'can-i-carry-medicines-in-hand-baggage',
+      'can-i-carry-prescription-medicines-abroad',
+      'can-i-carry-insulin-on-a-flight',
+    ],
+  },
+  {
+    id: 'international-travellers',
+    label: 'International travellers',
+    description: 'Crossing borders from India — documents, health and money.',
+    slugs: [
+      'how-much-passport-validity-do-i-need-to-travel-abroad',
+      'do-i-need-a-visa-to-travel-abroad',
+      'do-i-need-a-yellow-fever-vaccine-to-travel',
+      'how-much-foreign-currency-can-i-carry-abroad-from-india',
+      'what-is-the-duty-free-allowance-when-returning-to-india',
+      'how-much-gold-can-i-bring-into-india-from-abroad',
+    ],
+  },
+];
+
+/**
+ * Query-expansion synonyms for search (NOT new facts — just how Indian
+ * travellers phrase the same question). Applied before fuzzy matching so
+ * "e-visa", "hand baggage" or a common misspelling still finds the right
+ * verified answer. Keep modest and honest; this is UX, not content.
+ */
+export const SEARCH_SYNONYMS: [pattern: string, canonical: string][] = [
+  ['e-visa', 'visa'],
+  ['evisa', 'visa'],
+  ['e visa', 'visa'],
+  ['hand baggage', 'cabin baggage'],
+  ['hand bag', 'cabin baggage'],
+  ['cabin bag', 'cabin baggage'],
+  ['check in', 'check-in'],
+  ['checkin', 'check-in'],
+  ['id proof', 'ID'],
+  ['adhar card', 'aadhaar'],
+  ['adhaar', 'aadhaar'],
+  ['digital locker', 'digilocker'],
+  ['driving license', 'driving licence'],
+  ['lithium battery', 'battery'],
+  ['li-ion battery', 'battery'],
+  ['duty free', 'duty-free'],
+  ['suitcase', 'baggage'],
+  ['trolley bag', 'baggage'],
 ];
 
 /** One honest line describing what each category covers (for the category cards). */

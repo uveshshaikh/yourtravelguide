@@ -9,6 +9,7 @@ import {
   listVerifiedQuestions,
   popularQuestions,
   preflightChecklist,
+  travellerCollections,
 } from '@/services/resolver/catalog';
 import { authoritiesCovered } from '@/db/seed/content';
 
@@ -39,11 +40,12 @@ const steps = [
 ];
 
 export default async function HomePage() {
-  const [catalog, popular, intentGroups, checklist] = await Promise.all([
+  const [catalog, popular, intentGroups, checklist, collections] = await Promise.all([
     listVerifiedQuestions(),
     popularQuestions(6),
     listByIntentGroup(),
     preflightChecklist(),
+    travellerCollections(),
   ]);
   const authorities = authoritiesCovered();
 
@@ -168,6 +170,37 @@ export default async function HomePage() {
                   group={g.group}
                   description={g.description}
                   questions={g.questions}
+                />
+              ))}
+            </div>
+          </Container>
+        </section>
+      ) : null}
+
+      {/* ── Explore by traveller type — cross-cutting persona collections ── */}
+      {collections.length > 0 ? (
+        <section aria-labelledby="collections-heading">
+          <Container className="py-16 sm:py-20">
+            <div className="max-w-xl">
+              <h2
+                id="collections-heading"
+                className="text-xl font-semibold tracking-tight sm:text-2xl"
+              >
+                Travelling as a…
+              </h2>
+              <p className="text-muted-foreground mt-1.5 text-sm">
+                Curated from our verified answers for common trip types.
+              </p>
+            </div>
+            <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {collections.map((c) => (
+                <IntentCard
+                  key={c.id}
+                  group={c.label}
+                  description={c.description}
+                  questions={c.questions}
+                  max={6}
+                  href={`/search?collection=${encodeURIComponent(c.id)}`}
                 />
               ))}
             </div>

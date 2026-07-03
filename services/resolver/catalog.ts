@@ -9,8 +9,11 @@ import {
   INTENT_GROUP_META,
   INTENT_GROUPS,
   intentGroupForSlug,
+  orderSubcategories,
   PREFERRED_POPULAR,
   PREFLIGHT_CHECKLIST,
+  subcategoryForSlug,
+  TRAVELLER_COLLECTIONS,
 } from '@/db/seed/content';
 import type { AnswerKind, Verdict } from '@/lib/knowledge/types';
 
@@ -62,6 +65,7 @@ export async function listVerifiedQuestions(): Promise<QuestionSummaryView[]> {
       appliesTo: categoryForSlug(r.slug) ? appliesToLabel(r.slug) : appliesToSummary(r),
       answerKind: answerKindForSlug(r.slug),
       intentGroup: intentGroupForSlug(r.slug),
+      subcategory: subcategoryForSlug(r.slug),
       riskLevel: r.riskLevel,
       // Category from the content registry (authoritative), then the DB field,
       // then a safe fallback — so nothing is ever ungrouped.
@@ -123,16 +127,26 @@ export async function popularQuestions(limit = 8): Promise<QuestionSummaryView[]
   return out.slice(0, limit);
 }
 
+export interface SubcategoryGroup {
+  subcategory: string;
+  questions: QuestionSummaryView[];
+}
+
 export interface IntentGroupView {
   group: string;
   description: string;
   questions: QuestionSummaryView[];
+  /** Questions within this group, bucketed by subcategory (canonical order). */
+  subgroups: SubcategoryGroup[];
 }
 
 /**
  * Verified questions grouped by traveller INTENT (the homepage discovery axis),
- * in canonical journey order. Only non-empty groups are returned, so the page
- * grows automatically and never shows an empty stage. Data-driven from the Core.
+ * in canonical journey order, with a subcategory breakdown within each group
+ * (Category → Subcategory → Question). Only non-empty groups are returned, so
+ * the page grows automatically and never shows an empty stage — this is the
+ * scalable structure that supports thousands of questions without adding more
+ * top-level nav. Data-driven from the Core.
  */
 export async function listByIntentGroup(): Promise<IntentGroupView[]> {
   const all = await listVerifiedQuestions();
@@ -146,7 +160,52 @@ export async function listByIntentGroup(): Promise<IntentGroupView[]> {
   for (const group of INTENT_GROUPS) {
     const questions = byGroup.get(group);
     if (questions && questions.length > 0) {
-      out.push({ group, description: INTENT_GROUP_META[group], questions });
+      const bySubcat = new Map<string, QuestionSummaryView[]>();
+      const untagged: QuestionSummaryView[] = [];
+      for (const q of questions) {
+        if (!q.subcategory) {
+          untagged.push(q);
+          continue;
+        }
+        const list = bySubcat.get(q.subcategory) ?? [];
+        list.push(q);
+        bySubcat.set(q.subcategory, list);
+      }
+      const orderedNames = orderSubcategories(group, [...bySubcat.keys()]);
+      const subgroups: SubcategoryGroup[] = orderedNames.map((subcategory) => ({
+        subcategory,
+        questions: bySubcat.get(subcategory) ?? [],
+      }));
+      if (untagged.length > 0) subgroups.push({ subcategory: 'General', questions: untagged });
+      out.push({ group, description: INTENT_GROUP_META[group], questions, subgroups });
+    }
+  }
+  return out;
+}
+
+export interface TravellerCollectionView {
+  id: string;
+  label: string;
+  description: string;
+  questions: QuestionSummaryView[];
+}
+
+/**
+ * Curated traveller-type collections (cross-cutting discovery, e.g. "Travelling
+ * with children"), realised over the live verified catalog. Fail-closed: a
+ * collection only appears once at least 3 of its curated questions are actually
+ * verified, so it's never a promise the Core can't keep.
+ */
+export async function travellerCollections(): Promise<TravellerCollectionView[]> {
+  const all = await listVerifiedQuestions();
+  const bySlug = new Map(all.map((q) => [q.slug, q]));
+  const out: TravellerCollectionView[] = [];
+  for (const c of TRAVELLER_COLLECTIONS) {
+    const questions = c.slugs
+      .map((s) => bySlug.get(s))
+      .filter((q): q is QuestionSummaryView => Boolean(q));
+    if (questions.length >= 3) {
+      out.push({ id: c.id, label: c.label, description: c.description, questions });
     }
   }
   return out;

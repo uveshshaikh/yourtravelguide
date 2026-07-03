@@ -1,6 +1,7 @@
 import {
   ArrowRight,
   Baby,
+  Briefcase,
   ClipboardCheck,
   Compass,
   DoorOpen,
@@ -24,6 +25,7 @@ const intentIcon: Record<string, LucideIcon> = {
   'Before you book': Ticket,
   'Before you fly': ClipboardCheck,
   Packing: Luggage,
+  Baggage: Briefcase,
   'At the airport': Plane,
   'Airport security': ShieldCheck,
   Boarding: DoorOpen,
@@ -33,7 +35,7 @@ const intentIcon: Record<string, LucideIcon> = {
   'Medical travel': HeartPulse,
   Documents: FileText,
   'Money & customs': Landmark,
-  'Emergency situations': TriangleAlert,
+  'Travel disruptions': TriangleAlert,
 };
 
 /**
@@ -46,11 +48,16 @@ export function IntentCard({
   description,
   questions,
   max = 5,
+  href,
 }: {
   group: string;
   description: string;
   questions: QuestionSummaryView[];
   max?: number;
+  /** Override the "browse more" destination (defaults to the journey-stage
+   *  filter). Required for anything that isn't a real IntentGroup, e.g. a
+   *  persona collection — never let the label alone imply a working filter. */
+  href?: string;
 }) {
   const Icon = intentIcon[group] ?? Compass;
   const shown = questions.slice(0, max);
@@ -99,7 +106,7 @@ export function IntentCard({
 
       {/* Bottom-pinned action on every card, so heights align across the row. */}
       <a
-        href={`/search?intent=${encodeURIComponent(group)}`}
+        href={href ?? `/search?intent=${encodeURIComponent(group)}`}
         className="text-primary mt-auto inline-flex items-center gap-1 pt-3 text-xs font-medium hover:underline"
       >
         {remaining > 0 ? `+${remaining} more` : `Explore ${group}`}
