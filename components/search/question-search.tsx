@@ -8,6 +8,7 @@ import { searchQuestions } from '@/lib/search';
 import { Badge } from '@/components/ui/badge';
 import { verdictDisplay } from '@/components/decision/verdict-config';
 import { Kbd } from '@/components/ui/kbd';
+import { SEARCH_INPUT_ID } from '@/components/search/search-shortcut';
 import { cn } from '@/lib/utils';
 
 const RECENTS_KEY = 'ytg:recent-searches';
@@ -126,6 +127,7 @@ export function QuestionSearch({
           aria-hidden
         />
         <input
+          id={SEARCH_INPUT_ID}
           type="search"
           name="q"
           value={query}
