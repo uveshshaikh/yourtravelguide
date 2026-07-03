@@ -14,7 +14,7 @@ export function QuestionCard({ item }: { item: QuestionSummaryView }) {
   return (
     <a
       href={`/question/${item.slug}`}
-      className="group border-border bg-card hover:border-primary/30 relative flex flex-col gap-3 overflow-hidden rounded-2xl border p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+      className="group border-border bg-card hover:border-primary/30 relative flex h-full flex-col gap-3 overflow-hidden rounded-2xl border p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
     >
       {/* Verdict rail — the only colour, so it reads instantly. */}
       <span className={`absolute inset-y-0 left-0 w-1 ${v.dot}`} aria-hidden />

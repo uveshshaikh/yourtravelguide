@@ -24,23 +24,17 @@ export function PreflightChecklist({ items }: { items: ChecklistItemView[] }) {
         </div>
       </div>
 
-      <ul className="divide-border grid divide-y sm:grid-cols-2 sm:divide-y-0">
-        {items.map((item, i) => {
+      <ul className="grid gap-1.5 p-3 sm:grid-cols-2 sm:p-4">
+        {items.map((item) => {
           const v = verdictDisplay(item.answerKind, item.verdict);
           return (
-            <li
-              key={item.slug}
-              className={
-                // subtle inner grid lines on desktop
-                i % 2 === 0 ? 'sm:border-border sm:border-r' : ''
-              }
-            >
+            <li key={item.slug}>
               <a
                 href={`/question/${item.slug}`}
-                className="group hover:bg-muted/60 flex items-center gap-3 px-6 py-4 transition-colors"
+                className="group hover:bg-muted flex h-full items-center gap-3 rounded-xl px-3 py-3 transition-colors"
               >
                 <CircleCheck className="text-primary size-5 shrink-0" aria-hidden />
-                <span className="min-w-0 flex-1 font-medium text-pretty">{item.label}</span>
+                <span className="min-w-0 flex-1 text-sm font-medium text-pretty">{item.label}</span>
                 <span
                   className={`size-2 shrink-0 rounded-full ${v.dot}`}
                   aria-hidden

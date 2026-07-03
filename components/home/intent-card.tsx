@@ -59,7 +59,7 @@ export function IntentCard({
   return (
     <section
       aria-label={group}
-      className="border-border bg-card flex flex-col rounded-2xl border p-5 shadow-sm transition-shadow hover:shadow-md"
+      className="border-border bg-card flex h-full flex-col rounded-2xl border p-5 shadow-sm transition-shadow hover:shadow-md"
     >
       <div className="flex items-center gap-3">
         <span className="bg-muted text-primary grid size-10 shrink-0 place-items-center rounded-xl">
@@ -74,7 +74,7 @@ export function IntentCard({
         </span>
       </div>
 
-      <ul className="border-border/70 mt-4 space-y-0.5 border-t pt-3">
+      <ul className="border-border/70 mt-4 space-y-0.5 border-t pt-3 pb-1">
         {shown.map((q) => {
           const v = verdictDisplay(q.answerKind, q.verdict);
           return (
@@ -97,14 +97,14 @@ export function IntentCard({
         })}
       </ul>
 
-      {remaining > 0 ? (
-        <a
-          href={`/search?intent=${encodeURIComponent(group)}`}
-          className="text-primary mt-3 inline-flex items-center gap-1 text-xs font-medium hover:underline"
-        >
-          +{remaining} more <ArrowRight className="size-3" aria-hidden />
-        </a>
-      ) : null}
+      {/* Bottom-pinned action on every card, so heights align across the row. */}
+      <a
+        href={`/search?intent=${encodeURIComponent(group)}`}
+        className="text-primary mt-auto inline-flex items-center gap-1 pt-3 text-xs font-medium hover:underline"
+      >
+        {remaining > 0 ? `+${remaining} more` : `Explore ${group}`}
+        <ArrowRight className="size-3" aria-hidden />
+      </a>
     </section>
   );
 }

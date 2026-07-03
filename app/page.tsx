@@ -129,7 +129,7 @@ export default async function HomePage() {
                 Browse all <ArrowRight className="size-4" aria-hidden />
               </a>
             </div>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {popular.map((qn) => (
                 <QuestionCard key={qn.slug} item={qn} />
               ))}
@@ -161,7 +161,7 @@ export default async function HomePage() {
                 All questions <ArrowRight className="size-4" aria-hidden />
               </a>
             </div>
-            <div className="mt-7 grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {intentGroups.map((g) => (
                 <IntentCard
                   key={g.group}
