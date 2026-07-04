@@ -103,6 +103,10 @@ export function DecisionPage({
             </span>
           </>
         ) : null}
+        <span aria-hidden>·</span>
+        <a href="/trust" className="hover:text-foreground underline underline-offset-2">
+          How we verify
+        </a>
       </footer>
     </Container>
   );

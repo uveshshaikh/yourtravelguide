@@ -2464,6 +2464,35 @@ export function authoritiesCovered(): { code: string; name: string; description:
     }));
 }
 
+/** slug → authority code, for per-source attribution (e.g. the Trust Center). */
+export const authorityForSlug = (slug: string): AuthorityCode | undefined =>
+  TRAVEL_QUESTIONS.find((q) => q.slug === slug)?.authority;
+
+/**
+ * Full authority profile (name, site, description, and how many questions in
+ * the REGISTRY cite it) — the registry count, not a live DB count, since this
+ * powers a static trust page; `catalog.authoritiesWithLiveCounts()` cross-checks
+ * against what's actually verified right now for the number shown to users.
+ */
+export function authorityProfiles(): {
+  code: string;
+  name: string;
+  websiteUrl: string;
+  description: string;
+  questionCount: number;
+}[] {
+  const used = new Set(TRAVEL_QUESTIONS.map((q) => q.authority));
+  return (Object.keys(AUTHORITIES) as AuthorityCode[])
+    .filter((code) => used.has(code))
+    .map((code) => ({
+      code: code.toUpperCase(),
+      name: AUTHORITIES[code].name,
+      websiteUrl: AUTHORITIES[code].websiteUrl,
+      description: AUTHORITIES[code].description,
+      questionCount: TRAVEL_QUESTIONS.filter((q) => q.authority === code).length,
+    }));
+}
+
 /**
  * slug → short applicability label ("Domestic flights", "International travel"…).
  * Descriptive only — travelType is deliberately kept out of the claim scope so

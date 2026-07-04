@@ -13,6 +13,12 @@ export const siteConfig = {
   locale: 'en_IN',
   defaultOgImage: '/og-default.png',
   creator: 'YourTravelGuide',
+  /**
+   * PLACEHOLDER — set to a real, monitored inbox before launch. Used on the
+   * Trust Center's "Report an error" mailto link. An unmonitored address here
+   * would be a broken trust promise, not a working correction channel.
+   */
+  supportEmail: 'corrections@yourtravelguide.in',
   links: {
     // Populated as channels go live.
   },

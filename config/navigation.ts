@@ -23,5 +23,6 @@ export const primaryNav: NavItem[] = [];
  */
 export const footerLinks: NavItem[] = [
   { label: 'All questions', href: '/search' },
+  { label: 'Trust & Editorial Center', href: '/trust' },
   { label: 'Home', href: '/' },
 ];

@@ -4,6 +4,8 @@ import type { QuestionSummaryView } from '@/lib/knowledge/view';
 import {
   answerKindForSlug,
   appliesToLabel,
+  authorityForSlug,
+  authorityProfiles,
   CATEGORIES,
   categoryForSlug,
   INTENT_GROUP_META,
@@ -234,4 +236,32 @@ export async function listVerifiedByCategory(): Promise<CategoryGroup[]> {
     if (questions && questions.length > 0) ordered.push({ category, questions });
   }
   return ordered;
+}
+
+export interface AuthorityProfileView {
+  code: string;
+  name: string;
+  websiteUrl: string;
+  description: string;
+  /** Count of currently LIVE verified questions citing this authority. */
+  verifiedCount: number;
+}
+
+/**
+ * Authority profiles for the Trust Center's "Sources & Authorities" section,
+ * with a LIVE count — cross-checked against what's actually verified and
+ * published right now (fail-closed), not just what the registry declares. An
+ * authority with zero live questions is omitted, so the page never overclaims.
+ */
+export async function authoritiesWithLiveCounts(): Promise<AuthorityProfileView[]> {
+  const all = await listVerifiedQuestions();
+  const counts = new Map<string, number>();
+  for (const q of all) {
+    const code = authorityForSlug(q.slug);
+    if (!code) continue;
+    counts.set(code, (counts.get(code) ?? 0) + 1);
+  }
+  return authorityProfiles()
+    .map((a) => ({ ...a, verifiedCount: counts.get(a.code.toLowerCase()) ?? 0 }))
+    .filter((a) => a.verifiedCount > 0);
 }
