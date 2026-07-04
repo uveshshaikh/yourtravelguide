@@ -2,14 +2,24 @@ import { ArrowLeft, BadgeCheck, Info } from 'lucide-react';
 import type { BreadcrumbItemView, DecisionView } from '@/lib/knowledge/view';
 import { Container } from '@/components/layout/container';
 import { VerdictBanner } from '@/components/decision/verdict-banner';
+import { NumberCards } from '@/components/decision/number-cards';
+import { StepList } from '@/components/decision/step-list';
+import { DetailsList } from '@/components/decision/details-list';
 import { RelatedQuestions } from '@/components/content/related';
+import { choosePresentation } from '@/lib/knowledge/presentation';
 import { formatDate } from '@/lib/format';
 
 /**
- * DecisionPage — one calm, scannable answer. Deliberately minimal: the verdict,
- * the few details that matter, any real exception, related questions, and a
- * single quiet "verified · source" line. No route/airline/traveller panels, no
- * trust dashboards — a rushed traveller sees only what they need to decide.
+ * DecisionPage — one calm, scannable answer that ADAPTS to the question, not
+ * the other way round. The verdict banner and surrounding shell are the same
+ * for every page (that consistency is what makes the platform feel coherent),
+ * but the "details" block is chosen deterministically from decisionType +
+ * answerKind — fields the resolver already populates on every DecisionView,
+ * never inferred from the question text at runtime:
+ *   threshold (e.g. "How much…") → large number cards
+ *   procedure (e.g. "How do I…") → a numbered step sequence
+ *   everything else             → a labelled list, headed by answerKind
+ * Only ever renders real Knowledge Core conditions — no fabricated rows.
  */
 export function DecisionPage({
   decision,
@@ -20,6 +30,7 @@ export function DecisionPage({
 }) {
   const d = decision;
   const source = d.sources[0];
+  const presentation = choosePresentation(d.decisionType, d.answerKind);
 
   return (
     <Container className="max-w-2xl py-8 sm:py-10">
@@ -45,18 +56,19 @@ export function DecisionPage({
         />
       </div>
 
-      {/* The few details that matter. */}
+      {/* The details that matter — presentation adapts to the question type. */}
       {d.conditions?.length ? (
         <section className="mt-8">
-          <h2 className="text-sm font-semibold tracking-wide uppercase">Key details</h2>
-          <dl className="border-border divide-border mt-3 divide-y rounded-xl border">
-            {d.conditions.map((c) => (
-              <div key={c.label} className="flex items-baseline justify-between gap-4 px-4 py-3">
-                <dt className="text-muted-foreground text-sm">{c.label}</dt>
-                <dd className="text-right text-sm font-medium">{c.value ?? '—'}</dd>
-              </div>
-            ))}
-          </dl>
+          <h2 className="text-sm font-semibold tracking-wide uppercase">{presentation.heading}</h2>
+          <div className="mt-3">
+            {presentation.style === 'numbers' ? (
+              <NumberCards conditions={d.conditions} />
+            ) : presentation.style === 'steps' ? (
+              <StepList conditions={d.conditions} />
+            ) : (
+              <DetailsList conditions={d.conditions} />
+            )}
+          </div>
         </section>
       ) : null}
 
