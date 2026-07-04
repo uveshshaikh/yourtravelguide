@@ -1706,6 +1706,285 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     related: ['can-i-carry-scissors-in-hand-baggage', 'can-i-carry-a-razor-in-hand-baggage'],
     signoff: true,
   },
+
+  // ── Travel Problems — activates a previously-empty category ────────────────
+  {
+    slug: 'am-i-entitled-to-compensation-if-my-flight-is-delayed',
+    category: 'At the airport',
+    intentGroup: 'Travel Problems',
+    subcategory: 'Flight delays & cancellations',
+    question: 'Am I entitled to compensation if my flight is delayed?',
+    subject: GENERAL,
+    authority: 'dgca',
+    answerKind: 'requirement',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Depends on the delay — DGCA rules require the airline to provide facilities (meals, refreshments, and in longer delays, a refund or alternate flight), scaled to how long the delay is.',
+    conditions: {
+      'Short delay': 'Meals/refreshments after a set waiting time',
+      'Longer delay': 'Airline must offer a refund or an alternate flight',
+      Cause: 'Airline-caused delays are covered; weather/ATC delays are not',
+    },
+    riskLevel: 'medium',
+    timePhase: 'during',
+    intent: 'requirement',
+    decisionType: 'requirement',
+    source: {
+      title: 'Civil Aviation Requirements — facilitation for delayed flights',
+      url: 'https://www.dgca.gov.in/',
+    },
+    assertion:
+      'DGCA’s Civil Aviation Requirements mandate passenger facilitation for flight delays, scaled by delay length and airline fault.',
+    evidenceLevel: 'government_regulation',
+    related: [
+      'am-i-eligible-for-a-refund-if-my-flight-is-cancelled',
+      'am-i-eligible-for-compensation-if-i-am-denied-boarding',
+    ],
+    signoff: true,
+  },
+  {
+    slug: 'am-i-eligible-for-a-refund-if-my-flight-is-cancelled',
+    category: 'At the airport',
+    intentGroup: 'Travel Problems',
+    subcategory: 'Flight delays & cancellations',
+    question: 'Am I eligible for a refund if my flight is cancelled?',
+    subject: GENERAL,
+    authority: 'dgca',
+    answerKind: 'eligibility',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Yes — if the airline cancels your flight, DGCA rules entitle you to a full refund or an alternate flight, plus compensation if you weren’t told in advance.',
+    conditions: {
+      Choice: 'Full refund or an alternate flight, your choice',
+      'Short notice': 'Additional compensation if informed less than 2 weeks before',
+      'Your own cancellation': 'Follows the airline’s normal fare/refund rules instead',
+    },
+    riskLevel: 'medium',
+    timePhase: 'during',
+    intent: 'requirement',
+    decisionType: 'requirement',
+    source: {
+      title: 'Civil Aviation Requirements — flight cancellations',
+      url: 'https://www.dgca.gov.in/',
+    },
+    assertion:
+      'DGCA rules entitle passengers to a refund or alternate flight when the airline cancels a flight, with extra compensation for short-notice cancellations.',
+    evidenceLevel: 'government_regulation',
+    related: [
+      'am-i-entitled-to-compensation-if-my-flight-is-delayed',
+      'am-i-eligible-for-compensation-if-i-am-denied-boarding',
+    ],
+    signoff: true,
+  },
+  {
+    slug: 'am-i-eligible-for-compensation-if-i-am-denied-boarding',
+    category: 'At the airport',
+    intentGroup: 'Travel Problems',
+    subcategory: 'Flight delays & cancellations',
+    question: 'Am I eligible for compensation if I am denied boarding?',
+    subject: GENERAL,
+    authority: 'dgca',
+    answerKind: 'eligibility',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Yes — if you’re denied boarding due to overbooking despite holding a confirmed ticket and checking in on time, DGCA rules entitle you to an alternate flight and compensation.',
+    conditions: {
+      Condition: 'Confirmed ticket, checked in on time, denied due to overbooking',
+      Compensation: 'Scaled to how much later the alternate flight arrives',
+      'Not covered': 'Being denied for safety, security, or documentation reasons',
+    },
+    riskLevel: 'medium',
+    timePhase: 'during',
+    intent: 'requirement',
+    decisionType: 'requirement',
+    source: {
+      title: 'Civil Aviation Requirements — denied boarding',
+      url: 'https://www.dgca.gov.in/',
+    },
+    assertion:
+      'DGCA rules entitle passengers denied boarding due to overbooking to an alternate flight and compensation.',
+    evidenceLevel: 'government_regulation',
+    related: [
+      'am-i-entitled-to-compensation-if-my-flight-is-delayed',
+      'am-i-eligible-for-a-refund-if-my-flight-is-cancelled',
+    ],
+    signoff: true,
+  },
+  {
+    slug: 'am-i-eligible-for-compensation-if-my-baggage-is-lost',
+    category: 'At the airport',
+    intentGroup: 'Travel Problems',
+    subcategory: 'Lost & damaged baggage',
+    question: 'Am I eligible for compensation if my baggage is lost?',
+    subject: GENERAL,
+    authority: 'dgca',
+    answerKind: 'eligibility',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Yes — airlines are liable for lost or damaged checked baggage, up to a set limit; file a report at the airport before you leave the baggage-claim area.',
+    conditions: {
+      'File immediately': 'Report at the airline’s baggage desk before leaving the airport',
+      Liability: 'Capped per passenger — higher on international, lower on domestic flights',
+      Valuables: 'Cash, jewellery and electronics are often excluded — check the airline’s policy',
+    },
+    riskLevel: 'medium',
+    timePhase: 'after',
+    intent: 'requirement',
+    decisionType: 'requirement',
+    source: {
+      title: 'Carriage by Air Act — baggage liability',
+      url: 'https://www.dgca.gov.in/',
+    },
+    assertion:
+      'Airlines carry liability for lost or damaged checked baggage up to a capped limit, under the Carriage by Air Act and DGCA rules.',
+    evidenceLevel: 'government_regulation',
+    related: ['what-is-the-checked-baggage-weight-limit-for-domestic-flights'],
+    signoff: true,
+  },
+  {
+    slug: 'am-i-eligible-for-a-refund-if-i-miss-my-flight',
+    category: 'At the airport',
+    intentGroup: 'Travel Problems',
+    subcategory: 'Flight delays & cancellations',
+    question: 'Am I eligible for a refund if I miss my flight?',
+    subject: GENERAL,
+    authority: 'dgca',
+    answerKind: 'eligibility',
+    verdict: 'not_allowed',
+    summary:
+      'Generally no — missing your flight (a "no-show") usually forfeits the fare; some fare types allow a fee-based rebooking, so check your ticket conditions.',
+    conditions: {
+      'Standard fares': 'Fare is forfeited — no automatic refund',
+      'Flexible fares': 'May allow rebooking for a fee',
+      'Airline-caused misses': 'E.g. a delayed connecting flight are usually handled separately',
+    },
+    riskLevel: 'medium',
+    timePhase: 'during',
+    intent: 'requirement',
+    decisionType: 'requirement',
+    source: { title: 'No-show and missed-flight fare rules', url: 'https://www.dgca.gov.in/' },
+    assertion:
+      'A missed flight (no-show) generally forfeits the fare, subject to the ticket’s fare rules.',
+    evidenceLevel: 'government_advisory',
+    signoff: true,
+  },
+
+  // ── Baggage — fills the previously-empty "Checked baggage" subcategory ─────
+  {
+    slug: 'what-is-the-checked-baggage-weight-limit-for-domestic-flights',
+    category: 'Baggage & items',
+    intentGroup: 'Baggage',
+    subcategory: 'Checked baggage',
+    question: 'What is the checked baggage weight limit for domestic flights?',
+    subject: {
+      type: 'travel_item',
+      code: 'checked-baggage',
+      name: 'Checked baggage',
+      itemCategory: 'Baggage',
+    },
+    authority: 'dgca',
+    answerKind: 'carry',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Most Indian airlines allow 15 kg of checked baggage in economy on domestic flights — but the exact limit varies by airline and fare class.',
+    conditions: {
+      'Typical limit': '15 kg (economy, domestic)',
+      'Above the limit': 'Excess baggage charges apply, set by the airline',
+      Check: 'Your airline and fare — limits and charges vary',
+    },
+    riskLevel: 'low',
+    timePhase: 'before',
+    intent: 'threshold',
+    decisionType: 'threshold',
+    source: {
+      title: 'Checked baggage allowance (airline policy)',
+      url: 'https://www.dgca.gov.in/',
+    },
+    assertion:
+      'Indian carriers commonly permit ~15 kg of checked baggage in economy on domestic flights, varying by airline and fare class.',
+    evidenceLevel: 'government_advisory',
+    related: [
+      'what-is-the-cabin-baggage-size-and-weight-limit',
+      'am-i-eligible-for-compensation-if-my-baggage-is-lost',
+    ],
+    signoff: true,
+  },
+
+  // ── Documents — NRI / OCI + digital boarding pass ───────────────────────────
+  {
+    slug: 'do-oci-cardholders-need-a-visa-to-travel-to-india',
+    category: 'Documents & visas',
+    subcategory: 'Passport & visa',
+    question: 'Do OCI cardholders need a visa to travel to India?',
+    subject: {
+      type: 'document',
+      code: 'oci-card',
+      name: 'OCI card',
+      itemCategory: 'Travel document',
+    },
+    authority: 'mea',
+    answerKind: 'requirement',
+    verdict: 'not_allowed',
+    summary:
+      'No — a valid OCI (Overseas Citizen of India) card lets you enter and stay in India without a visa, for as long as the card is valid.',
+    conditions: {
+      Requires: 'A valid OCI card alongside your foreign passport',
+      Covers: 'Multiple entry, indefinite stay',
+      Note: 'Carry both documents together when travelling',
+    },
+    travelType: ['international'],
+    riskLevel: 'high',
+    timePhase: 'before',
+    intent: 'requirement',
+    decisionType: 'requirement',
+    source: {
+      title: 'Overseas Citizen of India (OCI) scheme',
+      url: 'https://www.passportindia.gov.in/',
+    },
+    assertion: 'A valid OCI card exempts the holder from needing a visa to enter India.',
+    evidenceLevel: 'government_advisory',
+    related: [
+      'do-i-need-a-visa-to-travel-abroad',
+      'how-much-passport-validity-do-i-need-to-travel-abroad',
+    ],
+    signoff: true,
+  },
+  {
+    slug: 'is-a-digital-boarding-pass-accepted-at-indian-airports',
+    category: 'Documents & visas',
+    intentGroup: 'At the airport',
+    subcategory: 'Boarding & entry',
+    question: 'Is a digital boarding pass accepted at Indian airports?',
+    subject: {
+      type: 'document',
+      code: 'boarding-pass',
+      name: 'Boarding pass',
+      itemCategory: 'Travel document',
+    },
+    authority: 'bcas',
+    answerKind: 'acceptance',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Yes — a digital (mobile app or e-mail) boarding pass is accepted at security and boarding at Indian airports; carry a charged phone as backup isn’t guaranteed.',
+    conditions: {
+      Accepted: 'Airline app, SMS or email boarding pass',
+      'Keep handy': 'Screen brightness up, phone charged',
+      International: 'Some transit airports abroad still prefer a printed copy',
+    },
+    riskLevel: 'low',
+    timePhase: 'before',
+    intent: 'verdict',
+    decisionType: 'verdict',
+    source: { title: 'Digital boarding pass acceptance', url: 'https://www.bcasindia.gov.in/' },
+    assertion: 'Digital boarding passes are accepted for security and boarding at Indian airports.',
+    evidenceLevel: 'government_regulation',
+    related: [
+      'is-web-check-in-mandatory-for-flights',
+      'can-i-use-digital-aadhaar-as-id-for-a-domestic-flight',
+      'can-i-use-digiyatra-for-domestic-flights',
+    ],
+    signoff: true,
+  },
 ];
 
 /** slug → category, for the homepage/search grouping (single source of truth). */
@@ -1794,6 +2073,10 @@ export const PREFERRED_POPULAR: string[] = [
   'do-children-need-a-passport-to-fly-internationally',
   'what-is-the-cabin-baggage-size-and-weight-limit',
   'what-is-the-duty-free-allowance-when-returning-to-india',
+  'what-is-the-checked-baggage-weight-limit-for-domestic-flights',
+  'is-a-digital-boarding-pass-accepted-at-indian-airports',
+  'am-i-eligible-for-a-refund-if-my-flight-is-cancelled',
+  'do-oci-cardholders-need-a-visa-to-travel-to-india',
 ];
 
 /**
@@ -1824,10 +2107,10 @@ export const PREFLIGHT_CHECKLIST: { slug: string; label: string }[] = [
  * from journey-stage categories. Each collection is hand-picked from EXISTING
  * verified questions only (no new facts, just selection) — this is deliberately
  * conservative: personas without enough real content today (students, business
- * travellers, NRIs, OCI holders, foreign tourists, pet travellers, solo/female
- * travellers) are NOT listed here yet. Adding their dedicated content is the
- * natural way to "unlock" a real collection for them later; the catalog only
- * renders a collection once it has a handful of real verified questions.
+ * travellers, foreign tourists, pet travellers, solo/female travellers) are NOT
+ * listed here yet. Adding their dedicated content is the natural way to "unlock"
+ * a real collection for them later; the catalog only renders a collection once
+ * it has a handful of real verified questions.
  */
 export interface TravellerCollection {
   id: string;
@@ -1881,6 +2164,17 @@ export const TRAVELLER_COLLECTIONS: TravellerCollection[] = [
       'do-i-need-a-visa-to-travel-abroad',
       'do-i-need-a-yellow-fever-vaccine-to-travel',
       'how-much-foreign-currency-can-i-carry-abroad-from-india',
+      'what-is-the-duty-free-allowance-when-returning-to-india',
+      'how-much-gold-can-i-bring-into-india-from-abroad',
+    ],
+  },
+  {
+    id: 'nri-oci-travellers',
+    label: 'NRIs & OCI cardholders',
+    description: 'Returning to India, or visiting as an NRI or OCI cardholder.',
+    slugs: [
+      'do-oci-cardholders-need-a-visa-to-travel-to-india',
+      'how-much-passport-validity-do-i-need-to-travel-abroad',
       'what-is-the-duty-free-allowance-when-returning-to-india',
       'how-much-gold-can-i-bring-into-india-from-abroad',
     ],
