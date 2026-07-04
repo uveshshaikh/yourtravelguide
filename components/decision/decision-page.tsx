@@ -7,7 +7,8 @@ import { StepList } from '@/components/decision/step-list';
 import { DetailsList } from '@/components/decision/details-list';
 import { ComparisonNotice } from '@/components/decision/comparison-notice';
 import { RelatedQuestions } from '@/components/content/related';
-import { choosePresentation } from '@/lib/knowledge/presentation';
+import { choosePresentation, isCaveatCondition } from '@/lib/knowledge/presentation';
+import { classifyLevel, type PageLevel } from '@/lib/knowledge/level';
 import { formatDate } from '@/lib/format';
 
 /**
@@ -24,7 +25,17 @@ import { formatDate } from '@/lib/format';
  *                                    so no fabricated table is shown
  *   everything else               → a labelled list, headed by answerKind
  * Only ever renders real Knowledge Core conditions — no fabricated rows.
+ *
+ * `classifyLevel` additionally scales spacing density (quick decision vs.
+ * guide) — see lib/knowledge/level.ts. It does not add or hide sections;
+ * every section below is already conditionally rendered on real data.
  */
+const SPACING: Record<PageLevel, { details: string; exceptions: string; related: string }> = {
+  1: { details: 'mt-6', exceptions: 'mt-4', related: 'mt-8' },
+  2: { details: 'mt-8', exceptions: 'mt-6', related: 'mt-10' },
+  3: { details: 'mt-10', exceptions: 'mt-8', related: 'mt-12' },
+};
+
 export function DecisionPage({
   decision,
 }: {
@@ -35,6 +46,12 @@ export function DecisionPage({
   const d = decision;
   const source = d.sources[0];
   const presentation = choosePresentation(d.decisionType, d.answerKind);
+  const level = classifyLevel({
+    decisionType: d.decisionType,
+    conditionsCount: (d.conditions ?? []).filter((c) => !isCaveatCondition(c.label)).length,
+    hasExceptions: (d.exceptions?.length ?? 0) > 0,
+  });
+  const spacing = SPACING[level];
 
   return (
     <Container className="max-w-2xl py-8 sm:py-10">
@@ -62,7 +79,7 @@ export function DecisionPage({
 
       {/* The details that matter — presentation adapts to the question type. */}
       {d.conditions?.length || presentation.style === 'comparison' ? (
-        <section className="mt-8">
+        <section className={spacing.details}>
           <h2 className="text-sm font-semibold tracking-wide uppercase">{presentation.heading}</h2>
           <div className="mt-3">
             {presentation.style === 'numbers' ? (
@@ -80,7 +97,7 @@ export function DecisionPage({
 
       {/* Genuinely useful exceptions only (e.g. medical travellers). */}
       {d.exceptions?.length ? (
-        <section className="mt-6">
+        <section className={spacing.exceptions}>
           <h2 className="text-sm font-semibold tracking-wide uppercase">Exceptions</h2>
           <div className="mt-3 space-y-3">
             {d.exceptions.map((ex) => (
@@ -98,7 +115,7 @@ export function DecisionPage({
 
       {/* Related questions — simple next steps. */}
       {d.relatedQuestions?.length ? (
-        <RelatedQuestions items={d.relatedQuestions} className="mt-10" />
+        <RelatedQuestions items={d.relatedQuestions} className={spacing.related} />
       ) : null}
 
       {/* One quiet trust line — verified date + official source. */}
