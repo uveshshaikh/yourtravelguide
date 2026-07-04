@@ -57,9 +57,23 @@ export type Category = (typeof CATEGORIES)[number];
  * "Baggage" is the one genuine addition: it answers a different question
  * ("how big/heavy can my bag be") than "Packing" ("what can I put in it"), the
  * same split real airline sites use, and it already has verified content.
- * "Emergency situations" is broadened and renamed "Travel disruptions" to also
- * cover flight delays/cancellations/missed flights (previously mis-scoped under
- * a proposed, overlapping "Flights & Airlines" category).
+ * "Emergency situations" was broadened and is now called "Travel Problems" —
+ * plain, findable language for flight delays/cancellations/missed flights,
+ * lost baggage/documents, and medical emergencies abroad. Real Indian
+ * travellers search "flight delayed what to do" / "lost baggage complaint" /
+ * "lost passport abroad" — not "disruption", the internal-sounding term a
+ * regulator or airline ops team would use. "Travel Problems" was chosen over
+ * "Flight Problems" / "Delays & Cancellations" because the group's scope is
+ * broader than flights (it also covers lost documents and medical
+ * emergencies) — a narrower label would misrepresent what's in it.
+ *
+ * APPROVED REFINEMENT (kept at ≤12 primary categories): "Boarding" and
+ * "Arrival" were removed as top-level categories — both were already empty (no
+ * verified questions) and are exactly the kind of thin category the 12-cap
+ * exists to prevent. "Boarding" folds into "At the airport" (subcategory
+ * "Boarding & entry", already in use); "Arrival" folds into "International
+ * travel" (subcategory "Arrival"). Nothing is lost — both remain valid
+ * SUBCATEGORIES the moment real content needs them.
  */
 export const INTENT_GROUPS = [
   'Before you book',
@@ -68,14 +82,12 @@ export const INTENT_GROUPS = [
   'Baggage',
   'At the airport',
   'Airport security',
-  'Boarding',
   'International travel',
-  'Arrival',
   'Family travel',
   'Medical travel',
   'Documents',
   'Money & customs',
-  'Travel disruptions',
+  'Travel Problems',
 ] as const;
 
 export type IntentGroup = (typeof INTENT_GROUPS)[number];
@@ -93,6 +105,7 @@ export const SUBCATEGORIES: Partial<Record<IntentGroup, readonly string[]>> = {
   'Airport security': ['Sharp & restricted items', 'Prohibited items', 'Electronics'],
   Documents: ['Passport & visa', 'Identity & digital ID'],
   'Money & customs': ['Cash & currency limits', 'Duty-free allowance', 'Gold & jewellery'],
+  // "Boarding & entry" absorbs the former top-level "Boarding" category.
   'At the airport': ['Check-in & timing', 'Boarding & entry'],
   'Family travel': ['Infants & babies', 'Passport & visa'],
   'Medical travel': [
@@ -101,7 +114,11 @@ export const SUBCATEGORIES: Partial<Record<IntentGroup, readonly string[]>> = {
     'Insulin & devices',
     'Certificates & vaccination',
   ],
-  'Travel disruptions': [
+  // "Arrival" absorbs the former top-level "Arrival" category; Immigration and
+  // Customs & declarations are reserved for when real country-specific content
+  // exists (see the entity-hub plan).
+  'International travel': ['Immigration', 'Customs & declarations', 'Arrival'],
+  'Travel Problems': [
     'Flight delays & cancellations',
     'Lost & damaged baggage',
     'Lost documents',
@@ -1712,16 +1729,14 @@ export const INTENT_GROUP_META: Record<IntentGroup, string> = {
   'Before you fly': 'Get ready the day before.',
   Packing: 'What you can put in your bag — and what stays home.',
   Baggage: 'Bag size, weight and airline allowances.',
-  'At the airport': 'Check-in, timing and getting through.',
+  'At the airport': 'Check-in, timing, boarding and getting through.',
   'Airport security': 'What passes screening — and what doesn’t.',
-  Boarding: 'Gates, boarding passes and last steps.',
-  'International travel': 'Crossing borders with confidence.',
-  Arrival: 'Landing, baggage and getting out.',
+  'International travel': 'Crossing borders — immigration, customs and arrival.',
   'Family travel': 'Flying with kids, infants and elders.',
   'Medical travel': 'Medicines, devices and medical needs.',
   Documents: 'Passports, visas and accepted IDs — from application to gate.',
   'Money & customs': 'Cash, gold, currency and allowances.',
-  'Travel disruptions': 'Delays, cancellations, and what to do if things go wrong.',
+  'Travel Problems': 'Delays, cancellations, lost baggage and what to do if things go wrong.',
 };
 
 /**
