@@ -103,20 +103,25 @@ export const SUBCATEGORIES: Partial<Record<IntentGroup, readonly string[]>> = {
   Packing: ['Electronics', 'Liquids & toiletries', 'Food', 'Alcohol & tobacco'],
   Baggage: ['Cabin baggage', 'Checked baggage', 'Airline allowance'],
   'Airport security': ['Sharp & restricted items', 'Prohibited items', 'Electronics'],
-  Documents: ['Passport & visa', 'Identity & digital ID'],
-  'Money & customs': ['Cash & currency limits', 'Duty-free allowance', 'Gold & jewellery'],
+  Documents: ['Passport & visa', 'Identity & digital ID', 'Tickets & identity matching'],
+  'Money & customs': [
+    'Cash & currency limits',
+    'Duty-free allowance',
+    'Gold & jewellery',
+    'Declarations',
+  ],
   // "Boarding & entry" absorbs the former top-level "Boarding" category.
-  'At the airport': ['Check-in & timing', 'Boarding & entry'],
-  'Family travel': ['Infants & babies', 'Passport & visa'],
+  'At the airport': ['Check-in & timing', 'Boarding & entry', 'Special assistance'],
+  'Family travel': ['Infants & babies', 'Passport & visa', 'Unaccompanied minors'],
   'Medical travel': [
     'Medicines',
     'Prescription medicines',
     'Insulin & devices',
     'Certificates & vaccination',
   ],
-  // "Arrival" absorbs the former top-level "Arrival" category; Immigration and
-  // Customs & declarations are reserved for when real country-specific content
-  // exists (see the entity-hub plan).
+  // "Arrival" absorbs the former top-level "Arrival" category; Customs &
+  // declarations is reserved for when real country-specific content exists (see
+  // the entity-hub plan). "Immigration" now has its first real question.
   'International travel': ['Immigration', 'Customs & declarations', 'Arrival'],
   'Travel Problems': [
     'Flight delays & cancellations',
@@ -1985,6 +1990,226 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     ],
     signoff: true,
   },
+
+  // ── Gap-audit additions — closing critical/high-priority coverage gaps ─────
+  {
+    slug: 'do-i-need-a-printed-ticket-to-enter-the-airport',
+    category: 'At the airport',
+    subcategory: 'Boarding & entry',
+    question: 'Do I need a printed ticket to enter the airport?',
+    subject: GENERAL,
+    authority: 'bcas',
+    answerKind: 'requirement',
+    verdict: 'not_allowed',
+    summary:
+      'No — a printed ticket isn’t required. CISF checks a valid ticket/boarding pass (digital is fine) with matching photo ID at the terminal entry gate, before check-in.',
+    conditions: {
+      'Terminal gate': 'Valid ticket/boarding pass + matching photo ID, digital is accepted',
+      'Non-travellers': 'Need an entry pass to accompany you past the gate',
+      Note: 'This is separate from the security screening after check-in',
+    },
+    riskLevel: 'medium',
+    timePhase: 'before',
+    intent: 'requirement',
+    decisionType: 'requirement',
+    source: { title: 'Airport terminal access control', url: 'https://www.bcasindia.gov.in/' },
+    assertion:
+      'CISF terminal entry checks require a valid ticket/boarding pass (digital accepted) and matching photo ID; a printed copy is not mandatory.',
+    evidenceLevel: 'government_regulation',
+    related: [
+      'is-a-digital-boarding-pass-accepted-at-indian-airports',
+      'what-id-do-i-need-for-a-domestic-flight-in-india',
+      'how-early-should-i-reach-the-airport',
+    ],
+    signoff: true,
+  },
+  {
+    slug: 'can-i-correct-a-name-spelling-mistake-on-my-flight-ticket',
+    category: 'Documents & visas',
+    subcategory: 'Tickets & identity matching',
+    question: 'Can I correct a name spelling mistake on my flight ticket?',
+    subject: {
+      type: 'document',
+      code: 'flight-ticket',
+      name: 'Flight ticket',
+      itemCategory: 'Travel document',
+    },
+    authority: 'dgca',
+    answerKind: 'acceptance',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Usually yes — most airlines allow a minor spelling correction for a fee; a major name change (different person) generally isn’t allowed and needs a fresh booking.',
+    conditions: {
+      'Minor correction': 'Airlines usually allow this for a fee',
+      'Major change': 'Not allowed — book a new ticket in the correct name',
+      Why: 'The name must match your ID for security and boarding',
+    },
+    riskLevel: 'medium',
+    timePhase: 'before',
+    intent: 'procedure',
+    decisionType: 'procedure',
+    source: { title: 'Passenger name correction policies', url: 'https://www.dgca.gov.in/' },
+    assertion:
+      'Airlines commonly permit minor name-spelling corrections for a fee; major name changes require a new booking, since the ticket name must match the traveller’s ID.',
+    evidenceLevel: 'government_advisory',
+    related: ['what-id-do-i-need-for-a-domestic-flight-in-india'],
+    signoff: true,
+  },
+  {
+    slug: 'what-are-the-rules-for-unaccompanied-minors-travelling-alone',
+    category: 'Documents & visas',
+    intentGroup: 'Family travel',
+    subcategory: 'Unaccompanied minors',
+    question: 'What are the rules for unaccompanied minors travelling alone?',
+    subject: GENERAL,
+    authority: 'dgca',
+    answerKind: 'requirement',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Children travelling alone need the airline’s Unaccompanied Minor (UM) service — typically required for younger children and optional for older teens, with an adult escorting them to and from the gate.',
+    conditions: {
+      'Younger children': 'UM service usually mandatory (exact age band set by the airline)',
+      'Older teens': 'Often optional — check your airline’s policy',
+      Escort: 'An adult drops off and collects the child at the gate',
+      Fee: 'Airlines typically charge for the UM service',
+    },
+    riskLevel: 'high',
+    timePhase: 'before',
+    intent: 'requirement',
+    decisionType: 'requirement',
+    source: {
+      title: 'Unaccompanied minor carriage policies',
+      url: 'https://www.dgca.gov.in/',
+    },
+    assertion:
+      'Airlines require an Unaccompanied Minor service for children travelling alone, with age thresholds and fees varying by airline.',
+    evidenceLevel: 'government_advisory',
+    related: ['do-children-need-a-passport-to-fly-internationally'],
+    signoff: true,
+  },
+  {
+    slug: 'can-i-request-wheelchair-assistance-at-the-airport',
+    category: 'At the airport',
+    subcategory: 'Special assistance',
+    question: 'Can I request wheelchair assistance at the airport?',
+    subject: GENERAL,
+    authority: 'dgca',
+    answerKind: 'eligibility',
+    verdict: 'allowed',
+    summary:
+      'Yes — free wheelchair and mobility assistance is available on request; book it with your airline in advance (typically at least 48 hours before departure) for a smoother experience.',
+    conditions: {
+      Cost: 'Free of charge',
+      'Book ahead': 'Request via your airline, ideally 48+ hours before departure',
+      'On the day': 'Also available at the airport, but pre-booking is more reliable',
+    },
+    riskLevel: 'low',
+    timePhase: 'before',
+    intent: 'procedure',
+    decisionType: 'procedure',
+    source: {
+      title: 'Facilitation of persons with disabilities and reduced mobility',
+      url: 'https://www.dgca.gov.in/',
+    },
+    assertion:
+      'DGCA guidelines require airlines to provide free wheelchair and mobility assistance on request, ideally booked in advance.',
+    evidenceLevel: 'government_regulation',
+    related: ['how-early-should-i-reach-the-airport'],
+  },
+  {
+    slug: 'what-is-the-red-and-green-channel-at-indian-customs',
+    category: 'Customs & duty-free',
+    subcategory: 'Declarations',
+    question: 'What is the red and green channel at Indian customs?',
+    subject: GENERAL,
+    authority: 'cbic',
+    answerKind: 'requirement',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Green channel is for passengers with nothing to declare (within duty-free limits); Red channel is for anything above your allowance or that must be declared.',
+    conditions: {
+      'Green channel': 'Nothing to declare — within your duty-free allowance',
+      'Red channel': 'Above the allowance, or carrying restricted/dutiable goods',
+      Risk: 'Walking through Green with undeclared dutiable goods can mean fines or seizure',
+    },
+    riskLevel: 'high',
+    timePhase: 'after',
+    intent: 'procedure',
+    decisionType: 'procedure',
+    source: { title: 'Customs channel system at Indian airports', url: 'https://www.cbic.gov.in/' },
+    assertion:
+      'Indian customs uses a Green (nothing to declare) and Red (declaration required) channel system for arriving passengers.',
+    evidenceLevel: 'government_regulation',
+    related: [
+      'what-is-the-duty-free-allowance-when-returning-to-india',
+      'how-much-gold-can-i-bring-into-india-from-abroad',
+    ],
+  },
+  {
+    slug: 'do-i-need-a-transit-visa-for-a-connecting-international-flight',
+    category: 'Documents & visas',
+    intentGroup: 'International travel',
+    subcategory: 'Immigration',
+    question: 'Do I need a transit visa for a connecting international flight?',
+    subject: {
+      type: 'document',
+      code: 'transit-visa',
+      name: 'Transit visa',
+      itemCategory: 'Travel document',
+    },
+    authority: 'boi',
+    answerKind: 'requirement',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'It depends on your transit country and airport — many exempt Indian passport holders who stay airside, but some require a transit visa even if you don’t leave the airport.',
+    conditions: {
+      'Staying airside': 'Often exempt, but not everywhere',
+      'Changing terminals / collecting baggage': 'More likely to need one',
+      Check: 'Your transit country’s official visa rules before booking',
+    },
+    travelType: ['international'],
+    riskLevel: 'high',
+    timePhase: 'before',
+    intent: 'requirement',
+    decisionType: 'requirement',
+    source: {
+      title: 'Transit visa requirements for connecting flights',
+      url: 'https://boi.gov.in/',
+    },
+    assertion:
+      'Transit visa requirements for connecting international flights vary by transit country and are not universally exempt for Indian passport holders.',
+    evidenceLevel: 'government_advisory',
+    related: ['do-i-need-a-visa-to-travel-abroad'],
+    signoff: true,
+  },
+  {
+    slug: 'is-there-a-minimum-age-for-an-infant-to-fly',
+    category: 'Documents & visas',
+    intentGroup: 'Family travel',
+    subcategory: 'Infants & babies',
+    question: 'Is there a minimum age for an infant to fly?',
+    subject: GENERAL,
+    authority: 'dgca',
+    answerKind: 'requirement',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Most airlines allow infants to fly from a few days old, but very young infants often need a doctor’s fitness certificate — the exact minimum age varies by airline.',
+    conditions: {
+      Typical: 'Domestic travel allowed from a few days old, with variation by airline',
+      'Very young infants': 'May need a doctor’s medical fitness certificate',
+      Fare: 'Infants under 2 usually travel on a lap seat at a reduced fare',
+    },
+    riskLevel: 'high',
+    timePhase: 'before',
+    intent: 'requirement',
+    decisionType: 'requirement',
+    source: { title: 'Carriage of infants — airline policies', url: 'https://www.dgca.gov.in/' },
+    assertion:
+      'Airlines set a minimum age for infant travel, often requiring medical clearance for very young infants; the exact threshold varies by airline.',
+    evidenceLevel: 'government_advisory',
+    related: ['do-children-need-a-passport-to-fly-internationally'],
+    signoff: true,
+  },
 ];
 
 /** slug → category, for the homepage/search grouping (single source of truth). */
@@ -2077,6 +2302,9 @@ export const PREFERRED_POPULAR: string[] = [
   'is-a-digital-boarding-pass-accepted-at-indian-airports',
   'am-i-eligible-for-a-refund-if-my-flight-is-cancelled',
   'do-oci-cardholders-need-a-visa-to-travel-to-india',
+  'do-i-need-a-printed-ticket-to-enter-the-airport',
+  'can-i-correct-a-name-spelling-mistake-on-my-flight-ticket',
+  'what-is-the-red-and-green-channel-at-indian-customs',
 ];
 
 /**
@@ -2143,6 +2371,8 @@ export const TRAVELLER_COLLECTIONS: TravellerCollection[] = [
       'can-i-carry-breast-milk-on-a-flight',
       'how-much-liquid-can-i-carry-in-hand-baggage',
       'what-is-the-cabin-baggage-size-and-weight-limit',
+      'what-are-the-rules-for-unaccompanied-minors-travelling-alone',
+      'is-there-a-minimum-age-for-an-infant-to-fly',
     ],
   },
   {
