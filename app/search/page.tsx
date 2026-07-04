@@ -13,7 +13,17 @@ import { cn } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = { title: 'Search' };
+/**
+ * Query-driven (?q=, ?intent=, ?collection=) — noindexed so search engines
+ * never index infinite query-parameter permutations of the same underlying
+ * content; `follow: true` still lets link equity flow through to the real
+ * question pages linked from here.
+ */
+export const metadata: Metadata = {
+  title: 'Search',
+  description: 'Search verified travel answers for Indian travellers.',
+  robots: { index: false, follow: true },
+};
 
 /**
  * /search — results come ONLY from the verified-question catalog (published,

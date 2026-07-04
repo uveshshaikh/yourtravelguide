@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { ArrowRight, BadgeCheck, Lock, Plane, Search, ShieldCheck } from 'lucide-react';
 import { Container } from '@/components/layout/container';
 import { QuestionSearch } from '@/components/search/question-search';
@@ -14,6 +15,12 @@ import {
 import { authoritiesCovered } from '@/db/seed/content';
 
 export const dynamic = 'force-dynamic';
+
+/** Title/description/OG/Twitter are inherited from the root layout default —
+ *  correct for the homepage. Only the canonical is homepage-specific. */
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+};
 
 const trustPoints = [
   { icon: ShieldCheck, label: 'Official sources only' },

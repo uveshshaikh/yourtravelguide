@@ -7,11 +7,26 @@ import { REVIEW_SLA_DAYS } from '@/lib/knowledge/volatility';
 
 export const dynamic = 'force-dynamic';
 
+const TRUST_DESCRIPTION =
+  'How YourTravelGuide sources, verifies, reviews and corrects every travel answer — and who to contact if something looks wrong.';
+
 export const metadata: Metadata = {
   title: 'Trust & Editorial Center',
-  description:
-    'How YourTravelGuide sources, verifies, reviews and corrects every travel answer — and who to contact if something looks wrong.',
+  description: TRUST_DESCRIPTION,
   alternates: { canonical: '/trust' },
+  openGraph: {
+    type: 'website',
+    url: '/trust',
+    siteName: siteConfig.name,
+    locale: siteConfig.locale,
+    title: 'Trust & Editorial Center',
+    description: TRUST_DESCRIPTION,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Trust & Editorial Center',
+    description: TRUST_DESCRIPTION,
+  },
 };
 
 const sections = [
