@@ -8,6 +8,7 @@ import {
   authorityProfiles,
   CATEGORIES,
   categoryForSlug,
+  collectionSlugs,
   INTENT_GROUP_META,
   INTENT_GROUPS,
   intentGroupForSlug,
@@ -185,30 +186,47 @@ export async function listByIntentGroup(): Promise<IntentGroupView[]> {
   return out;
 }
 
+export interface CollectionStageView {
+  label: string;
+  questions: QuestionSummaryView[];
+}
+
 export interface TravellerCollectionView {
   id: string;
   label: string;
   description: string;
+  /** Flattened, live-verified questions — used by the compact homepage card. */
   questions: QuestionSummaryView[];
+  /** Present only for journey collections (e.g. First-time flyers): the real,
+   *  ordered stages, each already filtered to what's currently verified. */
+  stages?: CollectionStageView[];
 }
 
 /**
  * Curated traveller-type collections (cross-cutting discovery, e.g. "Travelling
  * with children"), realised over the live verified catalog. Fail-closed: a
  * collection only appears once at least 3 of its curated questions are actually
- * verified, so it's never a promise the Core can't keep.
+ * verified, so it's never a promise the Core can't keep. Journey collections
+ * additionally carry their real stage structure, with each stage independently
+ * filtered to live content — a stage with nothing currently verified simply
+ * doesn't render, rather than showing a broken/empty step.
  */
 export async function travellerCollections(): Promise<TravellerCollectionView[]> {
   const all = await listVerifiedQuestions();
   const bySlug = new Map(all.map((q) => [q.slug, q]));
+  const resolveSlugs = (slugs: string[]) =>
+    slugs.map((s) => bySlug.get(s)).filter((q): q is QuestionSummaryView => Boolean(q));
+
   const out: TravellerCollectionView[] = [];
   for (const c of TRAVELLER_COLLECTIONS) {
-    const questions = c.slugs
-      .map((s) => bySlug.get(s))
-      .filter((q): q is QuestionSummaryView => Boolean(q));
-    if (questions.length >= 3) {
-      out.push({ id: c.id, label: c.label, description: c.description, questions });
-    }
+    const questions = resolveSlugs(collectionSlugs(c));
+    if (questions.length < 3) continue;
+
+    const stages = c.stages
+      ?.map((s) => ({ label: s.label, questions: resolveSlugs(s.slugs) }))
+      .filter((s) => s.questions.length > 0);
+
+    out.push({ id: c.id, label: c.label, description: c.description, questions, stages });
   }
   return out;
 }

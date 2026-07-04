@@ -102,7 +102,12 @@ export type IntentGroup = (typeof INTENT_GROUPS)[number];
 export const SUBCATEGORIES: Partial<Record<IntentGroup, readonly string[]>> = {
   Packing: ['Electronics', 'Liquids & toiletries', 'Food', 'Alcohol & tobacco'],
   Baggage: ['Cabin baggage', 'Checked baggage', 'Airline allowance'],
-  'Airport security': ['Sharp & restricted items', 'Prohibited items', 'Electronics'],
+  'Airport security': [
+    'Screening process',
+    'Sharp & restricted items',
+    'Prohibited items',
+    'Electronics',
+  ],
   Documents: ['Passport & visa', 'Identity & digital ID', 'Tickets & identity matching'],
   'Money & customs': [
     'Cash & currency limits',
@@ -2210,6 +2215,111 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     related: ['do-children-need-a-passport-to-fly-internationally'],
     signoff: true,
   },
+
+  // ── First-time-flyer journey — closes real gaps found while redesigning the
+  // First-time Flyers collection into a staged, step-by-step guide ──────────
+  {
+    slug: 'what-happens-at-airport-security-screening',
+    category: 'Security & screening',
+    subcategory: 'Screening process',
+    question: 'What happens at airport security screening?',
+    subject: GENERAL,
+    authority: 'bcas',
+    answerKind: 'requirement',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'You’ll walk through a metal detector or body scanner, your hand baggage goes through an X-ray, and laptops/liquids are usually screened separately — a pat-down happens only if something alarms.',
+    conditions: {
+      'Before the scanner': 'Take out laptops and your liquids bag; empty pockets',
+      'Body scan': 'Walk through a metal detector or full-body scanner',
+      'Hand baggage': 'X-ray screened alongside you',
+      'If flagged': 'A brief pat-down or manual bag check follows',
+    },
+    riskLevel: 'medium',
+    timePhase: 'before',
+    intent: 'procedure',
+    decisionType: 'procedure',
+    source: {
+      title: 'Passenger security screening procedure',
+      url: 'https://www.bcasindia.gov.in/',
+    },
+    assertion:
+      'Indian airport security screening involves a body scan, X-ray of hand baggage, and separate screening of electronics and liquids, with additional checks only if something is flagged.',
+    evidenceLevel: 'government_regulation',
+    related: [
+      'how-much-liquid-can-i-carry-in-hand-baggage',
+      'can-i-carry-a-lighter-on-a-flight',
+      'can-i-carry-a-laptop-in-hand-baggage',
+    ],
+    signoff: true,
+  },
+  {
+    slug: 'what-happens-during-boarding-at-the-airport',
+    category: 'At the airport',
+    subcategory: 'Boarding & entry',
+    question: 'What happens during boarding at the airport?',
+    subject: GENERAL,
+    authority: 'dgca',
+    answerKind: 'requirement',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Boarding usually starts about 45 minutes before departure, called by zone or group, with the gate typically closing 20–25 minutes before departure — arrive at the gate early, since a closed gate can mean denied boarding.',
+    conditions: {
+      'Boarding starts': '~45 minutes before departure (varies by airline/airport)',
+      Called: 'By zone, group, or row — listen for your announcement',
+      'Gate closes': '~20–25 minutes before departure',
+      'If you’re late': 'The gate may close before you arrive — you could miss the flight',
+    },
+    riskLevel: 'high',
+    timePhase: 'before',
+    intent: 'timing',
+    decisionType: 'procedure',
+    source: { title: 'Boarding and gate-closure timing', url: 'https://www.dgca.gov.in/' },
+    assertion:
+      'Boarding typically begins around 45 minutes before departure and gates commonly close 20–25 minutes before departure, though exact timing varies by airline and airport.',
+    evidenceLevel: 'government_advisory',
+    related: [
+      'how-early-should-i-reach-the-airport',
+      'am-i-eligible-for-a-refund-if-i-miss-my-flight',
+    ],
+    signoff: true,
+  },
+  {
+    slug: 'can-i-use-my-phone-during-a-flight',
+    category: 'Security & screening',
+    subcategory: 'Electronics',
+    question: 'Can I use my phone during a flight?',
+    subject: {
+      type: 'travel_item',
+      code: 'mobile-phone',
+      name: 'Mobile phone',
+      itemCategory: 'Electronics',
+    },
+    authority: 'dgca',
+    answerKind: 'carry',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Yes, in flight/airplane mode — regular calls aren’t allowed onboard, but Wi-Fi, messaging and offline use are fine once the crew permits electronics use.',
+    conditions: {
+      Required: 'Switch to flight/airplane mode',
+      'Voice calls': 'Not allowed during the flight',
+      'Wi-Fi / data': 'Only if the aircraft offers inflight Wi-Fi',
+      Timing: 'Follow crew instructions on when devices may be used',
+    },
+    riskLevel: 'low',
+    timePhase: 'during',
+    intent: 'verdict',
+    decisionType: 'verdict',
+    source: {
+      title: 'Use of portable electronic devices in flight',
+      url: 'https://www.dgca.gov.in/',
+    },
+    assertion:
+      'Mobile phones must be switched to flight/airplane mode in the air; voice calls are not permitted, though other uses are allowed once crew permits electronics use.',
+    evidenceLevel: 'government_regulation',
+    related: ['can-i-carry-a-power-bank-on-a-flight'],
+    signoff: true,
+  },
 ];
 
 /** slug → category, for the homepage/search grouping (single source of truth). */
@@ -2340,25 +2450,85 @@ export const PREFLIGHT_CHECKLIST: { slug: string; label: string }[] = [
  * a real collection for them later; the catalog only renders a collection once
  * it has a handful of real verified questions.
  */
+export interface TravellerCollectionStage {
+  label: string;
+  slugs: string[];
+}
+
 export interface TravellerCollection {
   id: string;
   label: string;
   description: string;
-  slugs: string[];
+  /**
+   * Flat (unordered) collections: a simple curated topic bundle.
+   * Journey collections (e.g. First-time flyers) use `stages` instead — an
+   * ORDERED sequence matching the traveller's real journey, not category order,
+   * not alphabetical, not popularity. Never reuses a slug across two stages, so
+   * the page never shows the same question twice.
+   */
+  slugs?: string[];
+  stages?: TravellerCollectionStage[];
+}
+
+/** Every slug in a collection, flattened — used for the fail-closed live count. */
+export function collectionSlugs(c: TravellerCollection): string[] {
+  return c.stages ? c.stages.flatMap((s) => s.slugs) : (c.slugs ?? []);
 }
 
 export const TRAVELLER_COLLECTIONS: TravellerCollection[] = [
   {
     id: 'first-time-flyers',
     label: 'First-time flyers',
-    description: 'The basics every new flyer should know before their first trip.',
-    slugs: [
-      'what-id-do-i-need-for-a-domestic-flight-in-india',
-      'what-is-the-cabin-baggage-size-and-weight-limit',
-      'how-much-liquid-can-i-carry-in-hand-baggage',
-      'is-web-check-in-mandatory-for-flights',
-      'how-early-should-i-reach-the-airport',
-      'can-i-carry-a-lighter-on-a-flight',
+    description:
+      'Flying for the first time? Follow this in order — everything you need, in the order you’ll actually need it.',
+    // A JOURNEY, not a topic dump: ordered exactly as a first-time domestic
+    // flyer experiences it. "Can I carry a lighter?" earlier sat in a flat,
+    // unordered list with no context — it now appears ONCE, inside Security,
+    // as the concrete answer to "what's prohibited", which is where it
+    // actually belongs in the traveller's journey.
+    stages: [
+      {
+        label: 'Before you leave home',
+        slugs: [
+          'what-is-the-cabin-baggage-size-and-weight-limit',
+          'what-is-the-checked-baggage-weight-limit-for-domestic-flights',
+          'how-early-should-i-reach-the-airport',
+        ],
+      },
+      {
+        label: 'Going to the airport',
+        slugs: [
+          'do-i-need-a-printed-ticket-to-enter-the-airport',
+          'what-id-do-i-need-for-a-domestic-flight-in-india',
+        ],
+      },
+      {
+        label: 'Check-in',
+        slugs: [
+          'is-web-check-in-mandatory-for-flights',
+          'is-a-digital-boarding-pass-accepted-at-indian-airports',
+        ],
+      },
+      {
+        label: 'Security',
+        slugs: [
+          'what-happens-at-airport-security-screening',
+          'how-much-liquid-can-i-carry-in-hand-baggage',
+          'can-i-carry-a-lighter-on-a-flight',
+        ],
+      },
+      {
+        label: 'Boarding',
+        slugs: ['what-happens-during-boarding-at-the-airport'],
+      },
+      {
+        label: 'During the flight',
+        slugs: ['can-i-use-my-phone-during-a-flight', 'can-i-carry-a-power-bank-on-a-flight'],
+      },
+      {
+        label: 'After landing',
+        slugs: ['am-i-eligible-for-compensation-if-my-baggage-is-lost'],
+      },
     ],
   },
   {

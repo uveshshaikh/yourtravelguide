@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Container } from '@/components/layout/container';
 import { QuestionSearch } from '@/components/search/question-search';
 import { VerifiedQuestionResult } from '@/components/search/verified-question-result';
+import { CollectionJourney } from '@/components/search/collection-journey';
 import { SearchNoResults } from '@/components/search/search-states';
 import {
   listByIntentGroup,
@@ -89,19 +90,29 @@ function CollectionResults({
 }: {
   collection: Awaited<ReturnType<typeof travellerCollections>>[number];
 }) {
+  const isJourney = collection.stages && collection.stages.length > 0;
   return (
     <div className="mt-8">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-muted-foreground text-sm">{collection.description}</p>
+        <p className="text-muted-foreground max-w-xl text-sm">{collection.description}</p>
         <a href="/search" className="text-primary shrink-0 text-sm font-medium hover:underline">
           All questions
         </a>
       </div>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        {collection.questions.map((q) => (
-          <VerifiedQuestionResult key={q.slug} item={q} />
-        ))}
-      </div>
+
+      {/* Journey collections (e.g. First-time flyers) get a step-by-step
+          checklist, in the real order a traveller experiences it — not a
+          search-results grid. Other (flat, topic-bundle) collections keep the
+          simple grid, since they aren't a sequence. */}
+      {isJourney ? (
+        <CollectionJourney stages={collection.stages!} />
+      ) : (
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {collection.questions.map((q) => (
+            <VerifiedQuestionResult key={q.slug} item={q} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
