@@ -33,14 +33,24 @@ describe('choosePresentation · deterministic, no text inference', () => {
   });
 
   it('degrades safely for decision types with no real content yet', () => {
-    // comparison/decision/emergency have zero questions today — must never crash,
+    // decision/emergency have zero questions today — must never crash,
     // must never show a blank/broken layout.
-    const noData: DecisionType[] = ['comparison', 'decision', 'emergency'];
+    const noData: DecisionType[] = ['decision', 'emergency'];
     for (const dt of noData) {
       const p = choosePresentation(dt, 'carry');
       expect(p.style).toBe('list');
       expect(p.heading.length).toBeGreaterThan(0);
     }
+  });
+
+  it('picks an honest comparison notice, never a fabricated table', () => {
+    // No question stores structured per-entity rows (the schema has no shape
+    // for it) — comparison gets its own style so the UI can show a plain
+    // admission instead of silently degrading to a generic list.
+    expect(choosePresentation('comparison', 'carry')).toEqual({
+      style: 'comparison',
+      heading: 'Comparison',
+    });
   });
 
   it('falls back to answerKind-driven heading when decisionType is undefined', () => {

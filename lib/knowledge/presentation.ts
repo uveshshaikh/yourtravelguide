@@ -14,7 +14,7 @@ import type { AnswerKind, DecisionType } from '@/lib/knowledge/types';
  * label on an otherwise identical block.
  */
 
-export type DetailsStyle = 'numbers' | 'steps' | 'list';
+export type DetailsStyle = 'numbers' | 'steps' | 'list' | 'comparison';
 
 export interface Presentation {
   /** Which component renders the conditions. */
@@ -28,11 +28,26 @@ const STYLE_BY_DECISION_TYPE: Record<DecisionType, DetailsStyle> = {
   procedure: 'steps',
   verdict: 'list',
   requirement: 'list',
-  comparison: 'list', // no comparison data exists yet anywhere — degrades safely
+  // No question stores structured per-entity rows (the schema has no shape for
+  // one) — rather than fabricate a table or silently show a generic list, this
+  // gets its own honest "not yet verified" render. See ComparisonNotice.
+  comparison: 'comparison',
   checklist: 'steps', // a checklist is a sequence too
   decision: 'list',
   emergency: 'list',
 };
+
+/**
+ * Labels content authors already use, consistently, for a caveat rather than
+ * a primary fact (e.g. "Note: rules differ abroad", "Check: your airline and
+ * fare"). Presentation-only: demotes these rows to small footnote text instead
+ * of an equal-weight card/row, so the primary numbers/facts aren't diluted.
+ */
+const CAVEAT_LABELS = new Set(['note', 'check']);
+
+export function isCaveatCondition(label: string): boolean {
+  return CAVEAT_LABELS.has(label.trim().toLowerCase());
+}
 
 const HEADING_BY_ANSWER_KIND: Record<AnswerKind, string> = {
   carry: 'What you need',
@@ -47,6 +62,7 @@ const HEADING_BY_DECISION_TYPE: Partial<Record<DecisionType, string>> = {
   threshold: 'The numbers',
   procedure: 'Step by step',
   checklist: 'Step by step',
+  comparison: 'Comparison',
 };
 
 export function choosePresentation(

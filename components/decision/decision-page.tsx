@@ -5,6 +5,7 @@ import { VerdictBanner } from '@/components/decision/verdict-banner';
 import { NumberCards } from '@/components/decision/number-cards';
 import { StepList } from '@/components/decision/step-list';
 import { DetailsList } from '@/components/decision/details-list';
+import { ComparisonNotice } from '@/components/decision/comparison-notice';
 import { RelatedQuestions } from '@/components/content/related';
 import { choosePresentation } from '@/lib/knowledge/presentation';
 import { formatDate } from '@/lib/format';
@@ -16,9 +17,12 @@ import { formatDate } from '@/lib/format';
  * but the "details" block is chosen deterministically from decisionType +
  * answerKind — fields the resolver already populates on every DecisionView,
  * never inferred from the question text at runtime:
- *   threshold (e.g. "How much…") → large number cards
- *   procedure (e.g. "How do I…") → a numbered step sequence
- *   everything else             → a labelled list, headed by answerKind
+ *   threshold  (e.g. "How much…")  → one grouped number container
+ *   procedure  (e.g. "How do I…")  → a numbered step sequence
+ *   comparison (e.g. "Which airline…") → an honest "not yet verified" notice —
+ *                                    the schema has no per-entity row shape,
+ *                                    so no fabricated table is shown
+ *   everything else               → a labelled list, headed by answerKind
  * Only ever renders real Knowledge Core conditions — no fabricated rows.
  */
 export function DecisionPage({
@@ -57,16 +61,18 @@ export function DecisionPage({
       </div>
 
       {/* The details that matter — presentation adapts to the question type. */}
-      {d.conditions?.length ? (
+      {d.conditions?.length || presentation.style === 'comparison' ? (
         <section className="mt-8">
           <h2 className="text-sm font-semibold tracking-wide uppercase">{presentation.heading}</h2>
           <div className="mt-3">
             {presentation.style === 'numbers' ? (
-              <NumberCards conditions={d.conditions} />
+              <NumberCards conditions={d.conditions ?? []} />
             ) : presentation.style === 'steps' ? (
-              <StepList conditions={d.conditions} />
+              <StepList conditions={d.conditions ?? []} />
+            ) : presentation.style === 'comparison' ? (
+              <ComparisonNotice />
             ) : (
-              <DetailsList conditions={d.conditions} />
+              <DetailsList conditions={d.conditions ?? []} />
             )}
           </div>
         </section>
@@ -74,19 +80,19 @@ export function DecisionPage({
 
       {/* Genuinely useful exceptions only (e.g. medical travellers). */}
       {d.exceptions?.length ? (
-        <section className="mt-6 space-y-3">
-          {d.exceptions.map((ex) => (
-            <div
-              key={ex.id}
-              className="border-border bg-subtle flex gap-3 rounded-xl border p-4 text-sm"
-            >
-              <Info className="text-muted-foreground mt-0.5 size-4 shrink-0" aria-hidden />
-              <p className="text-pretty">
-                <span className="font-medium capitalize">{ex.appliesTo} travellers: </span>
-                <span className="text-muted-foreground">{ex.detail}</span>
-              </p>
-            </div>
-          ))}
+        <section className="mt-6">
+          <h2 className="text-sm font-semibold tracking-wide uppercase">Exceptions</h2>
+          <div className="mt-3 space-y-3">
+            {d.exceptions.map((ex) => (
+              <div key={ex.id} className="border-border flex gap-2.5 border-l-2 pl-3 text-sm">
+                <Info className="text-muted-foreground mt-0.5 size-4 shrink-0" aria-hidden />
+                <p className="text-pretty">
+                  <span className="font-medium capitalize">{ex.appliesTo} travellers: </span>
+                  <span className="text-muted-foreground">{ex.detail}</span>
+                </p>
+              </div>
+            ))}
+          </div>
         </section>
       ) : null}
 

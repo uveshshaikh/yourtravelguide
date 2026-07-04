@@ -27,15 +27,15 @@ export function VerdictBanner({
   const showValidity = validity && validity !== 'stable';
   return (
     <div
-      className={cn('rounded-xl border p-5 sm:p-6', v.banner, className)}
+      className={cn('rounded-lg border p-4', v.banner, className)}
       role="status"
       aria-label={`Verdict: ${v.label}`}
     >
-      <div className="flex items-start gap-3">
-        <v.Icon className="mt-0.5 size-6 shrink-0" aria-hidden />
+      <div className="flex items-start gap-2.5">
+        <v.Icon className="mt-0.5 size-5 shrink-0" aria-hidden />
         <div className="min-w-0">
-          <p className="text-sm font-semibold tracking-wide uppercase">{v.label}</p>
-          <p className="mt-1 text-lg font-medium text-balance sm:text-xl">{answer}</p>
+          <p className="text-xs font-semibold tracking-wide uppercase">{v.label}</p>
+          <p className="mt-1 text-base font-medium text-balance sm:text-lg">{answer}</p>
           {showValidity ? (
             <p className="mt-2 inline-flex items-center rounded-full border border-current/25 px-2 py-0.5 text-xs font-medium">
               {validityLabel[validity]}
