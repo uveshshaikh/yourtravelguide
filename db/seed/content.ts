@@ -566,6 +566,41 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     ],
   },
   {
+    slug: 'can-i-carry-an-asthma-inhaler-on-a-flight',
+    category: 'Baggage & items',
+    intentGroup: 'Medical travel',
+    subcategory: 'Medicines',
+    question: 'Can I carry an asthma inhaler on a flight?',
+    subject: {
+      type: 'travel_item',
+      code: 'asthma-inhaler',
+      name: 'Asthma inhaler',
+      itemCategory: 'Health',
+    },
+    authority: 'bcas',
+    verdict: 'allowed_with_conditions',
+    summary:
+      'Yes — carry your inhaler in hand baggage; it’s exempt from the 100 ml liquids rule, and a prescription helps at security.',
+    conditions: {
+      Carriage: 'Hand baggage, not checked bags',
+      Liquids: 'Exempt from the 100 ml rule',
+      Proof: 'A prescription or doctor’s letter helps at security',
+    },
+    riskLevel: 'medium',
+    timePhase: 'before',
+    intent: 'verdict',
+    decisionType: 'verdict',
+    source: {
+      title: 'Carriage of medicines and medical items',
+      url: 'https://www.bcasindia.gov.in/',
+    },
+    assertion:
+      'Asthma inhalers are allowed in hand baggage and exempt from the liquids limit, the same medical exemption that applies to other prescribed medicines.',
+    evidenceLevel: 'government_regulation',
+    related: ['can-i-carry-medicines-in-hand-baggage', 'can-i-carry-insulin-on-a-flight'],
+    signoff: true,
+  },
+  {
     slug: 'can-i-carry-a-laptop-in-hand-baggage',
     category: 'Baggage & items',
     subcategory: 'Electronics',
@@ -1546,6 +1581,33 @@ export const TRAVEL_QUESTIONS: SeedQuestion[] = [
     assertion: 'Dry fruits and nuts are solid foods permitted in cabin and checked baggage.',
     evidenceLevel: 'government_regulation',
     related: ['can-i-carry-food-in-hand-baggage-on-a-domestic-flight'],
+  },
+  {
+    slug: 'can-i-carry-chocolates-on-a-flight',
+    category: 'Baggage & items',
+    intentGroup: 'Packing',
+    subcategory: 'Food',
+    question: 'Can I carry chocolates on a flight?',
+    subject: { type: 'travel_item', code: 'chocolates', name: 'Chocolates', itemCategory: 'Food' },
+    authority: 'bcas',
+    verdict: 'allowed',
+    summary: 'Yes — chocolates are solid food, allowed in both cabin and checked baggage without restriction.',
+    conditions: {
+      Cabin: 'Allowed',
+      Checked: 'Allowed',
+      Customs: 'Your destination may restrict some foods — check on arrival',
+    },
+    riskLevel: 'low',
+    timePhase: 'before',
+    intent: 'verdict',
+    decisionType: 'verdict',
+    source: { title: 'Food items in baggage', url: 'https://www.bcasindia.gov.in/' },
+    assertion: 'Chocolates are a solid food permitted in cabin and checked baggage without restriction.',
+    evidenceLevel: 'government_regulation',
+    related: [
+      'can-i-carry-dry-fruits-on-a-flight',
+      'can-i-carry-food-in-hand-baggage-on-a-domestic-flight',
+    ],
   },
   {
     slug: 'can-i-carry-toothpaste-on-a-flight',
@@ -2606,6 +2668,11 @@ export const SEARCH_SYNONYMS: [pattern: string, canonical: string][] = [
   ['duty free', 'duty-free'],
   ['suitcase', 'baggage'],
   ['trolley bag', 'baggage'],
+  ['dslr', 'camera'],
+  ['syringe', 'insulin'],
+  ['syringes', 'insulin'],
+  ['need passport', 'ID'],
+  ['cabin luggage', 'cabin baggage'],
 ];
 
 /** One honest line describing what each category covers (for the category cards). */
