@@ -36,6 +36,21 @@ export const LEGACY_REDIRECTS: LegacyRedirect[] = [
     source: '/airport-rules/cabin-baggage/power-bank-in-flight',
     destination: '/question/can-i-carry-a-power-bank-on-a-flight',
   },
+  // Not in the live sitemap — caught only by cross-referencing actual Search
+  // Console performance data (9 real impressions, 1 real click). A second,
+  // shorter URL scheme (/rules/...) exists alongside /airport-rules/... for
+  // at least this topic and is still indexed. Without this cross-check it
+  // would have silently 404'd after migration despite being a real,
+  // currently-clicked page — exactly the risk this phase exists to catch.
+  {
+    source: '/rules/asthma-inhaler-flight',
+    destination: '/question/can-i-carry-an-asthma-inhaler-on-a-flight',
+  },
+  {
+    source: '/rules/sharp-objects-in-flight',
+    destination: '/question/can-i-carry-scissors-in-hand-baggage',
+    consolidated: true,
+  },
   {
     source: '/travel-documents/passport/passport-expiry-validity',
     destination: '/question/how-much-passport-validity-do-i-need-to-travel-abroad',
