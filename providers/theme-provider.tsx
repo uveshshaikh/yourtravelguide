@@ -1,5 +1,5 @@
 'use client';
-import { ThemeProvider as NextThemesProvider } from 'next-themes';
+import { ThemeProvider as NextThemesProvider } from '@teispace/next-themes';
 import { type ComponentProps } from 'react';
 
 /** Wraps next-themes with our defaults (system-aware, class-based). */
@@ -10,6 +10,7 @@ export function ThemeProvider({ children, ...props }: ComponentProps<typeof Next
       defaultTheme="system"
       enableSystem
       disableTransitionOnChange
+      storage="local"
       {...props}
     >
       {children}

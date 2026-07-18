@@ -1,6 +1,6 @@
 'use client';
 import { Moon, Sun } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { useTheme } from '@teispace/next-themes';
 
 /**
  * Light/dark toggle. The icon switches purely via the `dark:` CSS variant (no
