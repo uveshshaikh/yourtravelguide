@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import { LEGACY_REDIRECTS } from '@/config/legacy-redirects';
 
 /**
  * Next.js configuration — App Router.
@@ -19,6 +20,20 @@ const nextConfig: NextConfig = {
 
   // Typed routes — compile-time safety for internal links (stable in Next 16).
   typedRoutes: true,
+
+  // Permanent redirects from the live production site's legacy URL scheme
+  // (/airport-rules/..., /travel-documents/..., /customs/...) to the
+  // canonical /question/[slug] this codebase actually serves. See
+  // config/legacy-redirects.ts for how each mapping was verified — this is
+  // NOT a catch-all; legacy URLs with no real equivalent are deliberately
+  // absent here and 404 rather than redirect to something unrelated.
+  async redirects() {
+    return LEGACY_REDIRECTS.map(({ source, destination }) => ({
+      source,
+      destination,
+      permanent: true,
+    }));
+  },
 
   async headers() {
     return [
