@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { siteConfig } from '@/config/site';
-import { listVerifiedQuestions } from '@/services/resolver/catalog';
+import { listVerifiedQuestions, listByIntentGroup } from '@/services/resolver/catalog';
+import { intentGroupSlug, type IntentGroup } from '@/db/seed/content';
 
 /**
  * Dynamic XML sitemap — generated from the SAME fail-closed data source every
@@ -14,7 +15,7 @@ import { listVerifiedQuestions } from '@/services/resolver/catalog';
  * same URL and is excluded by simply not being in this list).
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const questions = await listVerifiedQuestions();
+  const [questions, groups] = await Promise.all([listVerifiedQuestions(), listByIntentGroup()]);
 
   const staticEntries: MetadataRoute.Sitemap = [
     {
@@ -29,6 +30,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.5,
     },
+    {
+      url: `${siteConfig.url}/about`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    {
+      url: `${siteConfig.url}/contact`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    {
+      url: `${siteConfig.url}/privacy-policy`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.2,
+    },
+    {
+      url: `${siteConfig.url}/terms`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.2,
+    },
+    {
+      url: `${siteConfig.url}/disclaimer`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.2,
+    },
   ];
 
   const questionEntries: MetadataRoute.Sitemap = questions.map((q) => ({
@@ -38,5 +69,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticEntries, ...questionEntries];
+  // Only groups with real live content exist (listByIntentGroup already omits
+  // empty ones), so this can never list a hub page that would 404.
+  const categoryEntries: MetadataRoute.Sitemap = groups.map((g) => ({
+    url: `${siteConfig.url}/category/${intentGroupSlug(g.group as IntentGroup)}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.6,
+  }));
+
+  return [...staticEntries, ...categoryEntries, ...questionEntries];
 }

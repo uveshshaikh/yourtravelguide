@@ -24,5 +24,9 @@ export const primaryNav: NavItem[] = [];
 export const footerLinks: NavItem[] = [
   { label: 'All questions', href: '/search' },
   { label: 'Trust & Editorial Center', href: '/trust' },
-  { label: 'Home', href: '/' },
+  { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
+  { label: 'Privacy Policy', href: '/privacy-policy' },
+  { label: 'Terms', href: '/terms' },
+  { label: 'Disclaimer', href: '/disclaimer' },
 ];

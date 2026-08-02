@@ -5,6 +5,7 @@ import { DecisionPage } from '@/components/decision/decision-page';
 import { KnowledgeInProgress } from '@/components/decision/knowledge-incomplete';
 import { JsonLd } from '@/components/seo/json-ld';
 import { siteConfig } from '@/config/site';
+import { intentGroupForSlug, intentGroupSlug } from '@/db/seed/content';
 
 /**
  * One canonical URL per verified question — the title/description come straight
@@ -63,6 +64,9 @@ export default async function QuestionPage({ params }: { params: Promise<{ slug:
 
   const { view } = result;
   const url = `${siteConfig.url}/question/${slug}`;
+  const group = intentGroupForSlug(slug);
+  const categoryHref = `/category/${intentGroupSlug(group)}`;
+  const categoryUrl = `${siteConfig.url}${categoryHref}`;
 
   const webPageSchema = {
     '@context': 'https://schema.org',
@@ -79,7 +83,8 @@ export default async function QuestionPage({ params }: { params: Promise<{ slug:
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: siteConfig.url },
-      { '@type': 'ListItem', position: 2, name: view.question, item: url },
+      { '@type': 'ListItem', position: 2, name: group, item: categoryUrl },
+      { '@type': 'ListItem', position: 3, name: view.question, item: url },
     ],
   };
 
@@ -104,7 +109,11 @@ export default async function QuestionPage({ params }: { params: Promise<{ slug:
       <JsonLd data={faqSchema} />
       <DecisionPage
         decision={view}
-        breadcrumb={[{ label: 'Home', href: '/' }, { label: view.question }]}
+        breadcrumb={[
+          { label: 'Home', href: '/' },
+          { label: group, href: categoryHref },
+          { label: view.question },
+        ]}
       />
     </>
   );

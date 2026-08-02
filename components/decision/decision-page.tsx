@@ -38,9 +38,11 @@ const SPACING: Record<PageLevel, { details: string; exceptions: string; related:
 
 export function DecisionPage({
   decision,
+  breadcrumb,
 }: {
   decision: DecisionView;
-  /** Accepted for route compatibility; the visible nav is the back link. */
+  /** Rendered as a real breadcrumb nav when provided (real internal links,
+   *  not just structured-data theater) — falls back to a plain back-link. */
   breadcrumb?: BreadcrumbItemView[];
 }) {
   const d = decision;
@@ -55,13 +57,30 @@ export function DecisionPage({
 
   return (
     <Container className="max-w-2xl py-8 sm:py-10">
-      <a
-        href="/search"
-        className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm transition-colors"
-      >
-        <ArrowLeft className="size-4" aria-hidden />
-        All questions
-      </a>
+      {breadcrumb?.length ? (
+        <nav aria-label="Breadcrumb" className="text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm">
+          {breadcrumb.map((item, i) => (
+            <span key={item.label} className="flex items-center gap-1.5">
+              {i > 0 ? <span aria-hidden>/</span> : null}
+              {item.href ? (
+                <a href={item.href} className="hover:text-foreground transition-colors">
+                  {item.label}
+                </a>
+              ) : (
+                <span className="text-foreground">{item.label}</span>
+              )}
+            </span>
+          ))}
+        </nav>
+      ) : (
+        <a
+          href="/search"
+          className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm transition-colors"
+        >
+          <ArrowLeft className="size-4" aria-hidden />
+          All questions
+        </a>
+      )}
 
       <h1 className="mt-5 text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
         {d.question}
@@ -143,6 +162,10 @@ export function DecisionPage({
           How we verify
         </a>
       </footer>
+      <p className="text-muted-foreground mt-2 text-xs text-pretty">
+        Correct as of the verified date above — for anything time-critical, please double-check
+        directly with your airline or the relevant authority before you travel.
+      </p>
     </Container>
   );
 }

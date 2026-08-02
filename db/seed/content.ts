@@ -2425,6 +2425,24 @@ export function intentGroupForSlug(slug: string): IntentGroup {
   return q.intentGroup ?? CATEGORY_TO_INTENT[q.category];
 }
 
+/** Stable, URL-safe slug for a category hub page — e.g. "Money & customs" -> "money-customs". */
+export function intentGroupSlug(group: IntentGroup): string {
+  return group
+    .toLowerCase()
+    .replace(/&/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+const INTENT_GROUP_BY_SLUG: Partial<Record<string, IntentGroup>> = Object.fromEntries(
+  INTENT_GROUPS.map((g) => [intentGroupSlug(g), g]),
+);
+
+/** category-hub URL slug -> IntentGroup, or undefined if the slug isn't real. */
+export function intentGroupForCategorySlug(slug: string): IntentGroup | undefined {
+  return INTENT_GROUP_BY_SLUG[slug];
+}
+
 /**
  * slug → subcategory (second hierarchy level), if tagged. Used to break a large
  * intent group into scannable clusters (e.g. Packing → Electronics / Liquids /
