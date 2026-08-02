@@ -99,10 +99,23 @@ export interface AirlineGuidanceSection {
   airlines: AirlineGuidanceEntry[];
 }
 
+/** One rule can have guidance from more than one airport (Phase C2) -- same
+ *  shape rationale as AirlineGuidanceEntry above. */
+export interface AirportGuidanceEntry {
+  airport: string;
+  /** The actual guidance -- must trace to sourceUrl. */
+  guidance: string;
+  /** Facility detail (refill stations, fountains, etc.), if verifiable. */
+  facilityInfo?: string;
+  /** The official airport-operator page or statement this was verified against. */
+  sourceUrl: string;
+  /** ISO date string -- when sourceUrl was last confirmed to say this. */
+  lastVerified?: string;
+}
+
 export interface AirportGuidanceSection {
   type: 'airportGuidance';
-  airport: string;
-  notes: string[];
+  airports: AirportGuidanceEntry[];
 }
 
 export interface ScenarioSection {

@@ -2792,6 +2792,28 @@ export const rules: Rule[] = [
           },
         ],
       },
+      {
+        type: "airportGuidance",
+        airports: [
+          {
+            airport: "Delhi (DEL) — Indira Gandhi International Airport",
+            guidance:
+              "Free drinking water fountains are available at various locations inside the terminal building.",
+            facilityInfo:
+              "Packaged water is also sold at Maximum Retail Price (MRP) through vending machines and food outlets.",
+            sourceUrl: "https://x.com/DelhiAirport/status/1894373011114913814",
+            lastVerified: "2026-08-02",
+          },
+          {
+            airport: "Mumbai (BOM) — Chhatrapati Shivaji Maharaj International Airport",
+            guidance: "Water bottle refill stations are available at Terminal 2.",
+            facilityInfo:
+              "Drinking water can also be purchased from vending machines located across the terminal.",
+            sourceUrl: "https://x.com/CSMIA_Official/status/2003699027603271819",
+            lastVerified: "2026-08-02",
+          },
+        ],
+      },
     ],
     sources: [
       {

@@ -13,6 +13,7 @@ import {
   InternalLinksSection,
   ReferenceSection,
   AirlineGuidanceSection,
+  AirportGuidanceSection,
 } from '../data/sections';
 
 /**
@@ -334,10 +335,57 @@ export function renderAirlineGuidance(section: AirlineGuidanceSection, ctx: Sect
 }
 
 /**
+ * Airport Guidance (Phase C2) -- one card per airport, same card styling as
+ * Airline Guidance (border/rounded/bg-slate-50, same footer-link/date row)
+ * for visual consistency. Every entry must trace to a real sourceUrl -- see
+ * data/rules.ts's water-bottle-airport for the only rule currently using
+ * this (Delhi and Mumbai airport-operator official statements).
+ */
+export function renderAirportGuidance(section: AirportGuidanceSection, ctx: SectionRenderContext): ReactNode {
+  if (section.airports.length === 0) return null;
+  return (
+    <section className="mb-5">
+      <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">
+        Airport-specific guidance
+      </h2>
+      <div className="space-y-3">
+        {section.airports.map((entry, idx) => (
+          <div key={idx} className="border border-slate-200 rounded-xl p-4 bg-slate-50">
+            <p className="text-[13px] font-bold text-slate-800 mb-1">{entry.airport}</p>
+            <p className="text-[13px] text-slate-700 leading-relaxed">{entry.guidance}</p>
+            {entry.facilityInfo && (
+              <p className="mt-2 text-[13px] text-slate-600 leading-relaxed">{entry.facilityInfo}</p>
+            )}
+            <div className="mt-3 pt-2 border-t border-slate-200 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+              <a
+                href={entry.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline text-xs inline-flex items-center gap-1"
+              >
+                Official {entry.airport} guidance
+                <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+              {entry.lastVerified && (
+                <span className="text-xs text-slate-400">
+                  Verified: {ctx.formatDate(entry.lastVerified)}
+                </span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/**
  * Registry mapping each implemented section type to its renderer. Keyed by
  * ArticleSection['type'] so a typo in a key is a compile error. Future
- * module types (decisionTree, airportGuidance, scenario, exception,
- * securityProcess, callout) are deliberately absent -- see lib/sections.ts's
+ * module types (decisionTree, scenario, exception, securityProcess,
+ * callout) are deliberately absent -- see lib/sections.ts's
  * isImplementedSection() for the compile-time guardrail that keeps this
  * registry and that check in sync.
  *
@@ -362,4 +410,5 @@ export const SECTION_RENDERERS: SectionRendererMap = {
   internalLinks: renderInternalLinks,
   reference: renderReference,
   airlineGuidance: renderAirlineGuidance,
+  airportGuidance: renderAirportGuidance,
 };
