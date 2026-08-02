@@ -4,7 +4,7 @@ import { rules } from '../../../data/rules';
 import { Rule } from '../../../data/types';
 import Layout from '../../../components/Layout';
 import Breadcrumb, { BreadcrumbItem } from '../../../components/Breadcrumb';
-import { isNewArchRule, NEW_ARCH_CATEGORIES } from '../../../lib/urls';
+import { isNewArchRule, NEW_ARCH_CATEGORIES, buildCategoryUrl, buildSubcategoryUrl } from '../../../lib/urls';
 import { labelFor } from '../../../lib/labels';
 import { generateSubcategoryMeta } from '../../../lib/seoMeta';
 
@@ -47,7 +47,7 @@ export default function SubcategoryIndexPage({
   return (
     <Layout
       {...generateSubcategoryMeta({ subcategoryLabel, categoryLabel, ruleCount: pageRules.length })}
-      canonicalPath={`/${category}/${subcategory}`}
+      canonicalPath={buildSubcategoryUrl(category, subcategory)}
     >
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Breadcrumb items={breadcrumbs} />
@@ -55,7 +55,7 @@ export default function SubcategoryIndexPage({
         <h1 className="text-3xl font-bold text-slate-900 mb-2">{subcategoryLabel}</h1>
         <p className="text-slate-500 mb-8">
           {pageRules.length} rule{pageRules.length !== 1 ? 's' : ''} under{' '}
-          <Link href={`/${category}`} className="text-blue-600 hover:underline">
+          <Link href={buildCategoryUrl(category)} className="text-blue-600 hover:underline">
             {categoryLabel}
           </Link>
         </p>
@@ -64,7 +64,7 @@ export default function SubcategoryIndexPage({
           {pageRules.map((rule) => (
             <li key={rule.slug}>
               <Link
-                href={`/${category}/${subcategory}/${rule.slug}`}
+                href={`${buildSubcategoryUrl(category, subcategory)}/${rule.slug}`}
                 className="flex items-start justify-between gap-3 p-4 rounded-xl border border-slate-200 bg-white hover:border-blue-300 hover:shadow-sm transition group"
               >
                 <span className="text-sm font-medium text-slate-800 group-hover:text-blue-600 leading-snug">
@@ -116,8 +116,8 @@ export const getStaticProps: GetStaticProps<PageProps> = async ({ params }) => {
 
   const breadcrumbs: BreadcrumbItem[] = [
     { label: 'Home',             href: '/' },
-    { label: categoryLabel,      href: `/${category}` },
-    { label: subcategoryLabel,   href: `/${category}/${subcategory}` },
+    { label: categoryLabel,      href: buildCategoryUrl(category) },
+    { label: subcategoryLabel,   href: buildSubcategoryUrl(category, subcategory) },
   ];
 
   return {

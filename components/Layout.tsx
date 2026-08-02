@@ -8,8 +8,14 @@ interface LayoutProps {
   children: ReactNode;
   title?: string;
   description?: string;
-  /** Override canonical URL. Defaults to current path derived from router. */
-  canonicalPath?: string;
+  /**
+   * Required. The canonical path for this page (e.g. "/", "/about",
+   * "/airport-rules/cabin-baggage/power-bank-in-flight"). Deliberately not
+   * derived from router.asPath -- that reflects whatever URL variant was
+   * actually requested (trailing slash, casing, etc.), not one fixed
+   * canonical, so every page must declare its own.
+   */
+  canonicalPath: string;
   /** Override the OG image URL. Defaults to a dynamic /api/og image. */
   ogImage?: string;
 }
@@ -24,9 +30,7 @@ const Layout: React.FC<LayoutProps> = ({
   ogImage,
 }) => {
   const router = useRouter();
-  // Strip query string; use canonicalPath override when supplied
-  const pagePath = canonicalPath ?? router.asPath.split('?')[0];
-  const canonicalUrl = `${SITE_URL}${pagePath}`;
+  const canonicalUrl = `${SITE_URL}${canonicalPath}`;
 
   // Build dynamic OG image URL. Encode title + first 100 chars of description as params.
   const defaultOgImage = `${SITE_URL}/api/og?${new URLSearchParams({

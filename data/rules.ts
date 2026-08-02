@@ -376,7 +376,6 @@ export const rules: Rule[] = [
       ],
       internalLinks: [
         { label: "Domestic ID checklist", slug: "domestic-id-requirements" },
-        { label: "Minor consent letter guide", slug: "minor-travel-consent-letter" },
         { label: "Digital boarding pass tips", slug: "digital-boarding-pass" },
       ],
       verifiedOn: "2025-12-05",
@@ -4904,8 +4903,8 @@ export const rules: Rule[] = [
         "Use QR-coded greeting cards linked to digital photo albums instead of extra printed material.",
       ],
       internalLinks: [
-        { label: "Sharp objects policy", slug: "sharp-objects-flight" },
-        { label: "Perfume & liquids guide", slug: "perfume-on-flight" },
+        { label: "Sharp objects policy", slug: "sharp-objects-in-flight" },
+        { label: "Perfume & liquids guide", slug: "perfume-in-flight" },
         { label: "Empty bottle rules", slug: "empty-bottles-vs-liquid" },
       ],
       verifiedOn: "2025-12-06",

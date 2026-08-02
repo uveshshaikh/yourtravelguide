@@ -5,7 +5,7 @@ import { rules } from '../../data/rules';
 import { Rule } from '../../data/types';
 import Layout from '../../components/Layout';
 import Breadcrumb, { BreadcrumbItem } from '../../components/Breadcrumb';
-import { isNewArchRule, NEW_ARCH_CATEGORIES } from '../../lib/urls';
+import { isNewArchRule, NEW_ARCH_CATEGORIES, buildCategoryUrl, buildSubcategoryUrl } from '../../lib/urls';
 import { labelFor, SUBCATEGORY_LABELS } from '../../lib/labels';
 import { HUB_CONTENT, HubContent } from '../../lib/hubContent';
 import { generateCategoryMeta } from '../../lib/seoMeta';
@@ -67,7 +67,7 @@ export default function CategoryIndexPage({
   return (
     <Layout
       {...generateCategoryMeta({ categoryLabel, tagline: hub.tagline, totalRules })}
-      canonicalPath={`/${category}`}
+      canonicalPath={buildCategoryUrl(category)}
     >
       <Head>
         <script
@@ -125,7 +125,7 @@ export default function CategoryIndexPage({
                     <span className="text-xs text-slate-400">{group.totalRules} rule{group.totalRules !== 1 ? 's' : ''}</span>
                   </div>
                   <Link
-                    href={`/${category}/${group.subcategory}`}
+                    href={buildSubcategoryUrl(category, group.subcategory)}
                     className="text-xs font-semibold text-blue-600 hover:text-blue-800 hover:underline"
                   >
                     View all →
@@ -137,7 +137,7 @@ export default function CategoryIndexPage({
                   {group.topRules.map((rule) => (
                     <li key={rule.slug}>
                       <Link
-                        href={`/${category}/${group.subcategory}/${rule.slug}`}
+                        href={`${buildSubcategoryUrl(category, group.subcategory)}/${rule.slug}`}
                         className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-slate-50 transition-colors group"
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
@@ -158,7 +158,7 @@ export default function CategoryIndexPage({
                 {group.totalRules > group.topRules.length && (
                   <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50">
                     <Link
-                      href={`/${category}/${group.subcategory}`}
+                      href={buildSubcategoryUrl(category, group.subcategory)}
                       className="text-xs text-slate-500 hover:text-blue-600 hover:underline"
                     >
                       + {group.totalRules - group.topRules.length} more rules in {group.label}
@@ -195,7 +195,7 @@ export default function CategoryIndexPage({
             {groups.map((group) => (
               <Link
                 key={group.subcategory}
-                href={`/${category}/${group.subcategory}`}
+                href={buildSubcategoryUrl(category, group.subcategory)}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 bg-white text-[13px] font-medium text-slate-700 hover:border-blue-400 hover:text-blue-700 hover:bg-blue-50 transition-colors"
               >
                 {group.label}
@@ -286,7 +286,7 @@ export const getStaticProps: GetStaticProps<PageProps> = async ({ params }) => {
 
   const breadcrumbs: BreadcrumbItem[] = [
     { label: 'Home',        href: '/' },
-    { label: categoryLabel, href: `/${category}` },
+    { label: categoryLabel, href: buildCategoryUrl(category) },
   ];
 
   return {

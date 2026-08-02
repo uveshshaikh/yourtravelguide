@@ -1,5 +1,17 @@
 import { Rule } from '../data/types';
 
+/**
+ * Resolves a slug to its Rule, or null if it doesn't match any current rule.
+ * The ONE place that knows how to do this safely — every caller that turns a
+ * bare slug reference (richContent.internalLinks, rule.internalLinks, ...)
+ * into a link must go through this, so an unresolved/renamed/typo'd slug can
+ * never silently render as a broken or legacy link. See
+ * components/RuleDetail.tsx's getRuleUrl for the URL-building counterpart.
+ */
+export function resolveRuleBySlug(slug: string, allRules: Rule[]): Rule | null {
+  return allRules.find((r) => r.slug === slug) ?? null;
+}
+
 const MAX_RELATED = 6;
 /** Only fall back to the broadest tier (same category) if tiers 1-2 leave a
  *  rule genuinely thin — never used just to pad every page up to MAX_RELATED. */
@@ -34,11 +46,10 @@ export function getRelatedRules(rule: Rule, allRules: Rule[], max = MAX_RELATED)
 
   // Tier 0: manually-curated overrides, if ever populated for this rule.
   if (rule.internalLinks?.length) {
-    const bySlug = new Map(allRules.map((r) => [r.slug, r]));
     add(
       rule.internalLinks
-        .map((slug) => bySlug.get(slug))
-        .filter((r): r is Rule => Boolean(r)),
+        .map((slug) => resolveRuleBySlug(slug, allRules))
+        .filter((r): r is Rule => r !== null),
     );
   }
 

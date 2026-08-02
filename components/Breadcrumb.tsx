@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { labelFor } from '../lib/labels';
+import { buildCategoryUrl, buildSubcategoryUrl } from '../lib/urls';
 
 export interface BreadcrumbItem {
   label: string;
@@ -96,8 +97,8 @@ export function buildRuleBreadcrumbs(
 ): BreadcrumbItem[] {
   return [
     { label: 'Home',                      href: '/' },
-    { label: labelFor(category),          href: `/${category}` },
-    { label: labelFor(subcategory),       href: `/${category}/${subcategory}` },
+    { label: labelFor(category),          href: buildCategoryUrl(category) },
+    { label: labelFor(subcategory),       href: buildSubcategoryUrl(category, subcategory) },
     { label: articleTitle,                href: articleHref },
   ];
 }

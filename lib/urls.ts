@@ -14,6 +14,21 @@ export function isNewArchRule(
   return (NEW_ARCH_CATEGORIES as readonly string[]).includes(rule.category);
 }
 
+/** Canonical URL for a category hub page, e.g. "/airport-rules". */
+export function buildCategoryUrl(category: string): string {
+  return `/${category}`;
+}
+
+/**
+ * Canonical URL for a subcategory hub page, e.g.
+ * "/airport-rules/cabin-baggage". Built from buildCategoryUrl so a hub URL
+ * and its breadcrumb link can never diverge -- there's only one place that
+ * knows how to construct it.
+ */
+export function buildSubcategoryUrl(category: string, subcategory: string): string {
+  return `${buildCategoryUrl(category)}/${subcategory}`;
+}
+
 /**
  * Returns the canonical URL path for any rule.
  *
@@ -22,7 +37,7 @@ export function isNewArchRule(
  */
 export function buildRuleUrl(rule: Rule | { category: string; subcategory?: string; slug: string }): string {
   if ((NEW_ARCH_CATEGORIES as readonly string[]).includes(rule.category) && rule.subcategory) {
-    return `/${rule.category}/${rule.subcategory}/${rule.slug}`;
+    return `${buildSubcategoryUrl(rule.category, rule.subcategory)}/${rule.slug}`;
   }
   return `/rules/${rule.slug}`;
 }

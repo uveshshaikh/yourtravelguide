@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 import { rules } from "./data/rules";
 import { buildRuleUrl, isNewArchRule } from "./lib/urls";
+import { validateRules } from "./lib/validateContent";
+
+// Runs on every `next dev` / `next build` / `next start` boot, before the app
+// serves anything. Throws (failing the build) on duplicate slugs or dangling
+// internalLinks references -- see lib/validateContent.ts.
+validateRules(rules);
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,

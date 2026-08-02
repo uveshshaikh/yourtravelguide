@@ -9,7 +9,7 @@ import { rules } from '../data/rules';
 import { Rule } from '../data/types';
 import { buildRuleUrl, isNewArchRule } from '../lib/urls';
 import { generateRuleMeta } from '../lib/seoMeta';
-import { getRelatedRules } from '../lib/relatedRules';
+import { getRelatedRules, resolveRuleBySlug } from '../lib/relatedRules';
 
 interface RuleDetailProps {
   rule: Rule;
@@ -77,7 +77,7 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
   // doesn't resolve to a current rule — callers must skip rendering the link
   // rather than pointing it at a broken or legacy URL.
   const getRuleUrl = (slug: string): string | null => {
-    const target = rules.find((r) => r.slug === slug);
+    const target = resolveRuleBySlug(slug, rules);
     return target ? buildRuleUrl(target) : null;
   };
 
