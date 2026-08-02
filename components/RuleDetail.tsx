@@ -7,9 +7,21 @@ import Breadcrumb, { buildRuleBreadcrumbs } from './Breadcrumb';
 import FaqSchema from './FaqSchema';
 import { rules } from '../data/rules';
 import { Rule } from '../data/types';
+import {
+  QuickAnswerSection,
+  OverviewSection,
+  DosDontsSection,
+  TableSection,
+  ExamplesSection,
+  FaqSection,
+  TipsSection,
+  InternalLinksSection,
+  ChecklistSection,
+} from '../data/sections';
 import { buildRuleUrl, isNewArchRule } from '../lib/urls';
 import { generateRuleMeta } from '../lib/seoMeta';
 import { getRelatedRules, resolveRuleBySlug } from '../lib/relatedRules';
+import { getArticleSections } from '../lib/sections';
 
 interface RuleDetailProps {
   rule: Rule;
@@ -63,8 +75,31 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
   }
 
   const richContent = rule.richContent;
+  // Branch selector only (which JSX branch to render below) -- deliberately
+  // NOT derived from the sections[] array, so it can't change behaviour
+  // based on what a future rule.sections happens to contain. Section
+  // *content* below is sourced from getArticleSections(), not richContent.
   const hasRichContent = Boolean(richContent);
-  const richExamples = richContent?.examples ?? [];
+
+  // Phase B2: RuleDetail renders from getArticleSections(rule), which
+  // returns rule.sections as-is if authored directly, or derives the
+  // equivalent sections from richContent otherwise (lib/sections.ts). No
+  // rule currently sets `sections`, so every page below reads the same
+  // values it did before -- just through one typed interface instead of
+  // reading richContent's fields directly.
+  const sections = getArticleSections(rule);
+
+  const quickAnswerSection = sections.find((s): s is QuickAnswerSection => s.type === 'quickAnswer');
+  const overviewSection = sections.find((s): s is OverviewSection => s.type === 'overview');
+  const dosDontsSection = sections.find((s): s is DosDontsSection => s.type === 'dosDonts');
+  const tableSection = sections.find((s): s is TableSection => s.type === 'table');
+  const examplesSection = sections.find((s): s is ExamplesSection => s.type === 'examples');
+  const faqSection = sections.find((s): s is FaqSection => s.type === 'faq');
+  const tipsSection = sections.find((s): s is TipsSection => s.type === 'tips');
+  const internalLinksSection = sections.find((s): s is InternalLinksSection => s.type === 'internalLinks');
+  const checklistSections = sections.filter((s): s is ChecklistSection => s.type === 'checklist');
+
+  const richExamples = examplesSection?.items ?? [];
 
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -90,7 +125,7 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
   // In-article "Related guides" chips — only ones that resolve to a real,
   // current rule. An unresolvable slug is omitted entirely rather than
   // linking to a legacy or broken URL.
-  const resolvedInternalLinks = (richContent?.internalLinks ?? [])
+  const resolvedInternalLinks = (internalLinksSection?.links ?? [])
     .map((link) => ({ label: link.label, href: getRuleUrl(link.slug) }))
     .filter((link): link is { label: string; href: string } => link.href !== null);
 
@@ -98,11 +133,11 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
 
   // Key highlights: first checklist or first 4 howToComply items
   const highlights =
-    richContent?.checklists?.[0]?.items?.slice(0, 4) ??
+    checklistSections[0]?.items?.slice(0, 4) ??
     rule.howToComply.slice(0, 4);
 
   // Remaining checklists (first is used for highlights)
-  const remainingChecklists = richContent?.checklists?.slice(1) ?? [];
+  const remainingChecklists = checklistSections.slice(1);
 
   const { title: metaTitle, description: metaDescription } = generateRuleMeta(rule);
   const canonicalPath = buildRuleUrl(rule);
@@ -115,8 +150,8 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
 
   return (
     <Layout title={metaTitle} description={metaDescription} canonicalPath={canonicalPath} ogImage={ogImage}>
-      {richContent && richContent.faqs.length > 0 && (
-        <FaqSchema faqs={richContent.faqs} />
+      {faqSection && faqSection.items.length > 0 && (
+        <FaqSchema faqs={faqSection.items} />
       )}
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -143,9 +178,9 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
             <p className="text-slate-800 text-[15px] leading-relaxed font-semibold">
               {rule.verdict.summary}
             </p>
-            {richContent?.quickAnswer && (
+            {quickAnswerSection && (
               <p className="mt-2 pt-2 border-t border-slate-200 text-slate-600 text-sm leading-relaxed">
-                {richContent.quickAnswer}
+                {quickAnswerSection.text}
               </p>
             )}
           </div>
@@ -171,9 +206,9 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
           {hasRichContent ? (
             <>
               {/* Overview */}
-              {richContent!.overview.length > 0 && (
+              {overviewSection && overviewSection.paragraphs.length > 0 && (
                 <section className="mb-5 space-y-3">
-                  {richContent!.overview.map((paragraph, idx) => (
+                  {overviewSection.paragraphs.map((paragraph, idx) => (
                     <p key={idx} className="text-slate-700 leading-relaxed text-[15px]">
                       {paragraph}
                     </p>
@@ -182,19 +217,19 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
               )}
 
               {/* When allowed / When not allowed */}
-              {(richContent!.dos.length > 0 || richContent!.donts.length > 0) && (
+              {dosDontsSection && (dosDontsSection.dos.length > 0 || dosDontsSection.donts.length > 0) && (
                 <section className="mb-5">
                   <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">
                     When allowed vs. when not
                   </h2>
                   <div className="grid gap-3 sm:grid-cols-2">
-                    {richContent!.dos.length > 0 && (
+                    {dosDontsSection.dos.length > 0 && (
                       <div className="rounded-xl border border-green-200 bg-green-50 p-4">
                         <p className="text-[11px] font-bold uppercase tracking-wide text-green-700 mb-3">
                           ✅ {sc.allowedHeading}
                         </p>
                         <ul className="space-y-2">
-                          {richContent!.dos.map((item, idx) => (
+                          {dosDontsSection.dos.map((item, idx) => (
                             <li key={idx} className="flex items-start gap-2 text-[13px] text-slate-700 leading-snug">
                               <span className="text-green-500 mt-0.5 flex-shrink-0">•</span>
                               {item}
@@ -203,13 +238,13 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
                         </ul>
                       </div>
                     )}
-                    {richContent!.donts.length > 0 && (
+                    {dosDontsSection.donts.length > 0 && (
                       <div className="rounded-xl border border-red-200 bg-red-50 p-4">
                         <p className="text-[11px] font-bold uppercase tracking-wide text-red-700 mb-3">
                           🚫 {sc.notAllowedHeading}
                         </p>
                         <ul className="space-y-2">
-                          {richContent!.donts.map((item, idx) => (
+                          {dosDontsSection.donts.map((item, idx) => (
                             <li key={idx} className="flex items-start gap-2 text-[13px] text-slate-700 leading-snug">
                               <span className="text-red-400 mt-0.5 flex-shrink-0">•</span>
                               {item}
@@ -244,16 +279,16 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
               )}
 
               {/* Optional Table */}
-              {richContent!.table && (
+              {tableSection && (
                 <section className="mb-5">
                   <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">
-                    {richContent!.table.caption}
+                    {tableSection.caption}
                   </h2>
                   <div className="overflow-x-auto border border-slate-200 rounded-xl">
                     <table className="min-w-full divide-y divide-slate-200 text-sm">
                       <thead className="bg-slate-50">
                         <tr>
-                          {richContent!.table.headers.map((header, idx) => (
+                          {tableSection.headers.map((header, idx) => (
                             <th key={idx} className="px-4 py-3 text-left font-semibold text-slate-600 uppercase tracking-wide text-xs">
                               {header}
                             </th>
@@ -261,7 +296,7 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
-                        {richContent!.table.rows.map((row, rowIdx) => (
+                        {tableSection.rows.map((row, rowIdx) => (
                           <tr key={rowIdx} className="even:bg-slate-50">
                             {row.map((cell, cellIdx) => (
                               <td key={cellIdx} className="px-4 py-3 text-slate-700 text-sm">
@@ -293,13 +328,13 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
               )}
 
               {/* FAQ — accordion */}
-              {richContent!.faqs.length > 0 && (
+              {faqSection && faqSection.items.length > 0 && (
                 <section className="mb-5">
                   <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">
                     Frequently asked questions
                   </h2>
                   <div className="border border-slate-200 rounded-xl divide-y divide-slate-200 overflow-hidden">
-                    {richContent!.faqs.map((faq, idx) => (
+                    {faqSection.items.map((faq, idx) => (
                       <details key={idx} className="group">
                         <summary className="flex items-center justify-between gap-3 px-4 py-3.5 cursor-pointer list-none [&::-webkit-details-marker]:hidden hover:bg-slate-50 transition-colors">
                           <span className="font-semibold text-slate-800 text-sm pr-2">{faq.question}</span>
@@ -317,13 +352,13 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
               )}
 
               {/* Travel tips */}
-              {richContent!.tips.length > 0 && (
+              {tipsSection && tipsSection.items.length > 0 && (
                 <section className="mb-5 bg-blue-50 border border-blue-100 rounded-2xl p-5">
                   <h2 className="text-[11px] font-bold uppercase tracking-widest text-blue-600 mb-3">
                     Travel tips
                   </h2>
                   <ul className="space-y-2">
-                    {richContent!.tips.map((tip, idx) => (
+                    {tipsSection.items.map((tip, idx) => (
                       <li key={idx} className="flex items-start gap-2.5 text-[13px] text-slate-700 leading-snug">
                         <span className="flex-shrink-0 mt-0.5">✈️</span>
                         {tip}
@@ -333,7 +368,7 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
                 </section>
               )}
 
-              {/* In-article links (labelled, from richContent) */}
+              {/* In-article links (labelled, from internalLinksSection) */}
               {resolvedInternalLinks.length > 0 && (
                 <section className="mb-5">
                   <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">

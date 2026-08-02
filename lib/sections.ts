@@ -72,3 +72,42 @@ export function getArticleSections(rule: Rule): ArticleSection[] {
 
   return sections;
 }
+
+/**
+ * True for the section types RuleDetail.tsx actually renders (Phase B2).
+ * The remaining types (decisionTree, airlineGuidance, airportGuidance,
+ * scenario, exception, securityProcess, callout) are typed placeholders only
+ * -- real, but with no renderer yet, pending Phase B3 content.
+ *
+ * The `never` branch is a compile-time guarantee: adding a new
+ * ArticleSection variant without updating this switch is a type error, so a
+ * future module type can never silently render as nothing forever -- it has
+ * to be deliberately added here first.
+ */
+export function isImplementedSection(section: ArticleSection): boolean {
+  switch (section.type) {
+    case 'quickAnswer':
+    case 'overview':
+    case 'checklist':
+    case 'dosDonts':
+    case 'table':
+    case 'examples':
+    case 'faq':
+    case 'tips':
+    case 'internalLinks':
+    case 'reference':
+      return true;
+    case 'decisionTree':
+    case 'airlineGuidance':
+    case 'airportGuidance':
+    case 'scenario':
+    case 'exception':
+    case 'securityProcess':
+    case 'callout':
+      return false;
+    default: {
+      const _exhaustive: never = section;
+      return _exhaustive;
+    }
+  }
+}
