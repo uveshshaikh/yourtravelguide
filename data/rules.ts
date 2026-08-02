@@ -2842,6 +2842,21 @@ export const rules: Rule[] = [
         ],
         lastVerified: "2026-08-02",
       },
+      {
+        type: "securityProcess",
+        steps: [
+          "Your cabin baggage, including any water bottle, goes through X-ray screening before you're allowed to board — confirmed on Air India's own passenger guidance.",
+          "Any liquid you're carrying, including water, must be in a container of 100ml or less; a container over 100ml is not accepted even if it holds less liquid than that (Air India, IndiGo).",
+          "All permitted liquid containers (100ml or less) must fit inside one transparent, re-sealable bag of up to 1 litre (IndiGo).",
+          "Neither airline's official guidance describes checkpoint-level detail beyond this — for example, tray placement order or whether a bottle is screened separately from other items. That level of procedural detail wasn't found in an official source, so it isn't included here.",
+        ],
+        sourceUrls: [
+          "https://www.airindia.com/in/en/frequently-asked-questions/baggage.html",
+          "https://www.airindia.com/in/en/travel-information/baggage-guidelines/restricted-baggage.html",
+          "https://www.goindigo.in/travel-information/en/baggage-allowance.html",
+        ],
+        lastVerified: "2026-08-02",
+      },
     ],
     sources: [
       {

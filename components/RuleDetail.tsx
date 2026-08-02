@@ -22,6 +22,7 @@ import {
   AirportGuidanceSection,
   DomesticInternationalGuidanceSection,
   WaterSafetySection,
+  SecurityProcessSection,
 } from '../data/sections';
 import { buildRuleUrl, isNewArchRule } from '../lib/urls';
 import { generateRuleMeta } from '../lib/seoMeta';
@@ -110,6 +111,7 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
     (s): s is DomesticInternationalGuidanceSection => s.type === 'domesticInternationalGuidance',
   );
   const waterSafetySection = sections.find((s): s is WaterSafetySection => s.type === 'waterSafety');
+  const securityProcessSection = sections.find((s): s is SecurityProcessSection => s.type === 'securityProcess');
   const checklistSections = sections.filter((s): s is ChecklistSection => s.type === 'checklist');
 
   const formatDate = (dateString: string) =>
@@ -240,6 +242,8 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
                 SECTION_RENDERERS.domesticInternationalGuidance?.(domesticInternationalSection, renderCtx)}
 
               {waterSafetySection && SECTION_RENDERERS.waterSafety?.(waterSafetySection, renderCtx)}
+
+              {securityProcessSection && SECTION_RENDERERS.securityProcess?.(securityProcessSection, renderCtx)}
 
               {faqSection && SECTION_RENDERERS.faq?.(faqSection, renderCtx)}
 

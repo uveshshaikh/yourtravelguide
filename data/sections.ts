@@ -170,9 +170,21 @@ export interface ExceptionSection {
   explanation: string;
 }
 
+/**
+ * Security Process (Phase C5). Extended from the Phase B1 placeholder
+ * (steps only) with the same sourceUrls/lastVerified pattern as every other
+ * populated module -- a "journey through security" claim needs the same
+ * accountability as any other guidance here. `steps` should include an
+ * explicit entry disclosing where official sourcing runs out, rather than
+ * silently stopping or filling the gap with inferred procedure -- see
+ * data/rules.ts's water-bottle-airport.
+ */
 export interface SecurityProcessSection {
   type: 'securityProcess';
   steps: string[];
+  sourceUrls: string[];
+  /** ISO date string -- when sourceUrls were last confirmed to say this. */
+  lastVerified: string;
 }
 
 /**
