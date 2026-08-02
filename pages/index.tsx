@@ -553,7 +553,7 @@ export default function Home({ allRules }: HomeProps) {
 
   return (
     <>
-      <Layout>
+      <Layout canonicalPath="/">
       <section className="relative isolate overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-sky-500 text-white py-14 sm:py-20 px-4 sm:px-6 lg:px-8">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-white/15 to-transparent" />

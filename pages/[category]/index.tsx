@@ -67,6 +67,7 @@ export default function CategoryIndexPage({
   return (
     <Layout
       {...generateCategoryMeta({ categoryLabel, tagline: hub.tagline, totalRules })}
+      canonicalPath={`/${category}`}
     >
       <Head>
         <script

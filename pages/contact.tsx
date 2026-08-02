@@ -5,7 +5,7 @@ export default function Contact() {
   const pageDescription = 'Official contact details for YourTravelGuide to meet AdSense and transparency requirements.';
 
   return (
-    <Layout title={pageTitle} description={pageDescription}>
+    <Layout title={pageTitle} description={pageDescription} canonicalPath="/contact">
       <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
         <header className="space-y-3">
           <p className="text-sm font-semibold tracking-[0.3em] uppercase text-indigo-500">Contact</p>

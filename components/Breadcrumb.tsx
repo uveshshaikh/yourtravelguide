@@ -96,8 +96,8 @@ export function buildRuleBreadcrumbs(
 ): BreadcrumbItem[] {
   return [
     { label: 'Home',                      href: '/' },
-    { label: labelFor(category),          href: `/${category}/` },
-    { label: labelFor(subcategory),       href: `/${category}/${subcategory}/` },
+    { label: labelFor(category),          href: `/${category}` },
+    { label: labelFor(subcategory),       href: `/${category}/${subcategory}` },
     { label: articleTitle,                href: articleHref },
   ];
 }

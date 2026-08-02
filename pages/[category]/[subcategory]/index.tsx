@@ -47,6 +47,7 @@ export default function SubcategoryIndexPage({
   return (
     <Layout
       {...generateSubcategoryMeta({ subcategoryLabel, categoryLabel, ruleCount: pageRules.length })}
+      canonicalPath={`/${category}/${subcategory}`}
     >
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Breadcrumb items={breadcrumbs} />
@@ -54,7 +55,7 @@ export default function SubcategoryIndexPage({
         <h1 className="text-3xl font-bold text-slate-900 mb-2">{subcategoryLabel}</h1>
         <p className="text-slate-500 mb-8">
           {pageRules.length} rule{pageRules.length !== 1 ? 's' : ''} under{' '}
-          <Link href={`/${category}/`} className="text-blue-600 hover:underline">
+          <Link href={`/${category}`} className="text-blue-600 hover:underline">
             {categoryLabel}
           </Link>
         </p>
@@ -115,8 +116,8 @@ export const getStaticProps: GetStaticProps<PageProps> = async ({ params }) => {
 
   const breadcrumbs: BreadcrumbItem[] = [
     { label: 'Home',             href: '/' },
-    { label: categoryLabel,      href: `/${category}/` },
-    { label: subcategoryLabel,   href: `/${category}/${subcategory}/` },
+    { label: categoryLabel,      href: `/${category}` },
+    { label: subcategoryLabel,   href: `/${category}/${subcategory}` },
   ];
 
   return {

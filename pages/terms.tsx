@@ -5,7 +5,7 @@ export default function Terms() {
   const pageDescription = 'Read the terms that govern how you use YourTravelGuide and the limitations of liability.';
 
   return (
-    <Layout title={pageTitle} description={pageDescription}>
+    <Layout title={pageTitle} description={pageDescription} canonicalPath="/terms">
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
         <header className="space-y-3">
           <p className="text-sm font-semibold tracking-[0.3em] uppercase text-amber-500">Terms & Conditions</p>

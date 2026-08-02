@@ -400,7 +400,7 @@ const FirstFlightGuide = () => {
   };
 
   return (
-    <Layout title="First Flight Journey | YourTravelGuide" description="Step-by-step calm guide for every first-time flyer in India.">
+    <Layout title="First Flight Journey | YourTravelGuide" description="Step-by-step calm guide for every first-time flyer in India." canonicalPath="/first-flight">
       <div className="bg-gradient-to-b from-blue-600 via-blue-500 to-sky-400 text-white py-14 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <p className="uppercase text-sm tracking-[0.3em] text-white/80 mb-3">First Flight Coach</p>
