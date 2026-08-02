@@ -118,6 +118,27 @@ export interface AirportGuidanceSection {
   airports: AirportGuidanceEntry[];
 }
 
+/**
+ * Domestic vs. International Guidance (Phase C3). A single entry per rule
+ * (not a list like Airline/Airport Guidance) -- there's one domestic-facing
+ * answer and one international-facing answer for a given rule, not several
+ * competing ones. `domestic`/`international` are required precisely so a
+ * "no distinction found" finding has somewhere to go instead of being
+ * fabricated as a plausible-sounding difference: if research turns up no
+ * genuine official carve-out, that absence is the content of these two
+ * fields, not a reason to omit the section.
+ */
+export interface DomesticInternationalGuidanceSection {
+  type: 'domesticInternationalGuidance';
+  domestic: string;
+  international: string;
+  connecting?: string;
+  transit?: string;
+  sourceUrls: string[];
+  /** ISO date string -- when sourceUrls were last confirmed to say this. */
+  lastVerified: string;
+}
+
 export interface ScenarioSection {
   type: 'scenario';
   scenario: string;
@@ -162,6 +183,7 @@ export type ArticleSection =
   | DecisionTreeSection
   | AirlineGuidanceSection
   | AirportGuidanceSection
+  | DomesticInternationalGuidanceSection
   | ScenarioSection
   | ExceptionSection
   | SecurityProcessSection

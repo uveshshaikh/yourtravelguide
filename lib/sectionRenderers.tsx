@@ -14,6 +14,7 @@ import {
   ReferenceSection,
   AirlineGuidanceSection,
   AirportGuidanceSection,
+  DomesticInternationalGuidanceSection,
 } from '../data/sections';
 
 /**
@@ -382,6 +383,82 @@ export function renderAirportGuidance(section: AirportGuidanceSection, ctx: Sect
 }
 
 /**
+ * Domestic vs. International Guidance (Phase C3). Two side-by-side panels
+ * (neutral slate, not the green/red dos/donts palette -- this isn't an
+ * allowed/not-allowed distinction), optional connecting/transit notes below,
+ * then the same footer link(s)/date row as Airline and Airport Guidance.
+ *
+ * `domestic` and `international` are always rendered even when they say
+ * the rule doesn't actually differ -- see data/rules.ts's
+ * water-bottle-airport, where research found no official carve-out beyond
+ * the uniform 100ml/empty-bottle rule, and that finding is the content of
+ * these two fields rather than an invented distinction.
+ */
+export function renderDomesticInternationalGuidance(
+  section: DomesticInternationalGuidanceSection,
+  ctx: SectionRenderContext,
+): ReactNode {
+  return (
+    <section className="mb-5">
+      <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">
+        Domestic vs. international
+      </h2>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 mb-2">
+            Domestic flights
+          </p>
+          <p className="text-[13px] text-slate-700 leading-relaxed">{section.domestic}</p>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 mb-2">
+            International flights
+          </p>
+          <p className="text-[13px] text-slate-700 leading-relaxed">{section.international}</p>
+        </div>
+      </div>
+      {(section.connecting || section.transit) && (
+        <div className="mt-3 space-y-2">
+          {section.connecting && (
+            <p className="text-[13px] text-slate-600 leading-relaxed">
+              <span className="font-semibold text-slate-700">Connecting flights: </span>
+              {section.connecting}
+            </p>
+          )}
+          {section.transit && (
+            <p className="text-[13px] text-slate-600 leading-relaxed">
+              <span className="font-semibold text-slate-700">Transit passengers: </span>
+              {section.transit}
+            </p>
+          )}
+        </div>
+      )}
+      <div className="mt-3 pt-2 border-t border-slate-200 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+        <div className="flex flex-wrap gap-x-3 gap-y-1">
+          {section.sourceUrls.map((url, idx) => (
+            <a
+              key={idx}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline text-xs inline-flex items-center gap-1"
+            >
+              Official source{section.sourceUrls.length > 1 ? ` ${idx + 1}` : ''}
+              <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          ))}
+        </div>
+        <span className="text-xs text-slate-400">
+          Verified: {ctx.formatDate(section.lastVerified)}
+        </span>
+      </div>
+    </section>
+  );
+}
+
+/**
  * Registry mapping each implemented section type to its renderer. Keyed by
  * ArticleSection['type'] so a typo in a key is a compile error. Future
  * module types (decisionTree, scenario, exception, securityProcess,
@@ -411,4 +488,5 @@ export const SECTION_RENDERERS: SectionRendererMap = {
   reference: renderReference,
   airlineGuidance: renderAirlineGuidance,
   airportGuidance: renderAirportGuidance,
+  domesticInternationalGuidance: renderDomesticInternationalGuidance,
 };

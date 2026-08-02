@@ -2814,6 +2814,18 @@ export const rules: Rule[] = [
           },
         ],
       },
+      {
+        type: "domesticInternationalGuidance",
+        domestic:
+          "No official distinction was found. Air India's and IndiGo's own baggage pages state the 100ml-per-container liquids rule without carving out a separate, looser limit for domestic departures.",
+        international:
+          "No official distinction was found. The same 100ml-per-container rule applies at international departures too — neither airline's official page states a stricter or different limit specifically for international flights.",
+        sourceUrls: [
+          "https://www.airindia.com/in/en/travel-information/baggage-guidelines/restricted-baggage.html",
+          "https://www.goindigo.in/travel-information/en/baggage-allowance.html",
+        ],
+        lastVerified: "2026-08-02",
+      },
     ],
     sources: [
       {
