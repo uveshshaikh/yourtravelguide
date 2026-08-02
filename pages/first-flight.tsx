@@ -2,6 +2,19 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Layout from "../components/Layout";
 import BackButton from "../components/BackButton";
+import { rules } from "../data/rules";
+import { buildRuleUrl } from "../lib/urls";
+
+/**
+ * Resolves a hardcoded journey-step reference to its canonical URL. Throws at
+ * build time if the slug doesn't exist, rather than silently falling back to
+ * a legacy /rules/ URL — a broken build is preferable to a broken link.
+ */
+function canonicalHrefForSlug(slug: string): string {
+  const rule = rules.find((r) => r.slug === slug);
+  if (!rule) throw new Error(`canonicalHrefForSlug: no rule found for slug "${slug}"`);
+  return buildRuleUrl(rule);
+}
 
 type Mode = "domestic" | "international";
 
@@ -137,7 +150,7 @@ const steps: JourneyStep[] = [
       staffMayAsk: ["Did you pack this yourself?", "Any power banks inside?"],
       confidenceTip: "Stick the baggage receipt on your passport cover so it never gets lost.",
       checklist: ["Remove old tags", "Lock the bag", "Carry valuables in cabin"],
-      linkHref: "/rules/baggage-weight-size-limits",
+      linkHref: canonicalHrefForSlug("baggage-weight-size-limits"),
       linkLabel: "Check baggage weight guide",
     },
   },
@@ -160,7 +173,7 @@ const steps: JourneyStep[] = [
         "Liquids under 100 ml in a clear pouch",
         "Keep belt/watch handy to remove if asked",
       ],
-      linkHref: "/rules/liquids-over-100ml",
+      linkHref: canonicalHrefForSlug("liquids-over-100ml"),
       linkLabel: "View items allowed in cabin",
     },
     international: {

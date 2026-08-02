@@ -8,6 +8,18 @@ import PlayfulLoader from '../components/PlayfulLoader';
 import { rules } from '../data/rules';
 import { Rule } from '../data/types';
 import { airports } from '../data/airports';
+import { buildRuleUrl } from '../lib/urls';
+
+/**
+ * Resolves a hardcoded homepage reference to its canonical URL. Throws at
+ * build time if the slug doesn't exist, rather than silently falling back to
+ * a legacy /rules/ URL — a broken build is preferable to a broken link.
+ */
+function canonicalHrefForSlug(slug: string): string {
+  const rule = rules.find((r) => r.slug === slug);
+  if (!rule) throw new Error(`canonicalHrefForSlug: no rule found for slug "${slug}"`);
+  return buildRuleUrl(rule);
+}
 
 type HomeRule = Pick<Rule, 'slug' | 'title' | 'shortTitle' | 'category' | 'tags' | 'verdict' | 'lastUpdated'> & {
   subcategory?: string;
@@ -145,7 +157,7 @@ const heroHighlights = [
     searchKeywords: ['first flight', 'first-time flyer', 'new flyer', 'beginner'],
   },
   {
-    href: '/rules/airport-security-behavior-tips',
+    href: canonicalHrefForSlug('airport-security-behavior-tips'),
     eyebrow: 'Security ready',
     title: '✈️ Airport security tips',
     description: 'Easy tips for trays, security queues, and family lanes.',
@@ -655,7 +667,7 @@ export default function Home({ allRules }: HomeProps) {
                               {heroPreviewRules.map(rule => (
                                 <li key={rule.slug}>
                                   <Link
-                                    href={`/rules/${rule.slug}`}
+                                    href={buildRuleUrl(rule)}
                                     className="group flex flex-col gap-1 rounded-2xl px-3 py-2 hover:bg-blue-50"
                                   >
                                     <div className="flex items-center justify-between gap-3">

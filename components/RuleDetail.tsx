@@ -72,9 +72,12 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
     ? buildRuleBreadcrumbs(rule.category, rule.subcategory, rule.shortTitle, buildRuleUrl(rule))
     : null;
 
-  const getRuleUrl = (slug: string): string => {
+  // Returns null (never a legacy /rules/ URL) when the referenced slug
+  // doesn't resolve to a current rule — callers must skip rendering the link
+  // rather than pointing it at a broken or legacy URL.
+  const getRuleUrl = (slug: string): string | null => {
     const target = rules.find((r) => r.slug === slug);
-    return target ? buildRuleUrl(target) : `/rules/${slug}`;
+    return target ? buildRuleUrl(target) : null;
   };
 
   // Resolve sibling rules for "Related rules" cards
@@ -82,6 +85,13 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
     .map((slug) => rules.find((r) => r.slug === slug))
     .filter((r): r is Rule => r !== undefined)
     .slice(0, 6);
+
+  // In-article "Related guides" chips — only ones that resolve to a real,
+  // current rule. An unresolvable slug is omitted entirely rather than
+  // linking to a legacy or broken URL.
+  const resolvedInternalLinks = (richContent?.internalLinks ?? [])
+    .map((link) => ({ label: link.label, href: getRuleUrl(link.slug) }))
+    .filter((link): link is { label: string; href: string } => link.href !== null);
 
   const sc = STATUS_CONFIG[rule.verdict.status];
 
@@ -323,16 +333,16 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
               )}
 
               {/* In-article links (labelled, from richContent) */}
-              {richContent!.internalLinks.length > 0 && (
+              {resolvedInternalLinks.length > 0 && (
                 <section className="mb-5">
                   <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">
                     Related guides
                   </h2>
                   <div className="flex flex-wrap gap-2">
-                    {richContent!.internalLinks.map((link, idx) => (
+                    {resolvedInternalLinks.map((link, idx) => (
                       <Link
                         key={idx}
-                        href={getRuleUrl(link.slug)}
+                        href={link.href}
                         className="inline-flex items-center px-3 py-1.5 rounded-full border border-slate-200 bg-white text-[13px] font-medium text-blue-600 hover:border-blue-400 hover:bg-blue-50 transition-colors"
                       >
                         {link.label}
