@@ -5,7 +5,7 @@ export default function PrivacyPolicy() {
   const pageDescription = 'YourTravelGuide runs without personal data collection, trackers, or invasive analytics.';
 
   return (
-    <Layout title={pageTitle} description={pageDescription}>
+    <Layout title={pageTitle} description={pageDescription} canonicalPath="/privacy-policy">
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
         <header className="space-y-3">
           <p className="text-sm font-semibold tracking-[0.3em] uppercase text-blue-500">Privacy Policy</p>

@@ -5,7 +5,8 @@ export const rules: Rule[] = [
     slug: "power-bank-in-flight",
     title: "Power Bank in Flight - Allowed or Not (India)?",
     shortTitle: "Power bank in flight",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "cabin-baggage",
     tags: ["power bank", "battery", "cabin baggage", "electronics"],
     verdict: {
       status: "allowed",
@@ -105,7 +106,8 @@ export const rules: Rule[] = [
     slug: "passport-photocopy-valid",
     title: "Is a Passport Photocopy Enough at Indian Airports?",
     shortTitle: "Passport photocopy?",
-    category: "documents",
+    category: "travel-documents",
+    subcategory: "passport",
     tags: ["passport", "photocopy", "id", "documents"],
     verdict: {
       status: "not_allowed",
@@ -207,7 +209,8 @@ export const rules: Rule[] = [
     slug: "name-mismatch-flight-ticket",
     title: "Name Mismatch on Flight Ticket",
     shortTitle: "Name mismatch",
-    category: "documents",
+    category: "travel-documents",
+    subcategory: "domestic-flight-id",
     tags: ["ticket", "name", "spelling", "documents"],
     verdict: {
       status: "limited",
@@ -300,7 +303,8 @@ export const rules: Rule[] = [
     slug: "kids-id-requirement",
     title: "Do Kids Need ID to Fly in India?",
     shortTitle: "Kids ID rules",
-    category: "documents",
+    category: "travel-documents",
+    subcategory: "minor-travelling-alone",
     tags: ["kids", "infant", "id", "family"],
     verdict: {
       status: "allowed",
@@ -372,7 +376,6 @@ export const rules: Rule[] = [
       ],
       internalLinks: [
         { label: "Domestic ID checklist", slug: "domestic-id-requirements" },
-        { label: "Minor consent letter guide", slug: "minor-travel-consent-letter" },
         { label: "Digital boarding pass tips", slug: "digital-boarding-pass" },
       ],
       verifiedOn: "2025-12-05",
@@ -393,7 +396,8 @@ export const rules: Rule[] = [
     slug: "passport-expiry-validity",
     title: "Passport Validity Rules (6-Month Requirement)",
     shortTitle: "Passport validity",
-    category: "documents",
+    category: "travel-documents",
+    subcategory: "passport",
     tags: ["passport", "expiry", "validity", "documents"],
     verdict: {
       status: "limited",
@@ -486,7 +490,8 @@ export const rules: Rule[] = [
     slug: "laptops-electronics",
     title: "Laptop in Cabin vs Checked Baggage",
     shortTitle: "Laptop in cabin/check-in",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "cabin-baggage",
     tags: ["laptop", "electronics", "checked bag", "security tray"],
     verdict: {
       status: "allowed",
@@ -586,7 +591,8 @@ export const rules: Rule[] = [
     slug: "mobile-phone-in-check-in",
     title: "Can You Put Mobile Phones in Checked Baggage?",
     shortTitle: "Mobile phone in check-in",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "cabin-baggage",
     tags: ["phone", "checked bag", "battery"],
     verdict: {
       status: "limited",
@@ -684,7 +690,8 @@ export const rules: Rule[] = [
     slug: "camera-dslr-in-flight",
     title: "Camera Bodies and Lenses on Indian Flights",
     shortTitle: "Camera (DSLR)",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "cabin-baggage",
     tags: ["camera", "dslr", "lens", "photography"],
     verdict: {
       status: "allowed",
@@ -783,7 +790,8 @@ export const rules: Rule[] = [
     slug: "dry-cells-spare-batteries",
     title: "Dry Cells and Spare Batteries",
     shortTitle: "Dry cells & spares",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "cabin-baggage",
     tags: ["battery", "dry cell", "aa", "aaa"],
     verdict: {
       status: "allowed",
@@ -882,7 +890,8 @@ export const rules: Rule[] = [
     slug: "smart-luggage",
     title: "Smart Luggage with Battery",
     shortTitle: "Smart luggage",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "cabin-baggage",
     tags: ["smart bag", "battery", "tracking"],
     verdict: {
       status: "limited",
@@ -980,7 +989,8 @@ export const rules: Rule[] = [
     slug: "electronics-security-tray",
     title: "Electronics Security Tray Checklist",
     shortTitle: "Electronics at security",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "security-screening",
     tags: ["security", "tray", "electronics", "cisf"],
     verdict: {
       status: "allowed",
@@ -1079,7 +1089,8 @@ export const rules: Rule[] = [
     slug: "airport-security-behavior-tips",
     title: "Airport Security Behavior & Tips (India)",
     shortTitle: "Security behavior tips",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "security-screening",
     tags: ["security", "behavior", "cisf", "tips"],
     verdict: {
       status: "allowed",
@@ -1184,7 +1195,8 @@ export const rules: Rule[] = [
     slug: "bluetooth-headphones-flight",
     title: "Bluetooth Headphones and Wearables in Flight",
     shortTitle: "Bluetooth headphones",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "cabin-baggage",
     tags: ["bluetooth", "headphones", "wearables"],
     verdict: {
       status: "allowed",
@@ -1282,7 +1294,8 @@ export const rules: Rule[] = [
     slug: "perfume-in-flight",
     title: "Perfume and Deodorant Rules",
     shortTitle: "Perfume / Deodorant",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "liquids-aerosols-gels",
     tags: ["perfume", "deodorant", "liquid", "cabin"],
     verdict: {
       status: "limited",
@@ -1380,7 +1393,8 @@ export const rules: Rule[] = [
     slug: "sanitizer-in-flight",
     title: "Hand Sanitizer Limits",
     shortTitle: "Sanitizer allowance",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "liquids-aerosols-gels",
     tags: ["sanitizer", "liquid", "alcohol"],
     verdict: {
       status: "limited",
@@ -1478,7 +1492,8 @@ export const rules: Rule[] = [
     slug: "shampoo-and-lotions",
     title: "Shampoo, Lotions, and Creams",
     shortTitle: "Shampoo & lotions",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "liquids-aerosols-gels",
     tags: ["shampoo", "lotion", "cream", "toiletry"],
     verdict: {
       status: "limited",
@@ -1576,7 +1591,8 @@ export const rules: Rule[] = [
     slug: "makeup-in-cabin",
     title: "Makeup Items: Eyeliner, Mascara, Lipstick",
     shortTitle: "Makeup kit",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "liquids-aerosols-gels",
     tags: ["makeup", "cosmetics", "lipstick", "eyeliner"],
     verdict: {
       status: "limited",
@@ -1674,7 +1690,8 @@ export const rules: Rule[] = [
     slug: "nail-polish-remover",
     title: "Nail Polish and Removers",
     shortTitle: "Nail polish/remover",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "liquids-aerosols-gels",
     tags: ["nail polish", "acetone", "cosmetics"],
     verdict: {
       status: "limited",
@@ -1772,7 +1789,8 @@ export const rules: Rule[] = [
     slug: "liquids-over-100ml",
     title: "Carrying Liquid Bottles Over 100ml",
     shortTitle: "Liquid bottles >100ml",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "liquids-aerosols-gels",
     tags: ["liquid", "bottle", "security"],
     verdict: {
       status: "not_allowed",
@@ -1870,7 +1888,8 @@ export const rules: Rule[] = [
     slug: "hair-oil-ghee-flight",
     title: "Hair Oil, Ghee, and Butter",
     shortTitle: "Hair oil / ghee",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "liquids-aerosols-gels",
     tags: ["hair oil", "ghee", "butter", "liquid"],
     verdict: {
       status: "limited",
@@ -1968,7 +1987,8 @@ export const rules: Rule[] = [
     slug: "medicines-in-flight",
     title: "Medicines With or Without Prescription",
     shortTitle: "Medicines in cabin",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "cabin-baggage",
     tags: ["medicine", "prescription", "tablets"],
     verdict: {
       status: "allowed",
@@ -2066,7 +2086,8 @@ export const rules: Rule[] = [
     slug: "insulin-syringes-flight",
     title: "Insulin, Injections, and Syringes",
     shortTitle: "Insulin & syringes",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "cabin-baggage",
     tags: ["insulin", "syringe", "diabetes"],
     verdict: {
       status: "allowed",
@@ -2164,7 +2185,8 @@ export const rules: Rule[] = [
     slug: "asthma-inhaler-flight",
     title: "Asthma Inhalers",
     shortTitle: "Asthma inhaler",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "cabin-baggage",
     tags: ["asthma", "inhaler", "medicine"],
     verdict: {
       status: "allowed",
@@ -2262,7 +2284,8 @@ export const rules: Rule[] = [
     slug: "cpap-medical-devices",
     title: "CPAP Machines and Medical Devices",
     shortTitle: "CPAP & devices",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "cabin-baggage",
     tags: ["cpap", "medical device", "special assistance"],
     verdict: {
       status: "allowed",
@@ -2360,7 +2383,8 @@ export const rules: Rule[] = [
     slug: "wheelchairs-walking-sticks",
     title: "Wheelchairs and Walking Sticks",
     shortTitle: "Wheelchairs & sticks",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "cabin-baggage",
     tags: ["wheelchair", "mobility", "special assistance"],
     verdict: {
       status: "allowed",
@@ -2459,7 +2483,8 @@ export const rules: Rule[] = [
     slug: "baby-food-formula-flight",
     title: "Baby Milk, Formula, and Food",
     shortTitle: "Baby food",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "cabin-baggage",
     tags: ["baby food", "formula", "infant"],
     verdict: {
       status: "allowed",
@@ -2557,7 +2582,8 @@ export const rules: Rule[] = [
     slug: "food-and-snacks-in-flight",
     title: "Homemade Food, Fruits, and Dry Snacks",
     shortTitle: "Homemade food",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "cabin-baggage",
     tags: ["food", "snacks", "homemade", "fruits"],
     verdict: {
       status: "limited",
@@ -2656,7 +2682,8 @@ export const rules: Rule[] = [
     slug: "water-bottle-airport",
     title: "Carrying Water Bottles",
     shortTitle: "Water bottle",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "liquids-aerosols-gels",
     tags: ["water", "bottle", "hydration"],
     verdict: {
       status: "limited",
@@ -2754,7 +2781,8 @@ export const rules: Rule[] = [
     slug: "tea-coffee-powder",
     title: "Tea and Coffee Powder",
     shortTitle: "Tea/coffee powder",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "cabin-baggage",
     tags: ["tea", "coffee", "powder", "customs"],
     verdict: {
       status: "allowed",
@@ -2852,7 +2880,8 @@ export const rules: Rule[] = [
     slug: "chocolates-on-flight",
     title: "Carrying Chocolates on International Flights",
     shortTitle: "Chocolates",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "cabin-baggage",
     tags: ["chocolate", "duty free", "gifts"],
     verdict: {
       status: "allowed",
@@ -2950,7 +2979,8 @@ export const rules: Rule[] = [
     slug: "razor-cartridge-vs-blade",
     title: "Razor Types in Cabin Baggage",
     shortTitle: "Razors in cabin",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "restricted-items",
     tags: ["razor", "blade", "shaving"],
     verdict: {
       status: "limited",
@@ -3048,7 +3078,8 @@ export const rules: Rule[] = [
     slug: "sharp-objects-in-flight",
     title: "Scissors, Nail Cutters, and Hand Tools",
     shortTitle: "Scissors & tools",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "restricted-items",
     tags: ["scissors", "nail cutter", "hand tool"],
     verdict: {
       status: "not_allowed",
@@ -3146,7 +3177,8 @@ export const rules: Rule[] = [
     slug: "knife-zero-tolerance",
     title: "Knives and Bladed Weapons",
     shortTitle: "Knives",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "restricted-items",
     tags: ["knife", "weapon", "blade"],
     verdict: {
       status: "not_allowed",
@@ -3244,7 +3276,8 @@ export const rules: Rule[] = [
     slug: "hand-tools-flight",
     title: "Hand Tools: Hammers, Screwdrivers, Spanners",
     shortTitle: "Hand tools",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "restricted-items",
     tags: ["tools", "hammer", "screwdriver"],
     verdict: {
       status: "not_allowed",
@@ -3342,7 +3375,8 @@ export const rules: Rule[] = [
     slug: "aerosol-cans",
     title: "Aerosol Cans and Sprays",
     shortTitle: "Aerosol cans",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "liquids-aerosols-gels",
     tags: ["aerosol", "spray", "flammable"],
     verdict: {
       status: "limited",
@@ -3440,7 +3474,8 @@ export const rules: Rule[] = [
     slug: "matches-lighters",
     title: "Matches and Lighters",
     shortTitle: "Matches/lighter",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "restricted-items",
     tags: ["matchbox", "lighter", "fire"],
     verdict: {
       status: "limited",
@@ -3538,7 +3573,8 @@ export const rules: Rule[] = [
     slug: "domestic-id-requirements",
     title: "ID Required for Domestic Flights in India",
     shortTitle: "Domestic ID",
-    category: "documents",
+    category: "travel-documents",
+    subcategory: "domestic-flight-id",
     tags: ["id", "domestic", "boarding"],
     verdict: {
       status: "allowed",
@@ -3626,7 +3662,8 @@ export const rules: Rule[] = [
     slug: "aadhaar-digital-id",
     title: "Using Aadhaar Photos or Digital Copies",
     shortTitle: "Aadhaar photo",
-    category: "documents",
+    category: "travel-documents",
+    subcategory: "domestic-flight-id",
     tags: ["aadhaar", "digital id", "digilocker"],
     verdict: {
       status: "limited",
@@ -3714,7 +3751,8 @@ export const rules: Rule[] = [
     slug: "digital-boarding-pass",
     title: "Digital Boarding Pass Acceptance",
     shortTitle: "Digital boarding pass",
-    category: "documents",
+    category: "airport-rules",
+    subcategory: "security-screening",
     tags: ["boarding pass", "digital", "mobile"],
     verdict: {
       status: "allowed",
@@ -3802,7 +3840,8 @@ export const rules: Rule[] = [
     slug: "printed-ticket-needed",
     title: "Do You Need a Printed Ticket?",
     shortTitle: "Printed ticket?",
-    category: "documents",
+    category: "airport-rules",
+    subcategory: "security-screening",
     tags: ["ticket", "print", "boarding"],
     verdict: {
       status: "allowed",
@@ -3890,7 +3929,8 @@ export const rules: Rule[] = [
     slug: "baggage-weight-size-limits",
     title: "Baggage Weight and Size Limits",
     shortTitle: "Checked bag limits",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "checked-baggage",
     tags: ["baggage", "weight", "dimensions"],
     verdict: {
       status: "limited",
@@ -3989,7 +4029,8 @@ export const rules: Rule[] = [
     slug: "cabin-bag-count-dimensions",
     title: "Cabin Bag Count and Dimensions",
     shortTitle: "Cabin bag count",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "hand-baggage-size-weight",
     tags: ["cabin bag", "personal item"],
     verdict: {
       status: "limited",
@@ -4087,7 +4128,8 @@ export const rules: Rule[] = [
     slug: "fragile-items-packing",
     title: "Packing Fragile Items",
     shortTitle: "Fragile packing",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "checked-baggage",
     tags: ["fragile", "glass", "electronics"],
     verdict: {
       status: "limited",
@@ -4185,7 +4227,8 @@ export const rules: Rule[] = [
     slug: "duty-free-liquids-return",
     title: "Duty-Free Liquids on Return Flights",
     shortTitle: "Duty-free liquids",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "liquids-aerosols-gels",
     tags: ["duty free", "liquid", "steb"],
     verdict: {
       status: "limited",
@@ -4283,7 +4326,8 @@ export const rules: Rule[] = [
     slug: "prohibited-items-customs",
     title: "Customs-Prohibited Items When Entering India",
     shortTitle: "Customs prohibited",
-    category: "general-travel",
+    category: "customs",
+    subcategory: "prohibited-items",
     tags: ["customs", "prohibited", "import"],
     verdict: {
       status: "not_allowed",
@@ -4382,7 +4426,8 @@ export const rules: Rule[] = [
     slug: "carrying-cash-flight",
     title: "Carrying Cash on Flights",
     shortTitle: "Carrying cash",
-    category: "general-travel",
+    category: "customs",
+    subcategory: "foreign-currency",
     tags: ["cash", "customs", "income tax"],
     verdict: {
       status: "limited",
@@ -4480,7 +4525,8 @@ export const rules: Rule[] = [
     slug: "gold-jewellery-limit",
     title: "Gold Jewellery on Flights",
     shortTitle: "Gold jewellery",
-    category: "general-travel",
+    category: "customs",
+    subcategory: "gold-jewellery",
     tags: ["gold", "jewellery", "customs"],
     verdict: {
       status: "limited",
@@ -4578,7 +4624,8 @@ export const rules: Rule[] = [
     slug: "duty-free-alcohol-allowance",
     title: "Duty-Free Alcohol Allowance into India",
     shortTitle: "Duty-free alcohol",
-    category: "general-travel",
+    category: "customs",
+    subcategory: "duty-free-allowance",
     tags: ["alcohol", "duty free", "allowance"],
     verdict: {
       status: "limited",
@@ -4676,7 +4723,8 @@ export const rules: Rule[] = [
     slug: "cigarettes-tobacco-restrictions",
     title: "Cigarettes and Tobacco Restrictions",
     shortTitle: "Cigarettes & vape",
-    category: "flight",
+    category: "customs",
+    subcategory: "duty-free-allowance",
     tags: ["cigarettes", "tobacco", "allowance"],
     verdict: {
       status: "limited",
@@ -4774,7 +4822,8 @@ export const rules: Rule[] = [
     slug: "gift-items-wrapping",
     title: "Gift Items with Scissors or Tape",
     shortTitle: "Gift items",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "checked-baggage",
     tags: ["gifts", "wrapping", "security"],
     verdict: {
       status: "limited",
@@ -4854,8 +4903,8 @@ export const rules: Rule[] = [
         "Use QR-coded greeting cards linked to digital photo albums instead of extra printed material.",
       ],
       internalLinks: [
-        { label: "Sharp objects policy", slug: "sharp-objects-flight" },
-        { label: "Perfume & liquids guide", slug: "perfume-on-flight" },
+        { label: "Sharp objects policy", slug: "sharp-objects-in-flight" },
+        { label: "Perfume & liquids guide", slug: "perfume-in-flight" },
         { label: "Empty bottle rules", slug: "empty-bottles-vs-liquid" },
       ],
       verifiedOn: "2025-12-06",
@@ -4872,7 +4921,8 @@ export const rules: Rule[] = [
     slug: "empty-bottles-vs-liquid",
     title: "Empty Bottles vs Liquid-Filled",
     shortTitle: "Empty bottles",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "liquids-aerosols-gels",
     tags: ["bottle", "security", "liquid rule"],
     verdict: {
       status: "allowed",
@@ -4970,7 +5020,8 @@ export const rules: Rule[] = [
     slug: "pets-in-flight",
     title: "Flying with Pets in India",
     shortTitle: "Pets on flights",
-    category: "flight",
+    category: "airport-rules",
+    subcategory: "checked-baggage",
     tags: ["pets", "cabin", "cargo"],
     verdict: {
       status: "limited",

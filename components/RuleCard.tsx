@@ -2,8 +2,9 @@ import React, { useCallback } from 'react';
 import Link from 'next/link';
 import { Rule } from '../data/types';
 import TagChip from './TagChip';
+import { buildRuleUrl } from '../lib/urls';
 
-type RuleSummary = Pick<Rule, 'slug' | 'shortTitle' | 'category' | 'tags' | 'verdict' | 'lastUpdated'>;
+type RuleSummary = Pick<Rule, 'slug' | 'shortTitle' | 'category' | 'tags' | 'verdict' | 'lastUpdated'> & { subcategory?: string };
 
 interface RuleCardProps {
   rule: RuleSummary;
@@ -57,7 +58,7 @@ const RuleCard: React.FC<RuleCardProps> = ({ rule, contextLabel }) => {
 
   return (
     <Link
-      href={`/rules/${rule.slug}`}
+      href={buildRuleUrl(rule as Rule)}
       className="block h-full focus-visible:outline-0"
       onClick={handleSetReturnAnchor}
     >

@@ -8,8 +8,21 @@ import PlayfulLoader from '../components/PlayfulLoader';
 import { rules } from '../data/rules';
 import { Rule } from '../data/types';
 import { airports } from '../data/airports';
+import { buildRuleUrl } from '../lib/urls';
+
+/**
+ * Resolves a hardcoded homepage reference to its canonical URL. Throws at
+ * build time if the slug doesn't exist, rather than silently falling back to
+ * a legacy /rules/ URL — a broken build is preferable to a broken link.
+ */
+function canonicalHrefForSlug(slug: string): string {
+  const rule = rules.find((r) => r.slug === slug);
+  if (!rule) throw new Error(`canonicalHrefForSlug: no rule found for slug "${slug}"`);
+  return buildRuleUrl(rule);
+}
 
 type HomeRule = Pick<Rule, 'slug' | 'title' | 'shortTitle' | 'category' | 'tags' | 'verdict' | 'lastUpdated'> & {
+  subcategory?: string;
   searchTokens: string[];
 };
 
@@ -144,7 +157,7 @@ const heroHighlights = [
     searchKeywords: ['first flight', 'first-time flyer', 'new flyer', 'beginner'],
   },
   {
-    href: '/rules/airport-security-behavior-tips',
+    href: canonicalHrefForSlug('airport-security-behavior-tips'),
     eyebrow: 'Security ready',
     title: '✈️ Airport security tips',
     description: 'Easy tips for trays, security queues, and family lanes.',
@@ -262,6 +275,7 @@ const toHomeRule = (rule: Rule): HomeRule => ({
   title: rule.title,
   shortTitle: rule.shortTitle,
   category: rule.category,
+  subcategory: 'subcategory' in rule ? (rule as { subcategory?: string }).subcategory : undefined,
   tags: rule.tags,
   verdict: rule.verdict,
   lastUpdated: rule.lastUpdated,
@@ -539,7 +553,7 @@ export default function Home({ allRules }: HomeProps) {
 
   return (
     <>
-      <Layout>
+      <Layout canonicalPath="/">
       <section className="relative isolate overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-sky-500 text-white py-14 sm:py-20 px-4 sm:px-6 lg:px-8">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-white/15 to-transparent" />
@@ -653,7 +667,7 @@ export default function Home({ allRules }: HomeProps) {
                               {heroPreviewRules.map(rule => (
                                 <li key={rule.slug}>
                                   <Link
-                                    href={`/rules/${rule.slug}`}
+                                    href={buildRuleUrl(rule)}
                                     className="group flex flex-col gap-1 rounded-2xl px-3 py-2 hover:bg-blue-50"
                                   >
                                     <div className="flex items-center justify-between gap-3">

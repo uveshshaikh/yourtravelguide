@@ -1,4 +1,19 @@
 import Link from "next/link";
+import { rules } from "../data/rules";
+import { buildRuleUrl } from "../lib/urls";
+
+/**
+ * Resolves a hardcoded reference to its canonical URL. Throws at build time
+ * if the slug doesn't exist, rather than silently falling back to a legacy
+ * /rules/ URL — a broken build is preferable to a broken link.
+ */
+function canonicalHrefForSlug(slug: string): string {
+  const rule = rules.find((r) => r.slug === slug);
+  if (!rule) throw new Error(`canonicalHrefForSlug: no rule found for slug "${slug}"`);
+  return buildRuleUrl(rule);
+}
+
+const securityTipsHref = canonicalHrefForSlug("airport-security-behavior-tips");
 
 const FloatingCtas = () => {
   return (
@@ -11,7 +26,7 @@ const FloatingCtas = () => {
           😊 First-flight guide
         </Link>
         <Link
-          href="/rules/airport-security-behavior-tips"
+          href={securityTipsHref}
           className="inline-flex items-center gap-2 rounded-full border border-amber-300 bg-white text-amber-700 px-4 py-2 text-sm font-semibold shadow-lg hover:bg-amber-50"
         >
           ✈️ Security tips
@@ -26,7 +41,7 @@ const FloatingCtas = () => {
             😊 First flight
           </Link>
           <Link
-            href="/rules/airport-security-behavior-tips"
+            href={securityTipsHref}
             className="flex-1 inline-flex items-center justify-center gap-1 rounded-full border border-amber-300 text-amber-700 px-4 py-2 text-sm font-semibold"
           >
             ✈️ Security

@@ -5,7 +5,7 @@ export default function Disclaimer() {
   const pageDescription = 'Understand the limitations of YourTravelGuide content and how to validate rules before you travel.';
 
   return (
-    <Layout title={pageTitle} description={pageDescription}>
+    <Layout title={pageTitle} description={pageDescription} canonicalPath="/disclaimer">
       <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
         <header className="space-y-3">
           <p className="text-sm font-semibold tracking-[0.3em] uppercase text-rose-500">Disclaimer</p>
@@ -50,14 +50,6 @@ export default function Disclaimer() {
             </div>
           </section>
         </div>
-
-        <section className="bg-slate-900 text-white rounded-3xl p-6">
-          <h2 className="text-xl font-bold">Need more clarity?</h2>
-          <p className="mt-2 text-white/80">
-            Write to <a href="mailto:hello@YourTravelGuide.help" className="underline font-semibold">hello@YourTravelGuide.help</a> and we
-            will share the underlying public reference for a rule whenever possible.
-          </p>
-        </section>
       </section>
     </Layout>
   );

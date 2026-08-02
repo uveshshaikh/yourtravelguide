@@ -2,6 +2,19 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Layout from "../components/Layout";
 import BackButton from "../components/BackButton";
+import { rules } from "../data/rules";
+import { buildRuleUrl } from "../lib/urls";
+
+/**
+ * Resolves a hardcoded journey-step reference to its canonical URL. Throws at
+ * build time if the slug doesn't exist, rather than silently falling back to
+ * a legacy /rules/ URL — a broken build is preferable to a broken link.
+ */
+function canonicalHrefForSlug(slug: string): string {
+  const rule = rules.find((r) => r.slug === slug);
+  if (!rule) throw new Error(`canonicalHrefForSlug: no rule found for slug "${slug}"`);
+  return buildRuleUrl(rule);
+}
 
 type Mode = "domestic" | "international";
 
@@ -137,7 +150,7 @@ const steps: JourneyStep[] = [
       staffMayAsk: ["Did you pack this yourself?", "Any power banks inside?"],
       confidenceTip: "Stick the baggage receipt on your passport cover so it never gets lost.",
       checklist: ["Remove old tags", "Lock the bag", "Carry valuables in cabin"],
-      linkHref: "/rules/baggage-weight-size-limits",
+      linkHref: canonicalHrefForSlug("baggage-weight-size-limits"),
       linkLabel: "Check baggage weight guide",
     },
   },
@@ -160,7 +173,7 @@ const steps: JourneyStep[] = [
         "Liquids under 100 ml in a clear pouch",
         "Keep belt/watch handy to remove if asked",
       ],
-      linkHref: "/rules/liquids-over-100ml",
+      linkHref: canonicalHrefForSlug("liquids-over-100ml"),
       linkLabel: "View items allowed in cabin",
     },
     international: {
@@ -387,7 +400,7 @@ const FirstFlightGuide = () => {
   };
 
   return (
-    <Layout title="First Flight Journey | YourTravelGuide" description="Step-by-step calm guide for every first-time flyer in India.">
+    <Layout title="First Flight Journey | YourTravelGuide" description="Step-by-step calm guide for every first-time flyer in India." canonicalPath="/first-flight">
       <div className="bg-gradient-to-b from-blue-600 via-blue-500 to-sky-400 text-white py-14 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <p className="uppercase text-sm tracking-[0.3em] text-white/80 mb-3">First Flight Coach</p>
