@@ -9,6 +9,7 @@ import { rules } from '../data/rules';
 import { Rule } from '../data/types';
 import { buildRuleUrl, isNewArchRule } from '../lib/urls';
 import { generateRuleMeta } from '../lib/seoMeta';
+import { getRelatedRules } from '../lib/relatedRules';
 
 interface RuleDetailProps {
   rule: Rule;
@@ -80,11 +81,11 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
     return target ? buildRuleUrl(target) : null;
   };
 
-  // Resolve sibling rules for "Related rules" cards
-  const relatedRules: Rule[] = (rule.internalLinks ?? [])
-    .map((slug) => rules.find((r) => r.slug === slug))
-    .filter((r): r is Rule => r !== undefined)
-    .slice(0, 6);
+  // "Related rules" cards — derived from subcategory/tags (see
+  // lib/relatedRules.ts), not a hardcoded per-rule list. Every rule gets
+  // meaningfully relevant related links even where none have been manually
+  // curated (rule.internalLinks is honoured first when it exists).
+  const relatedRules: Rule[] = getRelatedRules(rule, rules);
 
   // In-article "Related guides" chips — only ones that resolve to a real,
   // current rule. An unresolvable slug is omitted entirely rather than
