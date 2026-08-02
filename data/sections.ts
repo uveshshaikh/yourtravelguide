@@ -139,6 +139,25 @@ export interface DomesticInternationalGuidanceSection {
   lastVerified: string;
 }
 
+/**
+ * Water Safety Guidance (Phase C4). Answers "is refill/tap water safe to
+ * drink" using only official airport-operator or government sources --
+ * explicitly not travel blogs. `guidance` is required so a "no official
+ * statement exists" finding has somewhere to go (same rationale as
+ * DomesticInternationalGuidanceSection's domestic/international fields)
+ * rather than the section being silently omitted or a safety claim being
+ * inferred from unrelated facts (e.g. sustainability certifications).
+ */
+export interface WaterSafetySection {
+  type: 'waterSafety';
+  guidance: string;
+  safetyNotes: string[];
+  exceptions?: string[];
+  sourceUrls: string[];
+  /** ISO date string -- when sourceUrls were last confirmed to say this. */
+  lastVerified: string;
+}
+
 export interface ScenarioSection {
   type: 'scenario';
   scenario: string;
@@ -184,6 +203,7 @@ export type ArticleSection =
   | AirlineGuidanceSection
   | AirportGuidanceSection
   | DomesticInternationalGuidanceSection
+  | WaterSafetySection
   | ScenarioSection
   | ExceptionSection
   | SecurityProcessSection

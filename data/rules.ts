@@ -2826,6 +2826,22 @@ export const rules: Rule[] = [
         ],
         lastVerified: "2026-08-02",
       },
+      {
+        type: "waterSafety",
+        guidance:
+          "No official statement from Delhi (DIAL) or Mumbai (CSMIA) airport operators was found confirming that refill-station or terminal tap water is safe to drink. This page does not assert water quality either way. If you're unsure, use the packaged bottled water sold at airport vending machines and food outlets instead (see Airport Guidance above).",
+        safetyNotes: [
+          "Mumbai Airport's own official complaints portal has a logged, unresolved passenger complaint (10 June 2024) describing a chlorine/bleaching-powder smell in the international terminal's drinking-water taps, with no documented official response.",
+          "No equivalent complaint or statement — positive or negative — was found for Delhi (DEL).",
+        ],
+        exceptions: [
+          "Sealed, packaged bottled water sold at airport vending machines and food outlets is a separately regulated product and isn't covered by this uncertainty.",
+        ],
+        sourceUrls: [
+          "https://mumbaiairport.in/complaints/regarding-quality-of-the-drinking-water-provided-in-mumbai-international-terminal-drinking-water-taps/",
+        ],
+        lastVerified: "2026-08-02",
+      },
     ],
     sources: [
       {

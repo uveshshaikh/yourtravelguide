@@ -21,6 +21,7 @@ import {
   AirlineGuidanceSection,
   AirportGuidanceSection,
   DomesticInternationalGuidanceSection,
+  WaterSafetySection,
 } from '../data/sections';
 import { buildRuleUrl, isNewArchRule } from '../lib/urls';
 import { generateRuleMeta } from '../lib/seoMeta';
@@ -108,6 +109,7 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
   const domesticInternationalSection = sections.find(
     (s): s is DomesticInternationalGuidanceSection => s.type === 'domesticInternationalGuidance',
   );
+  const waterSafetySection = sections.find((s): s is WaterSafetySection => s.type === 'waterSafety');
   const checklistSections = sections.filter((s): s is ChecklistSection => s.type === 'checklist');
 
   const formatDate = (dateString: string) =>
@@ -236,6 +238,8 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
 
               {domesticInternationalSection &&
                 SECTION_RENDERERS.domesticInternationalGuidance?.(domesticInternationalSection, renderCtx)}
+
+              {waterSafetySection && SECTION_RENDERERS.waterSafety?.(waterSafetySection, renderCtx)}
 
               {faqSection && SECTION_RENDERERS.faq?.(faqSection, renderCtx)}
 

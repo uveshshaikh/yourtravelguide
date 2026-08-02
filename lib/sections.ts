@@ -81,9 +81,10 @@ export function getArticleSections(rule: Rule): ArticleSection[] {
 /**
  * True for the section types RuleDetail.tsx actually renders (Phase B2,
  * airlineGuidance added Phase C1, airportGuidance added Phase C2,
- * domesticInternationalGuidance added Phase C3). The remaining types
- * (decisionTree, scenario, exception, securityProcess, callout) are typed
- * placeholders only -- real, but with no renderer yet.
+ * domesticInternationalGuidance added Phase C3, waterSafety added Phase
+ * C4). The remaining types (decisionTree, scenario, exception,
+ * securityProcess, callout) are typed placeholders only -- real, but with
+ * no renderer yet.
  *
  * The `never` branch is a compile-time guarantee: adding a new
  * ArticleSection variant without updating this switch is a type error, so a
@@ -105,6 +106,7 @@ export function isImplementedSection(section: ArticleSection): boolean {
     case 'airlineGuidance':
     case 'airportGuidance':
     case 'domesticInternationalGuidance':
+    case 'waterSafety':
       return true;
     case 'decisionTree':
     case 'scenario':

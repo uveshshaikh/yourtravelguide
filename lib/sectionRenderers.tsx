@@ -15,6 +15,7 @@ import {
   AirlineGuidanceSection,
   AirportGuidanceSection,
   DomesticInternationalGuidanceSection,
+  WaterSafetySection,
 } from '../data/sections';
 
 /**
@@ -459,6 +460,67 @@ export function renderDomesticInternationalGuidance(
 }
 
 /**
+ * Water Safety Guidance (Phase C4). Same neutral card treatment as Domestic
+ * vs. International (not a warning/danger style -- this reports what could
+ * and couldn't be verified, not a confirmed hazard). `guidance` always
+ * renders, including when it says no official statement was found; that
+ * absence is real content, not an empty state.
+ */
+export function renderWaterSafety(section: WaterSafetySection, ctx: SectionRenderContext): ReactNode {
+  return (
+    <section className="mb-5">
+      <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">
+        Water safety
+      </h2>
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <p className="text-[13px] text-slate-700 leading-relaxed">{section.guidance}</p>
+        {section.safetyNotes.length > 0 && (
+          <ul className="mt-2 space-y-1.5">
+            {section.safetyNotes.map((note, idx) => (
+              <li key={idx} className="flex items-start gap-2 text-[13px] text-slate-600 leading-snug">
+                <span className="text-slate-400 mt-0.5 flex-shrink-0">•</span>
+                {note}
+              </li>
+            ))}
+          </ul>
+        )}
+        {section.exceptions && section.exceptions.length > 0 && (
+          <ul className="mt-2 space-y-1.5">
+            {section.exceptions.map((exception, idx) => (
+              <li key={idx} className="flex items-start gap-2 text-[13px] text-slate-600 leading-snug">
+                <span className="text-slate-400 mt-0.5 flex-shrink-0">•</span>
+                {exception}
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className="mt-3 pt-2 border-t border-slate-200 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+          <div className="flex flex-wrap gap-x-3 gap-y-1">
+            {section.sourceUrls.map((url, idx) => (
+              <a
+                key={idx}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline text-xs inline-flex items-center gap-1"
+              >
+                Official source{section.sourceUrls.length > 1 ? ` ${idx + 1}` : ''}
+                <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            ))}
+          </div>
+          <span className="text-xs text-slate-400">
+            Verified: {ctx.formatDate(section.lastVerified)}
+          </span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/**
  * Registry mapping each implemented section type to its renderer. Keyed by
  * ArticleSection['type'] so a typo in a key is a compile error. Future
  * module types (decisionTree, scenario, exception, securityProcess,
@@ -489,4 +551,5 @@ export const SECTION_RENDERERS: SectionRendererMap = {
   airlineGuidance: renderAirlineGuidance,
   airportGuidance: renderAirportGuidance,
   domesticInternationalGuidance: renderDomesticInternationalGuidance,
+  waterSafety: renderWaterSafety,
 };
