@@ -18,6 +18,7 @@ import {
   InternalLinksSection,
   ReferenceSection,
   ChecklistSection,
+  AirlineGuidanceSection,
 } from '../data/sections';
 import { buildRuleUrl, isNewArchRule } from '../lib/urls';
 import { generateRuleMeta } from '../lib/seoMeta';
@@ -100,6 +101,7 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
   const tipsSection = sections.find((s): s is TipsSection => s.type === 'tips');
   const internalLinksSection = sections.find((s): s is InternalLinksSection => s.type === 'internalLinks');
   const referenceSection = sections.find((s): s is ReferenceSection => s.type === 'reference');
+  const airlineGuidanceSection = sections.find((s): s is AirlineGuidanceSection => s.type === 'airlineGuidance');
   const checklistSections = sections.filter((s): s is ChecklistSection => s.type === 'checklist');
 
   const formatDate = (dateString: string) =>
@@ -130,6 +132,7 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
   const renderCtx: SectionRenderContext = {
     dosDontsHeadings: { allowedHeading: sc.allowedHeading, notAllowedHeading: sc.notAllowedHeading },
     resolveInternalLink: getRuleUrl,
+    formatDate,
   };
 
   // Key highlights: first checklist or first 4 howToComply items
@@ -220,6 +223,8 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
               {tableSection && SECTION_RENDERERS.table?.(tableSection, renderCtx)}
 
               {examplesSection && SECTION_RENDERERS.examples?.(examplesSection, renderCtx)}
+
+              {airlineGuidanceSection && SECTION_RENDERERS.airlineGuidance?.(airlineGuidanceSection, renderCtx)}
 
               {faqSection && SECTION_RENDERERS.faq?.(faqSection, renderCtx)}
 

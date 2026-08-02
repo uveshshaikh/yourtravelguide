@@ -2769,6 +2769,30 @@ export const rules: Rule[] = [
       ],
       verifiedOn: "2025-12-06",
     },
+    sections: [
+      {
+        type: "airlineGuidance",
+        airlines: [
+          {
+            airline: "Air India",
+            guidance:
+              "Liquids, aerosols and gels (including water) must each be in a container of 100ml or less — a container over 100ml is not accepted at security even if it holds less water than that.",
+            sourceUrl: "https://www.airindia.com/in/en/travel-information/baggage-guidelines/restricted-baggage.html",
+            notes: [
+              "Medicines with a valid prescription, inhalers, and baby food are treated as exceptions to this limit.",
+            ],
+            lastVerified: "2026-08-02",
+          },
+          {
+            airline: "IndiGo",
+            guidance:
+              "Liquids in hand baggage must be in containers with a maximum volume of 100ml each, and all such containers must fit comfortably inside one transparent, re-sealable 1-litre bag.",
+            sourceUrl: "https://www.goindigo.in/travel-information/en/baggage-allowance.html",
+            lastVerified: "2026-08-02",
+          },
+        ],
+      },
+    ],
     sources: [
       {
         label: "AAI Passenger Facilities Advisory",

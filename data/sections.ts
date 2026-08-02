@@ -77,10 +77,26 @@ export interface DecisionTreeSection {
   }[];
 }
 
+/**
+ * One rule can have guidance from more than one airline (Phase C1), so this
+ * holds a list rather than a single {airline, notes} pair -- keeps it one
+ * section per rule, findable the same way as every other singular section
+ * type, with the renderer handling the per-airline grouping internally.
+ */
+export interface AirlineGuidanceEntry {
+  airline: string;
+  /** The actual guidance, in the airline's own terms -- must trace to sourceUrl. */
+  guidance: string;
+  /** The official airline page this guidance was verified against. */
+  sourceUrl: string;
+  notes?: string[];
+  /** ISO date string -- when sourceUrl was last confirmed to say this. */
+  lastVerified?: string;
+}
+
 export interface AirlineGuidanceSection {
   type: 'airlineGuidance';
-  airline: string;
-  notes: string[];
+  airlines: AirlineGuidanceEntry[];
 }
 
 export interface AirportGuidanceSection {

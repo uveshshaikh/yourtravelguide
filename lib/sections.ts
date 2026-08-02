@@ -2,26 +2,31 @@ import { Rule } from '../data/types';
 import { ArticleSection } from '../data/sections';
 
 /**
- * Compatibility layer for the modular section architecture (Phase B1).
+ * Compatibility layer for the modular section architecture (Phase B1,
+ * revised Phase C1).
  *
  * Returns the effective ordered list of sections for a rule:
- *   1. rule.sections, if a rule has been authored directly in the new
- *      modular format -- takes priority, used as-is.
- *   2. Otherwise, richContent is adapted into the equivalent sections on
- *      the fly. No data is migrated or duplicated; this just re-describes
- *      the existing fields as sections so both formats can be consumed
- *      through one interface going forward.
+ *   1. richContent (if present) is adapted into the equivalent sections,
+ *      exactly as before -- no data migrated or duplicated, just re-described
+ *      through one interface.
+ *   2. rule.sections, if a rule has any hand-authored modules, are appended
+ *      after the richContent-derived ones.
  *
- * Nothing in the app calls this yet -- RuleDetail.tsx still renders
- * richContent/rule fields directly, so existing page output is unchanged.
- * This function exists so future rendering work (and newly-authored rules)
- * have a single, fully-typed entry point instead of two parallel shapes.
+ * Originally (Phase B1) rule.sections fully REPLACED richContent when
+ * present. That didn't survive contact with a real module: giving
+ * water-bottle-airport an Airline Guidance section (Phase C1) via
+ * rule.sections would have discarded its entire existing richContent-derived
+ * article. Sections now layer instead of override, so a rule keeps its
+ * existing content and picks up new modules incrementally, one at a time --
+ * which is what "populate only one article, don't migrate the rest" actually
+ * requires in practice. (Not handled: a rule.sections entry of a type that
+ * richContent also derives, e.g. a second 'overview' -- the derived one wins
+ * because RuleDetail's `.find()` sees it first. No current use case needs an
+ * override, so that's left as a known limitation rather than solved here.)
  */
 export function getArticleSections(rule: Rule): ArticleSection[] {
-  if (rule.sections) return rule.sections;
-
   const richContent = rule.richContent;
-  if (!richContent) return [];
+  if (!richContent) return [...(rule.sections ?? [])];
 
   const sections: ArticleSection[] = [];
 
@@ -70,14 +75,14 @@ export function getArticleSections(rule: Rule): ArticleSection[] {
     sections.push({ type: 'reference', sources: rule.sources });
   }
 
-  return sections;
+  return [...sections, ...(rule.sections ?? [])];
 }
 
 /**
- * True for the section types RuleDetail.tsx actually renders (Phase B2).
- * The remaining types (decisionTree, airlineGuidance, airportGuidance,
- * scenario, exception, securityProcess, callout) are typed placeholders only
- * -- real, but with no renderer yet, pending Phase B3 content.
+ * True for the section types RuleDetail.tsx actually renders (Phase B2,
+ * airlineGuidance added Phase C1). The remaining types (decisionTree,
+ * airportGuidance, scenario, exception, securityProcess, callout) are typed
+ * placeholders only -- real, but with no renderer yet.
  *
  * The `never` branch is a compile-time guarantee: adding a new
  * ArticleSection variant without updating this switch is a type error, so a
@@ -96,9 +101,9 @@ export function isImplementedSection(section: ArticleSection): boolean {
     case 'tips':
     case 'internalLinks':
     case 'reference':
+    case 'airlineGuidance':
       return true;
     case 'decisionTree':
-    case 'airlineGuidance':
     case 'airportGuidance':
     case 'scenario':
     case 'exception':

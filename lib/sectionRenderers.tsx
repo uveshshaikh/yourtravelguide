@@ -12,6 +12,7 @@ import {
   TipsSection,
   InternalLinksSection,
   ReferenceSection,
+  AirlineGuidanceSection,
 } from '../data/sections';
 
 /**
@@ -34,6 +35,10 @@ export interface SectionRenderContext {
    *  renderer omits that link entirely rather than pointing at a legacy or
    *  broken URL, see lib/relatedRules.ts's resolveRuleBySlug). */
   resolveInternalLink: (slug: string) => string | null;
+  /** Same date formatting used for "Last updated" / "Verified on" elsewhere
+   *  on the page, so a section's own dates (e.g. airlineGuidance's
+   *  lastVerified) look consistent with the rest of the article. */
+  formatDate: (dateString: string) => string;
 }
 
 export function renderQuickAnswer(section: QuickAnswerSection): ReactNode {
@@ -274,12 +279,67 @@ export function renderReference(section: ReferenceSection): ReactNode {
 }
 
 /**
+ * Airline Guidance (Phase C1) -- one card per airline, grouped under a
+ * single "Airline-specific guidance" heading, styled to match the existing
+ * checklist card (border/rounded/bg-slate-50) and the Official references
+ * link (external-link icon, same blue). Every entry must trace to a real
+ * sourceUrl -- see data/rules.ts's water-bottle-airport for the only rule
+ * currently using this (Air India + IndiGo official baggage pages).
+ */
+export function renderAirlineGuidance(section: AirlineGuidanceSection, ctx: SectionRenderContext): ReactNode {
+  if (section.airlines.length === 0) return null;
+  return (
+    <section className="mb-5">
+      <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">
+        Airline-specific guidance
+      </h2>
+      <div className="space-y-3">
+        {section.airlines.map((entry, idx) => (
+          <div key={idx} className="border border-slate-200 rounded-xl p-4 bg-slate-50">
+            <p className="text-[13px] font-bold text-slate-800 mb-1">{entry.airline}</p>
+            <p className="text-[13px] text-slate-700 leading-relaxed">{entry.guidance}</p>
+            {entry.notes && entry.notes.length > 0 && (
+              <ul className="mt-2 space-y-1.5">
+                {entry.notes.map((note, noteIdx) => (
+                  <li key={noteIdx} className="flex items-start gap-2 text-[13px] text-slate-600 leading-snug">
+                    <span className="text-slate-400 mt-0.5 flex-shrink-0">•</span>
+                    {note}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="mt-3 pt-2 border-t border-slate-200 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+              <a
+                href={entry.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline text-xs inline-flex items-center gap-1"
+              >
+                Official {entry.airline} guidance
+                <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+              {entry.lastVerified && (
+                <span className="text-xs text-slate-400">
+                  Verified: {ctx.formatDate(entry.lastVerified)}
+                </span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/**
  * Registry mapping each implemented section type to its renderer. Keyed by
  * ArticleSection['type'] so a typo in a key is a compile error. Future
- * module types (decisionTree, airlineGuidance, airportGuidance, scenario,
- * exception, securityProcess, callout) are deliberately absent -- see
- * lib/sections.ts's isImplementedSection() for the compile-time guardrail
- * that keeps this registry and that check in sync.
+ * module types (decisionTree, airportGuidance, scenario, exception,
+ * securityProcess, callout) are deliberately absent -- see lib/sections.ts's
+ * isImplementedSection() for the compile-time guardrail that keeps this
+ * registry and that check in sync.
  *
  * `checklist` is intentionally not in this registry -- see
  * renderChecklistCard's doc comment for why it's a grouped exception.
@@ -301,4 +361,5 @@ export const SECTION_RENDERERS: SectionRendererMap = {
   tips: renderTips,
   internalLinks: renderInternalLinks,
   reference: renderReference,
+  airlineGuidance: renderAirlineGuidance,
 };
