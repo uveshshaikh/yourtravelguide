@@ -1,6 +1,12 @@
 import { GetServerSideProps } from 'next';
 import { rules } from '../data/rules';
-import { buildRuleUrl, isNewArchRule, NEW_ARCH_CATEGORIES } from '../lib/urls';
+import {
+  buildRuleUrl,
+  buildCategoryUrl,
+  buildSubcategoryUrl,
+  isNewArchRule,
+  NEW_ARCH_CATEGORIES,
+} from '../lib/urls';
 
 const SITE = 'https://yourtravelguide.in';
 
@@ -22,21 +28,34 @@ function generateSitemap(): string {
     url('/terms',          today,        '0.5'),
   ];
 
+  // ── Category + subcategory lastmod, derived from real child-rule dates ─────
+  // (ISO "YYYY-MM-DD" strings sort correctly lexicographically, so a plain
+  // string comparison finds the most recent date without parsing.)
+  const categoryLastmod = new Map<string, string>();
+  const subcategoryLastmod = new Map<string, string>(); // key: "category/subcategory"
+
+  for (const r of rules) {
+    if (!isNewArchRule(r)) continue;
+    const rLastmod = r.lastUpdated ?? today;
+
+    const prevCat = categoryLastmod.get(r.category);
+    if (!prevCat || rLastmod > prevCat) categoryLastmod.set(r.category, rLastmod);
+
+    const subKey = `${r.category}/${r.subcategory}`;
+    const prevSub = subcategoryLastmod.get(subKey);
+    if (!prevSub || rLastmod > prevSub) subcategoryLastmod.set(subKey, rLastmod);
+  }
+
   // ── Category hub pages (/airport-rules, /travel-documents, /customs) ───────
   const categoryPages = NEW_ARCH_CATEGORIES.map((cat) =>
-    url(`/${cat}`, today, '0.9'),
+    url(buildCategoryUrl(cat), categoryLastmod.get(cat) ?? today, '0.9'),
   );
 
-  // ── Subcategory listing pages (unique deduped combos from rules) ───────────
-  const subcategoryPaths = new Set<string>();
-  for (const r of rules) {
-    if (isNewArchRule(r)) {
-      subcategoryPaths.add(`/${r.category}/${r.subcategory}`);
-    }
-  }
-  const subcategoryPages = Array.from(subcategoryPaths).map((path) =>
-    url(path, today, '0.8'),
-  );
+  // ── Subcategory listing pages (unique combos, derived from rules) ──────────
+  const subcategoryPages = Array.from(subcategoryLastmod.entries()).map(([key, lastmod]) => {
+    const [category, subcategory] = key.split('/');
+    return url(buildSubcategoryUrl(category, subcategory), lastmod, '0.8');
+  });
 
   // ── Rule detail pages ──────────────────────────────────────────────────────
   const rulePages = rules.map((r) => {
