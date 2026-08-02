@@ -1,88 +1,28 @@
 {
-  "name": "yourtravelguide",
+  "name": "travel-sure",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
-  "packageManager": "pnpm@9.15.4",
-  "engines": {
-    "node": ">=20.11.0"
-  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:e2e": "playwright test",
-    "test:e2e:install": "playwright install --with-deps",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio",
-    "db:seed": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local db/seed/run.ts",
-    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test",
-    "prepare": "husky"
+    "lint": "eslint"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.5.2",
-    "@supabase/supabase-js": "^2.47.10",
-    "@tanstack/react-query": "^5.62.7",
-    "@teispace/next-themes": "2.0.4",
-    "@vercel/speed-insights": "^1.1.0",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "drizzle-orm": "^0.38.2",
-    "fuse.js": "^7.4.2",
-    "geist": "^1.7.2",
-    "lucide-react": "^0.468.0",
+    "@vercel/speed-insights": "^1.3.1",
     "next": "^16.0.10",
-    "postgres": "^3.4.5",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3",
-    "server-only": "^0.0.1",
-    "tailwind-merge": "^2.5.5",
-    "zod": "^3.24.1"
+    "react-dom": "^19.2.3"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.6.1",
-    "@commitlint/config-conventional": "^19.6.0",
-    "@electric-sql/pglite": "^0.2.14",
-    "@playwright/test": "^1.49.1",
-    "@tailwindcss/postcss": "^4.0.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.1.0",
-    "@testing-library/user-event": "^14.5.2",
-    "@types/node": "^20.17.10",
-    "@types/react": "^19.0.2",
-    "@types/react-dom": "^19.0.2",
-    "@vitejs/plugin-react": "^4.3.4",
-    "dotenv": "^16.4.7",
-    "drizzle-kit": "^0.30.1",
-    "eslint": "^9.17.0",
-    "eslint-config-next": "^16.0.10",
-    "eslint-config-prettier": "^9.1.0",
-    "husky": "^9.1.7",
-    "jsdom": "^25.0.1",
-    "lint-staged": "^15.2.11",
-    "prettier": "^3.4.2",
-    "prettier-plugin-tailwindcss": "^0.6.9",
-    "tailwindcss": "^4.0.0",
-    "tsx": "^4.19.2",
-    "tw-animate-css": "^1.0.1",
-    "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{js,mjs,cjs,json,md,css}": [
-      "prettier --write"
-    ]
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.7",
+    "sharp": "^0.33.0",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }

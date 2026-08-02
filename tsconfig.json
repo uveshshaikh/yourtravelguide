@@ -1,15 +1,10 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
-    /* Strictness — non-negotiable per engineering principles. */
     "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-    "noFallthroughCasesInSwitch": true,
-    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
@@ -18,14 +13,6 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "verbatimModuleSyntax": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    /* Single import alias. No deep relative chains across layers. */
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
     }
@@ -34,9 +21,9 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "**/*.mts",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
   ],
-  "exclude": ["node_modules", "legacy", "tests/e2e", "playwright-report"]
+  "exclude": ["node_modules"]
 }
