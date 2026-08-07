@@ -8,7 +8,8 @@ import PlayfulLoader from '../components/PlayfulLoader';
 import { rules } from '../data/rules';
 import { Rule } from '../data/types';
 import { airports } from '../data/airports';
-import { buildRuleUrl } from '../lib/urls';
+import { buildRuleUrl, buildCategoryUrl, NEW_ARCH_CATEGORIES } from '../lib/urls';
+import { labelFor } from '../lib/labels';
 
 /**
  * Resolves a hardcoded homepage reference to its canonical URL. Throws at
@@ -187,6 +188,32 @@ const journeyShortcuts = [
   },
 ];
 
+// Short, factual summaries of what's actually in each category (mirrors the
+// real subcategories in lib/labels.ts) -- not marketing copy, just a map so
+// the browse cards below don't render with no description.
+const categoryEmojis: Record<string, string> = {
+  'airport-rules': '🛄',
+  'travel-documents': '🪪',
+  customs: '💰',
+};
+
+const categoryDescriptions: Record<string, string> = {
+  'airport-rules': 'Baggage, liquids, security screening, and restricted items.',
+  'travel-documents': 'Passports, IDs, and boarding document rules.',
+  customs: 'Duty-free limits, cash, gold, and prohibited items.',
+};
+
+// The three canonical category hubs, derived from the existing
+// NEW_ARCH_CATEGORIES export and buildCategoryUrl()/labelFor() helpers --
+// no hardcoded slugs, labels, or URLs.
+const categoryHubs = NEW_ARCH_CATEGORIES.map((category) => ({
+  category,
+  label: labelFor(category),
+  description: categoryDescriptions[category] ?? '',
+  emoji: categoryEmojis[category] ?? '📄',
+  href: buildCategoryUrl(category),
+}));
+
 const quickSearchSuggestions = [
   'power bank cabin bag',
   'passport expiry rule',
@@ -327,7 +354,6 @@ export default function Home({ allRules }: HomeProps) {
   const [isSearching, setIsSearching] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     documents: false,
-    flights: false,
     packing: false,
     customs: false,
     family: false,
@@ -505,10 +531,6 @@ export default function Home({ allRules }: HomeProps) {
       .sort((a, b) => (order.get(a.slug) ?? 0) - (order.get(b.slug) ?? 0));
   }, [searchFilteredRules]);
 
-  const flightsRules = useMemo(
-    () => searchFilteredRules.filter(rule => rule.category === 'flight'),
-    [searchFilteredRules]
-  );
   const packingRules = useMemo(
     () => searchFilteredRules.filter(rule => matchesKeywords(rule, packingKeywords)),
     [searchFilteredRules]
@@ -524,7 +546,6 @@ export default function Home({ allRules }: HomeProps) {
 
   const categoryNav = [
     { id: 'documents', label: '🪪 Documents & IDs' },
-    { id: 'flights', label: '✈️ Flights' },
     { id: 'packing', label: '🎒 Packing Tips' },
     { id: 'customs', label: '💰 Customs & Duty' },
     { id: 'family', label: '👶 Travelling with Family' },
@@ -572,8 +593,8 @@ export default function Home({ allRules }: HomeProps) {
             Clear answers for your flight—documents, packing, customs, and travelling with family. Simple, current, and reassuring.
           </p>
         </div>
-        <div className="relative mt-10 max-w-6xl mx-auto grid gap-6 lg:gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-start">
-          <div className="rounded-[28px] border border-white/25 bg-white/95/5 p-5 sm:p-6 backdrop-blur-xl shadow-[0_30px_90px_-60px_rgba(15,23,42,0.9)] flex flex-col">
+        <div className="relative mt-10 max-w-6xl mx-auto grid gap-6 lg:gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,0.7fr)] lg:items-start">
+          <div className="rounded-[28px] border border-white/25 bg-white/95 p-5 sm:p-6 backdrop-blur-xl shadow-[0_30px_90px_-60px_rgba(15,23,42,0.9)] flex flex-col">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2 text-left">
                 <p className="text-[11px] uppercase tracking-[0.45em] text-white/70 font-semibold">Quick rule finder</p>
@@ -701,10 +722,10 @@ export default function Home({ allRules }: HomeProps) {
               </div>
             )}
           </div>
-          <div className="rounded-[32px] border border-white/50 bg-white/95 px-5 py-6 shadow-[0_30px_60px_-45px_rgba(15,23,42,0.75)] flex flex-col gap-5 h-full">
+          <div className="rounded-2xl border border-white/60 bg-white/90 px-5 py-5 shadow-sm flex flex-col gap-4 h-full">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.4em] text-blue-600">Featured guides</p>
-              <p className="text-xl font-bold text-slate-900 mt-1">Save time with our most-read walk-throughs.</p>
+              <p className="text-lg font-semibold text-slate-900 mt-1">Save time with our most-read walk-throughs.</p>
             </div>
             <div className="grid gap-4 content-start">
               {heroHighlights.map(card => (
@@ -726,25 +747,35 @@ export default function Home({ allRules }: HomeProps) {
       <section className="bg-white/70 backdrop-blur-sm border-b border-slate-200/60">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="rounded-3xl bg-white border border-slate-200/80 p-5 sm:p-6 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.8)]">
-            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.35em] text-slate-500 font-semibold">Plan by goal</p>
-                <h2 className="text-2xl font-bold text-slate-900">Jump into the section you need right now</h2>
-              </div>
-            </div>
-            <div className="mt-6 flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:snap-none">
-              {journeyShortcuts.map(shortcut => (
-                <button
-                  key={shortcut.id}
-                  type="button"
-                  onClick={() => scrollToSection(shortcut.id)}
-                  className="text-left rounded-2xl border border-slate-200/80 bg-slate-50/60 p-4 hover:border-blue-200 hover:bg-white transition shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] min-w-[220px] snap-center md:min-w-0 h-full"
+            <p className="text-xs uppercase tracking-[0.35em] text-slate-500 font-semibold">Browse</p>
+            <h2 className="text-2xl font-bold text-slate-900">Browse by category</h2>
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+              {categoryHubs.map(hub => (
+                <Link
+                  key={hub.category}
+                  href={hub.href}
+                  className="rounded-2xl border border-slate-200/80 bg-slate-50/60 p-4 hover:border-blue-200 hover:bg-white transition shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] h-full flex flex-col"
                 >
                   <span className="text-2xl" role="img" aria-hidden="true">
-                    {shortcut.emoji}
+                    {hub.emoji}
                   </span>
-                  <p className="mt-3 text-base font-semibold text-slate-900">{shortcut.title}</p>
-                  <p className="text-sm text-slate-600">{shortcut.helper}</p>
+                  <p className="mt-3 text-base font-semibold text-slate-900">{hub.label}</p>
+                  <p className="text-sm text-slate-600">{hub.description}</p>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-6 pt-5 border-t border-slate-100 flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-slate-400 mr-1">
+                Jump to a topic on this page:
+              </span>
+              {categoryNav.map(link => (
+                <button
+                  key={link.id}
+                  onClick={() => scrollToSection(link.id)}
+                  type="button"
+                  className="topic-chip"
+                >
+                  {link.label}
                 </button>
               ))}
             </div>
@@ -753,61 +784,38 @@ export default function Home({ allRules }: HomeProps) {
       </section>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <section className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 sm:p-6 mb-10 grid gap-6 md:grid-cols-[2fr,3fr]">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Verdict filters</p>
-            <div className="flex flex-wrap gap-3">
-              {verdictButtons.map(option => {
-                const isActive = verdictFilter === option.id;
-                const palette = isActive ? option.active : `${option.bg} ${option.border}`;
-                const hoverClass = isActive ? 'hover:opacity-90' : option.hover;
-                return (
-                  <button
-                    key={option.id}
-                    onClick={() => handleVerdictClick(option.id)}
-                    type="button"
-                    className={`filter-pill ${hoverClass} ${palette}`}
-                  >
-                    {option.label}
-                  </button>
-                );
-              })}
-              <button
-                onClick={() => setVerdictFilter('all')}
-                disabled={!hasVerdictFilter}
-                type="button"
-                className={`filter-pill filter-pill--reset ${hasVerdictFilter ? 'bg-white' : 'bg-slate-50'}`}
-              >
-                Clear
-              </button>
-            </div>
-          </div>
-          <div>
-            {hasSearchQuery ? (
-              <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Search snapshot</p>
-                <p className="text-sm text-slate-600">
-                  {hasSearchResults
-                    ? `Showing ${searchFilteredRules.length} match${searchFilteredRules.length > 1 ? 'es' : ''} for “${trimmedSearch}”.`
-                    : `No matches for “${trimmedSearch}” yet.`}
-                </p>
-              </div>
-            ) : (
-              <>
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Jump to topics</p>
-                <div className="flex flex-wrap gap-2">
-                  {categoryNav.map(link => (
-                    <button
-                      key={link.id}
-                      onClick={() => scrollToSection(link.id)}
-                      type="button"
-                      className="topic-chip"
-                    >
-                      {link.label}
-                    </button>
-                  ))}
-                </div>
-              </>
+        <section className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 sm:p-5 mb-10">
+          <div className="flex flex-wrap items-center gap-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Filter by status</p>
+            {verdictButtons.map(option => {
+              const isActive = verdictFilter === option.id;
+              const palette = isActive ? option.active : `${option.bg} ${option.border}`;
+              const hoverClass = isActive ? 'hover:opacity-90' : option.hover;
+              return (
+                <button
+                  key={option.id}
+                  onClick={() => handleVerdictClick(option.id)}
+                  type="button"
+                  className={`filter-pill ${hoverClass} ${palette}`}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+            <button
+              onClick={() => setVerdictFilter('all')}
+              disabled={!hasVerdictFilter}
+              type="button"
+              className={`filter-pill filter-pill--reset ${hasVerdictFilter ? 'bg-white' : 'bg-slate-50'}`}
+            >
+              Clear
+            </button>
+            {hasSearchQuery && (
+              <p className="ml-auto text-sm text-slate-500">
+                {hasSearchResults
+                  ? `Showing ${searchFilteredRules.length} match${searchFilteredRules.length > 1 ? 'es' : ''} for “${trimmedSearch}”.`
+                  : `No matches for “${trimmedSearch}” yet.`}
+              </p>
             )}
           </div>
         </section>
@@ -869,33 +877,6 @@ export default function Home({ allRules }: HomeProps) {
                 </div>
               </section>
             )}
-
-            <section className="mb-12 scroll-mt-24" id="flights">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Flights · Batteries · Security</p>
-                  <h2 className="text-2xl font-bold text-slate-900">Flights</h2>
-                </div>
-                {flightsRules.length > DEFAULT_SECTION_CARD_COUNT && (
-                  <button
-                    type="button"
-                    onClick={() => toggleSection('flights')}
-                    className="text-sm font-semibold text-blue-600 hover:underline"
-                  >
-                    {expandedSections.flights ? 'Show less' : `Show ${flightsRules.length - DEFAULT_SECTION_CARD_COUNT} more`}
-                  </button>
-                )}
-              </div>
-              {flightsRules.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {(expandedSections.flights ? flightsRules : flightsRules.slice(0, DEFAULT_SECTION_CARD_COUNT)).map(rule => (
-                    <RuleCard key={`flight-${rule.slug}`} rule={rule} contextLabel="Flight Rule" />
-                  ))}
-                </div>
-              ) : (
-                <p className="text-slate-500 text-sm">No flight rules available right now.</p>
-              )}
-            </section>
 
             <section className="mb-12 scroll-mt-24" id="packing">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">

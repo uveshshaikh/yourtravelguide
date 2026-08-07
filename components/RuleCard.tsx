@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Rule } from '../data/types';
 import TagChip from './TagChip';
 import { buildRuleUrl } from '../lib/urls';
+import { labelFor } from '../lib/labels';
 
 type RuleSummary = Pick<Rule, 'slug' | 'shortTitle' | 'category' | 'tags' | 'verdict' | 'lastUpdated'> & { subcategory?: string };
 
@@ -20,14 +21,16 @@ const RuleCard: React.FC<RuleCardProps> = ({ rule, contextLabel }) => {
       // Ignore storage errors silently.
     }
   }, [rule.slug]);
+  // Falls back to the real subcategory/category label (via the shared
+  // labelFor() helper, same one Breadcrumb uses) whenever a caller doesn't
+  // pass an explicit contextLabel -- e.g. the homepage search-results grid,
+  // which previously fell through to a generic, inaccurate "Travel Rule"
+  // because these checks were legacy category values ('flight', 'documents',
+  // 'train', 'bus') that no current rule uses.
   const getCategoryLabel = () => {
     if (contextLabel) return contextLabel;
-    if (rule.category === 'documents') return 'Documents & ID';
-    if (rule.category === 'general-travel') return 'Travel Tip';
-    if (rule.category === 'train') return 'Train Rule';
-    if (rule.category === 'bus') return 'Bus Rule';
-    if (rule.category === 'flight') return 'Flight Rule';
-    return 'Travel Rule';
+    if (rule.subcategory) return labelFor(rule.subcategory);
+    return labelFor(rule.category);
   };
 
   const getStatusColor = (status: Rule['verdict']['status']) => {
