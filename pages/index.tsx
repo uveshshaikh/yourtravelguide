@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { GetStaticProps } from 'next';
 import Layout from '../components/Layout';
 import SearchBar from '../components/SearchBar';
@@ -29,6 +30,20 @@ type HomeRule = Pick<Rule, 'slug' | 'title' | 'shortTitle' | 'category' | 'tags'
 
 interface HomeProps {
   allRules: HomeRule[];
+  /** True only if every rule in data/rules.ts currently has at least one
+   *  source citation -- computed at build time so this can't drift out of
+   *  sync with the data the way a hardcoded claim could. */
+  allRulesHaveSources: boolean;
+  /** The single most recent lastUpdated date across all rules, already
+   *  formatted at build time (not a raw ISO string formatted at render
+   *  time) -- toLocaleDateString() run independently on the server and in
+   *  the browser can produce subtly different output for the same date
+   *  depending on each environment's ICU data, which React flags as a
+   *  hydration mismatch. Formatting once in getStaticProps means server
+   *  and client only ever display the same fixed string, never recompute
+   *  it. Not a claim that every rule is this fresh -- just the true
+   *  most-recent one. */
+  mostRecentUpdateDisplay: string;
 }
 
 type VerdictFilter = 'all' | 'allowed' | 'not_allowed' | 'limited';
@@ -45,40 +60,19 @@ type NearbyAirport = {
 type PermissionStatusValue = 'prompt' | 'granted' | 'denied' | 'unsupported';
 
 const MAX_NEARBY_DISTANCE_KM = 300;
-const DEFAULT_SECTION_CARD_COUNT = 3;
+// Two clean rows of two per category. The old 3 left an orphan card
+// dangling on a second row of a 2-column grid; 4 fills both rows evenly,
+// and anything more makes four stacked sections too tall before the
+// "See all" affordance gets a chance to do its job.
+const DEFAULT_SECTION_CARD_COUNT = 4;
 
-const verdictButtons: Array<{
-  id: VerdictFilter;
-  label: string;
-  bg: string;
-  border: string;
-  hover: string;
-  active: string;
-}> = [
-  {
-    id: 'allowed',
-    label: 'Allowed',
-    bg: 'bg-green-50 text-green-700',
-    border: 'border-green-200',
-    hover: 'hover:bg-green-100 hover:text-green-900',
-    active: 'bg-green-500 text-white border-green-500 shadow-[0_12px_30px_-18px_rgba(34,197,94,0.7)]',
-  },
-  {
-    id: 'limited',
-    label: 'Limited',
-    bg: 'bg-amber-50 text-amber-700',
-    border: 'border-amber-200',
-    hover: 'hover:bg-amber-100 hover:text-amber-900',
-    active: 'bg-amber-500 text-white border-amber-500 shadow-[0_12px_30px_-18px_rgba(245,158,11,0.7)]',
-  },
-  {
-    id: 'not_allowed',
-    label: 'Not Allowed',
-    bg: 'bg-rose-50 text-rose-700',
-    border: 'border-rose-200',
-    hover: 'hover:bg-rose-100 hover:text-rose-900',
-    active: 'bg-rose-500 text-white border-rose-500 shadow-[0_12px_30px_-18px_rgba(244,63,94,0.65)]',
-  },
+// Phase H4: the filter is a quiet refinement control now (plain text,
+// bold + colored only when active), not a row of solid-colored buttons --
+// so it no longer needs full pill/border/shadow classes per option.
+const verdictButtons: Array<{ id: VerdictFilter; label: string; activeText: string }> = [
+  { id: 'allowed', label: 'Allowed', activeText: 'text-green-700' },
+  { id: 'limited', label: 'Limited', activeText: 'text-amber-700' },
+  { id: 'not_allowed', label: 'Not allowed', activeText: 'text-rose-700' },
 ];
 
 const passportRuleSlugs = [
@@ -90,6 +84,21 @@ const passportRuleSlugs = [
   'name-mismatch-flight-ticket',
   'kids-id-requirement',
   'passport-expiry-validity',
+];
+
+/**
+ * The handful of rules travellers most often arrive looking for -- a
+ * starting point for anyone who doesn't yet know what to search. Curated
+ * by slug (each verified to exist in data/rules.ts); any slug that stops
+ * resolving is simply dropped rather than rendering a dead card.
+ */
+const popularRuleSlugs = [
+  'water-bottle-airport',
+  'power-bank-in-flight',
+  'liquids-over-100ml',
+  'medicines-in-flight',
+  'domestic-id-requirements',
+  'baggage-weight-size-limits',
 ];
 
 const packingKeywords = new Set([
@@ -148,11 +157,22 @@ const verdictBadgeStyles: Record<Rule['verdict']['status'], string> = {
   not_allowed: 'bg-rose-100 text-rose-700',
 };
 
+// Text-only verdict colour for the curated "Popular travel questions"
+// list. That section is editorial, not a database view, so the status
+// reads as a coloured word under the question rather than a filled pill --
+// the pill treatment stays in the directory's RuleCards, keeping the two
+// sections visually distinct.
+const verdictTextStyles: Record<Rule['verdict']['status'], string> = {
+  allowed: 'text-green-700',
+  limited: 'text-amber-700',
+  not_allowed: 'text-rose-700',
+};
+
 const heroHighlights = [
   {
     href: '/first-flight',
     eyebrow: 'Journey coach',
-    title: '😊 First-time flyer guide',
+    title: 'First-time flyer guide',
     description: 'Seven calm steps with friendly reminders before each checkpoint.',
     accent: 'text-blue-500',
     searchKeywords: ['first flight', 'first-time flyer', 'new flyer', 'beginner'],
@@ -160,7 +180,7 @@ const heroHighlights = [
   {
     href: canonicalHrefForSlug('airport-security-behavior-tips'),
     eyebrow: 'Security ready',
-    title: '✈️ Airport security tips',
+    title: 'Airport security tips',
     description: 'Easy tips for trays, security queues, and family lanes.',
     accent: 'text-amber-500',
     searchKeywords: ['security tips', 'cisf', 'security lane', 'airport security'],
@@ -198,9 +218,9 @@ const categoryEmojis: Record<string, string> = {
 };
 
 const categoryDescriptions: Record<string, string> = {
-  'airport-rules': 'Baggage, liquids, security screening, and restricted items.',
-  'travel-documents': 'Passports, IDs, and boarding document rules.',
-  customs: 'Duty-free limits, cash, gold, and prohibited items.',
+  'airport-rules': 'Security & baggage',
+  'travel-documents': 'IDs & documentation',
+  customs: 'Duty & limits',
 };
 
 // The three canonical category hubs, derived from the existing
@@ -215,10 +235,10 @@ const categoryHubs = NEW_ARCH_CATEGORIES.map((category) => ({
 }));
 
 const quickSearchSuggestions = [
-  'power bank cabin bag',
-  'passport expiry rule',
-  'duty free allowance',
-  'baby food security check',
+  'Water bottle',
+  'Power bank',
+  'Passport',
+  'Medicines',
 ];
 
 const stopwords = new Set([
@@ -309,6 +329,10 @@ const toHomeRule = (rule: Rule): HomeRule => ({
   searchTokens: buildRuleSearchTokens(rule),
 });
 
+// Same date format RuleDetail.tsx uses, kept consistent across the site.
+const formatDisplayDate = (dateString: string) =>
+  new Date(dateString).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
 const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
 
 const getDistanceKm = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -343,7 +367,7 @@ const formatDriveTime = (distanceKm: number) => {
 };
 
 
-export default function Home({ allRules }: HomeProps) {
+export default function Home({ allRules, allRulesHaveSources, mostRecentUpdateDisplay }: HomeProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [verdictFilter, setVerdictFilter] = useState<VerdictFilter>('all');
   const [nearbyAirports, setNearbyAirports] = useState<NearbyAirport[]>([]);
@@ -531,6 +555,16 @@ export default function Home({ allRules }: HomeProps) {
       .sort((a, b) => (order.get(a.slug) ?? 0) - (order.get(b.slug) ?? 0));
   }, [searchFilteredRules]);
 
+  // Deliberately built from allRules, not searchFilteredRules: these are
+  // fixed entry points into the site, so they shouldn't shuffle or vanish
+  // when the status filter below them changes.
+  const popularRules = useMemo(() => {
+    const bySlug = new Map(allRules.map(rule => [rule.slug, rule]));
+    return popularRuleSlugs
+      .map(slug => bySlug.get(slug))
+      .filter((rule): rule is HomeRule => rule !== undefined);
+  }, [allRules]);
+
   const packingRules = useMemo(
     () => searchFilteredRules.filter(rule => matchesKeywords(rule, packingKeywords)),
     [searchFilteredRules]
@@ -544,11 +578,13 @@ export default function Home({ allRules }: HomeProps) {
     [searchFilteredRules]
   );
 
+  // Labels match the section headings below exactly, so a nav item and the
+  // heading it scrolls to can never read as two different things.
   const categoryNav = [
-    { id: 'documents', label: '🪪 Documents & IDs' },
-    { id: 'packing', label: '🎒 Packing Tips' },
-    { id: 'customs', label: '💰 Customs & Duty' },
-    { id: 'family', label: '👶 Travelling with Family' },
+    { id: 'documents', label: 'Documents & IDs' },
+    { id: 'packing', label: 'Packing Tips' },
+    { id: 'customs', label: 'Customs & Duty' },
+    { id: 'family', label: 'Travelling with Family' },
   ];
 
   const hasSearchResults = searchFilteredRules.length > 0;
@@ -572,58 +608,113 @@ export default function Home({ allRules }: HomeProps) {
     }
   }, []);
 
+  // Only facts this app can actually prove from its own data (see
+  // getStaticProps) -- no badges, endorsements, or unverifiable claims.
+  // Any entry whose underlying fact isn't true simply doesn't render.
+  const trustPoints = [
+    `${allRules.length} rules · ${categoryHubs.length} categories`,
+    allRulesHaveSources ? 'Sources linked' : null,
+    mostRecentUpdateDisplay ? `Reviewed ${mostRecentUpdateDisplay}` : null,
+  ].filter((point): point is string => point !== null);
+
   return (
     <>
       <Layout canonicalPath="/">
-      <section className="relative isolate overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-sky-500 text-white py-14 sm:py-20 px-4 sm:px-6 lg:px-8">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-white/15 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-sky-500/30 to-transparent" />
-          <div className="absolute -top-16 left-4 h-56 w-56 rounded-full bg-cyan-300/50 blur-[140px]" />
-          <div className="absolute -bottom-24 right-0 h-64 w-64 rounded-full bg-indigo-400/40 blur-[140px]" />
-        </div>
-        <div className="relative max-w-6xl mx-auto text-center lg:text-left">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1 text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] text-white/80">
-            YourTravelGuide prep desk
-          </span>
-          <h1 className="mt-6 text-3xl sm:text-4xl lg:text-5xl font-black leading-tight">
-            Know what’s allowed <span className="bg-gradient-to-r from-amber-200 to-white bg-clip-text text-transparent">before you leave home</span>.
-          </h1>
-          <p className="mt-4 text-base sm:text-lg text-white/85 max-w-3xl mx-auto lg:mx-0">
-            Clear answers for your flight—documents, packing, customs, and travelling with family. Simple, current, and reassuring.
-          </p>
-        </div>
-        <div className="relative mt-10 max-w-6xl mx-auto grid gap-6 lg:gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,0.7fr)] lg:items-start">
-          <div className="rounded-[28px] border border-white/25 bg-white/95 p-5 sm:p-6 backdrop-blur-xl shadow-[0_30px_90px_-60px_rgba(15,23,42,0.9)] flex flex-col">
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2 text-left">
-                <p className="text-[11px] uppercase tracking-[0.45em] text-white/70 font-semibold">Quick rule finder</p>
-                <h2 className="text-xl sm:text-2xl font-semibold text-white">Ask the exact airport question on your mind.</h2>
-                <p className="text-sm text-white/80">Try “first-time flyer guide”, “airport security tips”, or “duty free allowance”—we answer with the matching guides, sections, and rules.</p>
-              </div>
-              <div className="relative">
+      <section className="relative overflow-hidden bg-gradient-to-b from-white to-slate-50 border-b border-slate-200/70">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-12 sm:pt-14 sm:pb-16 lg:pt-16 lg:pb-20">
+          {/* P1.2: content column was previously narrower than the
+              illustration column (1fr vs 1.1fr) -- the supporting image was
+              literally wider than the primary search/hierarchy column.
+              Flipped so content leads. */}
+          <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.95fr)] lg:gap-14">
+
+            {/* Left — headline + search. The one focal action on the page. */}
+            <div className="max-w-xl">
+              <span className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-blue-700">
+                Travel rules · India
+              </span>
+              <h1 className="mt-5 text-4xl sm:text-5xl font-black leading-[1.08] tracking-tight text-slate-900">
+                Know what’s allowed <span className="text-blue-600">before you leave home</span>.
+              </h1>
+              <p className="mt-4 text-base sm:text-lg text-slate-600 leading-relaxed">
+                Find clear answers about airport rules, baggage, documents, and customs — with every rule linked to its source.
+              </p>
+
+              <div className="mt-7">
                 <SearchBar value={searchQuery} onChange={handleSearchInputChange} onClear={handleClearSearch} />
+                {/* P1-A: a live search has no submit action to label, so this
+                    is a passive caption, not a button -- it just closes the
+                    "is this live?" question the icon+placeholder alone don't
+                    fully answer. Hidden once results are showing, since the
+                    live update is then self-evident. */}
+                {!hasSearchQuery && (
+                  <p className="mt-2 text-xs text-slate-400">Results update instantly as you type.</p>
+                )}
               </div>
+
               {!hasSearchQuery && (
-                <div className="mt-3 text-left">
-                  <p className="text-[11px] uppercase tracking-[0.35em] text-white/70 font-semibold">Popular checks</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {quickSearchSuggestions.map(item => (
+                <div className="mt-4 flex flex-wrap items-center gap-x-2 text-sm">
+                  <span className="text-slate-400 mr-1">Try:</span>
+                  {quickSearchSuggestions.map((item, idx) => (
+                    <Fragment key={item}>
                       <button
-                        key={item}
                         type="button"
                         onClick={() => handleSearchInputChange(item)}
-                        className="rounded-full border border-white/30 bg-white/15 px-3 py-1.5 text-sm font-semibold text-white/85 hover:bg-white/25"
+                        className="inline-block py-2 font-medium text-slate-700 hover:text-blue-600 underline decoration-slate-300 underline-offset-4 hover:decoration-blue-400 transition-colors"
                       >
                         {item}
                       </button>
-                    ))}
-                  </div>
+                      {idx < quickSearchSuggestions.length - 1 && (
+                        <span className="text-slate-300" aria-hidden="true">·</span>
+                      )}
+                    </Fragment>
+                  ))}
                 </div>
               )}
-            </div>
-            {hasSearchQuery && (
-              <div className="mt-5 space-y-4 rounded-[24px] border border-slate-100 bg-white/98 p-4 sm:p-5 text-slate-900 shadow-[0_30px_80px_-55px_rgba(15,23,42,0.85)]">
+
+              {!hasSearchQuery && trustPoints.length > 0 && (
+                <ul className="mt-5 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-slate-500">
+                  {trustPoints.map(point => (
+                    <li key={point} className="inline-flex items-center gap-1">
+                      <svg
+                        className="h-3.5 w-3.5 flex-shrink-0 text-green-600"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.7 5.3a1 1 0 0 1 0 1.4l-7.5 7.5a1 1 0 0 1-1.4 0L3.3 9.7a1 1 0 1 1 1.4-1.4l3.8 3.8 6.8-6.8a1 1 0 0 1 1.4 0Z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      {point}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {/* P1-C: a subtle fallback for someone who doesn't know what to
+                  search -- deliberately one compact line, not the larger
+                  card-based "Browse by what you need" section further down
+                  the page. Reuses categoryHubs (buildCategoryUrl()-derived)
+                  rather than any new/hardcoded URLs. */}
+              {!hasSearchQuery && (
+                <p className="mt-4 text-xs text-slate-400">
+                  Not sure what to search?{' '}
+                  {categoryHubs.map((hub, idx) => (
+                    <Fragment key={hub.category}>
+                      <Link href={hub.href} className="font-medium text-slate-500 hover:text-blue-600 underline decoration-slate-300 underline-offset-2 hover:decoration-blue-400 transition-colors">
+                        {hub.label}
+                      </Link>
+                      {idx < categoryHubs.length - 1 && <span aria-hidden="true"> · </span>}
+                    </Fragment>
+                  ))}
+                </p>
+              )}
+
+          {hasSearchQuery && (
+            <div className="mt-4 space-y-4 rounded-2xl border border-slate-100 bg-white p-4 sm:p-5 text-slate-900 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.85)]">
                 {isSearching ? (
                   <PlayfulLoader message="Checking the latest airport rules for you..." />
                 ) : hasInlinePreviewContent ? (
@@ -719,126 +810,188 @@ export default function Home({ allRules }: HomeProps) {
                     No results for “{trimmedSearch}”. Try another keyword like power bank or stroller.
                   </p>
                 )}
-              </div>
-            )}
-          </div>
-          <div className="rounded-2xl border border-white/60 bg-white/90 px-5 py-5 shadow-sm flex flex-col gap-4 h-full">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.4em] text-blue-600">Featured guides</p>
-              <p className="text-lg font-semibold text-slate-900 mt-1">Save time with our most-read walk-throughs.</p>
+                </div>
+              )}
             </div>
-            <div className="grid gap-4 content-start">
-              {heroHighlights.map(card => (
-                <Link
-                  key={card.href}
-                  href={card.href}
-                  className="rounded-2xl border border-slate-100 bg-white px-4 py-4 text-slate-900 hover:-translate-y-0.5 hover:border-blue-100 hover:shadow-lg transition flex flex-col gap-1"
-                >
-                  <p className={`text-[11px] font-semibold uppercase tracking-wide ${card.accent}`}>{card.eyebrow}</p>
-                  <h3 className="mt-2 text-lg font-bold flex items-center gap-2">{card.title}</h3>
-                  <p className="mt-1 text-sm text-slate-600">{card.description}</p>
-                </Link>
-              ))}
+
+            {/* Right — supporting illustration. Sets context instantly and
+                gives the hero warmth, without competing with the search. */}
+            <div className="relative">
+              {/* Container aspect matches the asset's own 1400x1161, so
+                  object-cover crops essentially nothing. */}
+              <div className="relative aspect-[6/5] overflow-hidden rounded-2xl bg-slate-100">
+                <Image
+                  src="/hero-travel.png"
+                  alt="A traveller checking her boarding pass beside a packed cabin bag in an airport departure area."
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 52vw"
+                  className="object-cover object-center"
+                />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="bg-white/70 backdrop-blur-sm border-b border-slate-200/60">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="rounded-3xl bg-white border border-slate-200/80 p-5 sm:p-6 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.8)]">
-            <p className="text-xs uppercase tracking-[0.35em] text-slate-500 font-semibold">Browse</p>
-            <h2 className="text-2xl font-bold text-slate-900">Browse by category</h2>
-            <div className="mt-6 grid gap-4 sm:grid-cols-3">
-              {categoryHubs.map(hub => (
+      {/* Step 2: the primary post-hero discovery moment for anyone who
+          doesn't yet know what to search. A hairline-divided list, not
+          bordered/bg cards -- typography + whitespace carry the hierarchy
+          (title, one-line answer, verdict as colored text), matching the
+          Apple/Stripe/Google Flights reference this site follows elsewhere.
+          Each row still surfaces the verdict + answer directly, so "Quick
+          answers" below the heading is true at a glance, not just a promise
+          you have to click through on.
+          (The old standalone "Browse by what you need" category-card
+          section was removed here, not compressed-and-relocated: the hero
+          already has its own "Not sure what to search?" fallback linking
+          to these exact 3 category URLs, so keeping a second copy anywhere
+          on the page -- even a smaller one -- would still have been the
+          duplicate navigation this phase is about removing.)
+          Hidden during a search so it never competes with the user's own
+          query. */}
+      {!hasSearchQuery && popularRules.length > 0 && (
+        <section className="bg-white border-b border-slate-200/60">
+          {/* P1.4: asymmetric padding, not the symmetric py-14/py-20 this
+              had before -- the top entry (right after the hero) keeps its
+              full weight, but the bottom (the connector into "All travel
+              rules") is tightened, since that combined gap was ~160px on
+              desktop, well past what two sequential steps in one flow need. */}
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 sm:pt-20 pb-10 sm:pb-14">
+            <div className="max-w-xl">
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Popular travel questions</h2>
+              <p className="mt-2 text-slate-600">Quick answers to the questions travellers ask most.</p>
+            </div>
+            {/* Editorial, not a card grid: hairline rules and typography
+                carry this section, so it stays visually distinct from the
+                directory's RuleCards below. Column-gap is wide (the text
+                measure, not the container, sets the line length) and the
+                row padding is symmetric, which fixes the earlier version
+                where the divider crowded the next question's title. */}
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-x-14">
+              {popularRules.map(rule => (
                 <Link
-                  key={hub.category}
-                  href={hub.href}
-                  className="rounded-2xl border border-slate-200/80 bg-slate-50/60 p-4 hover:border-blue-200 hover:bg-white transition shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] h-full flex flex-col"
+                  key={`popular-${rule.slug}`}
+                  href={buildRuleUrl(rule)}
+                  className="group flex flex-col py-6 border-b border-slate-200/80 hover:border-blue-300 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
                 >
-                  <span className="text-2xl" role="img" aria-hidden="true">
-                    {hub.emoji}
+                  <h3 className="text-[17px] font-semibold text-slate-900 leading-snug group-hover:text-blue-600 transition-colors">
+                    {rule.shortTitle}
+                  </h3>
+                  <span
+                    className={`mt-1.5 text-[11px] font-bold uppercase tracking-[0.08em] ${verdictTextStyles[rule.verdict.status]}`}
+                  >
+                    {verdictBadgeLabels[rule.verdict.status]}
                   </span>
-                  <p className="mt-3 text-base font-semibold text-slate-900">{hub.label}</p>
-                  <p className="text-sm text-slate-600">{hub.description}</p>
+                  <p className="mt-2.5 text-sm text-slate-600 leading-relaxed line-clamp-2">
+                    {rule.verdict.summary}
+                  </p>
                 </Link>
               ))}
             </div>
-            <div className="mt-6 pt-5 border-t border-slate-100 flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wide text-slate-400 mr-1">
-                Jump to a topic on this page:
-              </span>
+            <div className="mt-6 flex flex-wrap items-center gap-x-2 text-sm">
+              <span className="text-slate-400 mr-1">Or read a guide:</span>
+              {heroHighlights.map((card, idx) => (
+                <Fragment key={card.href}>
+                  <Link
+                    href={card.href}
+                    className="inline-block py-2 font-medium text-slate-600 hover:text-blue-600 underline decoration-slate-300 underline-offset-4 hover:decoration-blue-400 transition-colors"
+                  >
+                    {card.title}
+                  </Link>
+                  {idx < heroHighlights.length - 1 && (
+                    <span className="text-slate-300" aria-hidden="true">·</span>
+                  )}
+                </Fragment>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Step 3: the complete directory. Deliberately quieter than the
+          section above -- small eyebrow label (same pattern already used
+          for the "Nearby airports" utility section below) instead of a big
+          standalone intro, and one step down in heading size -- so it
+          reads as "the full archive" rather than a second discovery
+          moment. The topic nav here scrolls to same-page anchors, a
+          different job from the hero's category-hub links (real pages),
+          so it stays -- that's not the duplicate this phase is removing. */}
+      {/* Top padding mirrors Popular Questions' reduced bottom padding
+          (together forming the tightened connector gap); bottom padding
+          stays generous since Nearby Airports below is a genuinely
+          different, secondary utility that still deserves clear separation. */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-14 sm:pb-20">
+        {!hasSearchQuery && (
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900">All travel rules</h2>
+            <p className="mt-1.5 text-slate-600">Complete directory of airport, document and customs rules.</p>
+            {/* Pill nav: these jump to same-page anchors. Labels match the
+                section headings they scroll to exactly, so a nav chip and
+                its destination can never read as two different things. */}
+            <div className="mt-5 flex flex-wrap gap-2">
               {categoryNav.map(link => (
                 <button
                   key={link.id}
                   onClick={() => scrollToSection(link.id)}
                   type="button"
-                  className="topic-chip"
+                  className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-sm font-medium text-slate-700 hover:border-blue-300 hover:text-blue-700 hover:bg-blue-50/60 transition-colors"
                 >
                   {link.label}
                 </button>
               ))}
             </div>
           </div>
-        </div>
-      </section>
+        )}
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <section className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 sm:p-5 mb-10">
-          <div className="flex flex-wrap items-center gap-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Filter by status</p>
-            {verdictButtons.map(option => {
-              const isActive = verdictFilter === option.id;
-              const palette = isActive ? option.active : `${option.bg} ${option.border}`;
-              const hoverClass = isActive ? 'hover:opacity-90' : option.hover;
-              return (
-                <button
-                  key={option.id}
-                  onClick={() => handleVerdictClick(option.id)}
-                  type="button"
-                  className={`filter-pill ${hoverClass} ${palette}`}
-                >
-                  {option.label}
-                </button>
-              );
-            })}
-            <button
-              onClick={() => setVerdictFilter('all')}
-              disabled={!hasVerdictFilter}
-              type="button"
-              className={`filter-pill filter-pill--reset ${hasVerdictFilter ? 'bg-white' : 'bg-slate-50'}`}
-            >
-              Clear
-            </button>
-            {hasSearchQuery && (
-              <p className="ml-auto text-sm text-slate-500">
-                {hasSearchResults
-                  ? `Showing ${searchFilteredRules.length} match${searchFilteredRules.length > 1 ? 'es' : ''} for “${trimmedSearch}”.`
-                  : `No matches for “${trimmedSearch}” yet.`}
-              </p>
-            )}
-          </div>
-        </section>
+        <div className="mt-6 mb-10 flex flex-wrap items-center gap-x-1 gap-y-2 text-sm">
+          <span className="text-slate-400 mr-2">Filter</span>
+          <button
+            type="button"
+            onClick={() => setVerdictFilter('all')}
+            className={`inline-flex items-center min-h-11 sm:min-h-0 px-2.5 py-1 rounded-md transition-colors ${!hasVerdictFilter ? 'font-semibold text-slate-900' : 'text-slate-500 hover:text-slate-800'}`}
+          >
+            All
+          </button>
+          {verdictButtons.map(option => {
+            const isActive = verdictFilter === option.id;
+            return (
+              <button
+                key={option.id}
+                onClick={() => handleVerdictClick(option.id)}
+                type="button"
+                aria-pressed={isActive}
+                className={`inline-flex items-center min-h-11 sm:min-h-0 px-2.5 py-1 rounded-md transition-colors ${isActive ? `font-semibold ${option.activeText}` : 'text-slate-500 hover:text-slate-800'}`}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+          {hasSearchQuery && (
+            <p className="ml-auto text-sm text-slate-500">
+              {hasSearchResults
+                ? `Showing ${searchFilteredRules.length} match${searchFilteredRules.length > 1 ? 'es' : ''} for “${trimmedSearch}”.`
+                : `No matches for “${trimmedSearch}” yet.`}
+            </p>
+          )}
+        </div>
 
         {hasSearchQuery ? (
-          <section className="mb-12 scroll-mt-24" id="search-results">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Search results</p>
-                <h2 className="text-2xl font-bold text-slate-900">Results for “{trimmedSearch}”</h2>
-              </div>
+          <section className="mb-16 scroll-mt-24" id="search-results">
+            <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2 mb-6">
+              <h2 className="text-2xl font-bold text-slate-900">Results for “{trimmedSearch}”</h2>
               {hasSearchResults && (
                 <span className="text-sm text-slate-500">{searchFilteredRules.length} match{searchFilteredRules.length > 1 ? 'es' : ''} found</span>
               )}
             </div>
             {hasSearchResults ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {searchFilteredRules.map(rule => (
                   <RuleCard key={`search-${rule.slug}`} rule={rule} />
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12 bg-white rounded-lg border border-slate-200 border-dashed">
+              <div className="text-center py-12 border border-dashed border-slate-200 rounded-xl">
                 <p className="text-slate-500 text-lg">No rules found for “{trimmedSearch}”.</p>
                 <button
                   onClick={handleClearSearch}
@@ -852,52 +1005,44 @@ export default function Home({ allRules }: HomeProps) {
         ) : (
           <>
             {passportRules.length > 0 && (
-              <section className="mb-12 scroll-mt-24" id="documents">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-rose-500">Passport & Ticket Rules</p>
-                    <h2 className="text-2xl font-bold text-slate-900">Documents & IDs</h2>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-500">
-                    {passportRules.length > DEFAULT_SECTION_CARD_COUNT && (
-                      <button
-                        type="button"
-                        onClick={() => toggleSection('documents')}
-                        className="text-blue-600 font-semibold hover:underline"
-                      >
-                        {expandedSections.documents ? 'Show less' : `Show ${passportRules.length - DEFAULT_SECTION_CARD_COUNT} more`}
-                      </button>
-                    )}
-                  </div>
+              <section className="mb-16 scroll-mt-24" id="documents">
+                <div className="flex items-baseline justify-between gap-3 border-b border-slate-200 pb-3 mb-5">
+                  <h3 className="min-w-0 text-xl font-bold text-slate-900">Documents & IDs</h3>
+                  {passportRules.length > DEFAULT_SECTION_CARD_COUNT && (
+                    <button
+                      type="button"
+                      onClick={() => toggleSection('documents')}
+                      className="text-sm font-semibold text-blue-600 hover:underline whitespace-nowrap"
+                    >
+                      {expandedSections.documents ? 'Show less' : 'See all →'}
+                    </button>
+                  )}
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {(expandedSections.documents ? passportRules : passportRules.slice(0, DEFAULT_SECTION_CARD_COUNT)).map(rule => (
-                    <RuleCard key={rule.slug} rule={rule} contextLabel="Documents & ID" />
+                    <RuleCard key={rule.slug} rule={rule} />
                   ))}
                 </div>
               </section>
             )}
 
-            <section className="mb-12 scroll-mt-24" id="packing">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Packing Tips</p>
-                  <h2 className="text-2xl font-bold text-slate-900">Packing Tips</h2>
-                </div>
+            <section className="mb-16 scroll-mt-24" id="packing">
+              <div className="flex items-baseline justify-between gap-3 border-b border-slate-200 pb-3 mb-5">
+                <h3 className="min-w-0 text-xl font-bold text-slate-900">Packing Tips</h3>
                 {packingRules.length > DEFAULT_SECTION_CARD_COUNT && (
                   <button
                     type="button"
                     onClick={() => toggleSection('packing')}
-                    className="text-sm font-semibold text-blue-600 hover:underline"
+                    className="text-sm font-semibold text-blue-600 hover:underline whitespace-nowrap"
                   >
-                    {expandedSections.packing ? 'Show less' : `Show ${packingRules.length - DEFAULT_SECTION_CARD_COUNT} more`}
+                    {expandedSections.packing ? 'Show less' : 'See all →'}
                   </button>
                 )}
               </div>
               {packingRules.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {(expandedSections.packing ? packingRules : packingRules.slice(0, DEFAULT_SECTION_CARD_COUNT)).map(rule => (
-                    <RuleCard key={`packing-${rule.slug}`} rule={rule} contextLabel="Packing Tip" />
+                    <RuleCard key={`packing-${rule.slug}`} rule={rule} />
                   ))}
                 </div>
               ) : (
@@ -905,26 +1050,23 @@ export default function Home({ allRules }: HomeProps) {
               )}
             </section>
 
-            <section className="mb-12 scroll-mt-24" id="customs">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Customs & Duty</p>
-                  <h2 className="text-2xl font-bold text-slate-900">Customs & Duty</h2>
-                </div>
+            <section className="mb-16 scroll-mt-24" id="customs">
+              <div className="flex items-baseline justify-between gap-3 border-b border-slate-200 pb-3 mb-5">
+                <h3 className="min-w-0 text-xl font-bold text-slate-900">Customs & Duty</h3>
                 {customsRules.length > DEFAULT_SECTION_CARD_COUNT && (
                   <button
                     type="button"
                     onClick={() => toggleSection('customs')}
-                    className="text-sm font-semibold text-blue-600 hover:underline"
+                    className="text-sm font-semibold text-blue-600 hover:underline whitespace-nowrap"
                   >
-                    {expandedSections.customs ? 'Show less' : `Show ${customsRules.length - DEFAULT_SECTION_CARD_COUNT} more`}
+                    {expandedSections.customs ? 'Show less' : 'See all →'}
                   </button>
                 )}
               </div>
               {customsRules.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {(expandedSections.customs ? customsRules : customsRules.slice(0, DEFAULT_SECTION_CARD_COUNT)).map(rule => (
-                    <RuleCard key={`customs-${rule.slug}`} rule={rule} contextLabel="Customs & Duty" />
+                    <RuleCard key={`customs-${rule.slug}`} rule={rule} />
                   ))}
                 </div>
               ) : (
@@ -932,26 +1074,23 @@ export default function Home({ allRules }: HomeProps) {
               )}
             </section>
 
-            <section className="mb-12 scroll-mt-24" id="family">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Travelling with Family</p>
-                  <h2 className="text-2xl font-bold text-slate-900">Travelling with Family</h2>
-                </div>
+            <section className="mb-16 scroll-mt-24" id="family">
+              <div className="flex items-baseline justify-between gap-3 border-b border-slate-200 pb-3 mb-5">
+                <h3 className="min-w-0 text-xl font-bold text-slate-900">Travelling with Family</h3>
                 {familyRules.length > DEFAULT_SECTION_CARD_COUNT && (
                   <button
                     type="button"
                     onClick={() => toggleSection('family')}
-                    className="text-sm font-semibold text-blue-600 hover:underline"
+                    className="text-sm font-semibold text-blue-600 hover:underline whitespace-nowrap"
                   >
-                    {expandedSections.family ? 'Show less' : `Show ${familyRules.length - DEFAULT_SECTION_CARD_COUNT} more`}
+                    {expandedSections.family ? 'Show less' : 'See all →'}
                   </button>
                 )}
               </div>
               {familyRules.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {(expandedSections.family ? familyRules : familyRules.slice(0, DEFAULT_SECTION_CARD_COUNT)).map(rule => (
-                    <RuleCard key={`family-${rule.slug}`} rule={rule} contextLabel="Family Travel" />
+                    <RuleCard key={`family-${rule.slug}`} rule={rule} />
                   ))}
                 </div>
               ) : (
@@ -963,11 +1102,11 @@ export default function Home({ allRules }: HomeProps) {
 
       </div>
 
-      <section className="px-4 sm:px-6 lg:px-8 py-12">
-        <div className="max-w-4xl mx-auto bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-5">
-          <div className="space-y-2">
-            <p className="text-[11px] uppercase tracking-[0.4em] text-slate-400 font-semibold">Nearby airports</p>
-            <h2 className="text-2xl font-semibold text-slate-900">Find airports close to you in one tap.</h2>
+      <section className="bg-white border-t border-slate-200/60 px-4 sm:px-6 lg:px-8 py-14">
+        <div className="max-w-4xl mx-auto space-y-5">
+          <div className="max-w-xl">
+            <p className="text-xs uppercase tracking-[0.35em] text-slate-500 font-semibold">Nearby airports</p>
+            <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-slate-900">Find airports close to you in one tap.</h2>
           </div>
           <div className="flex flex-wrap gap-3 items-center">
             <button
@@ -1034,9 +1173,21 @@ export default function Home({ allRules }: HomeProps) {
 export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   // In a real app, you might fetch this from an API or file system
   // Since we import directly, it's available at build time
+  const allRulesHaveSources = rules.every((rule) => rule.sources.length > 0);
+  // ISO "YYYY-MM-DD" strings sort correctly lexicographically (same approach
+  // as pages/sitemap.xml.ts's lastmod computation), so a plain string
+  // comparison finds the most recent date without parsing.
+  const mostRecentUpdate = rules.reduce(
+    (latest, rule) => (rule.lastUpdated > latest ? rule.lastUpdated : latest),
+    rules[0]?.lastUpdated ?? '',
+  );
+  const mostRecentUpdateDisplay = mostRecentUpdate ? formatDisplayDate(mostRecentUpdate) : '';
+
   return {
     props: {
       allRules: rules.map(toHomeRule),
+      allRulesHaveSources,
+      mostRecentUpdateDisplay,
     },
   };
 };
