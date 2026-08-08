@@ -7,9 +7,28 @@ import Breadcrumb, { buildRuleBreadcrumbs } from './Breadcrumb';
 import FaqSchema from './FaqSchema';
 import { rules } from '../data/rules';
 import { Rule } from '../data/types';
+import {
+  QuickAnswerSection,
+  OverviewSection,
+  DosDontsSection,
+  TableSection,
+  ExamplesSection,
+  FaqSection,
+  TipsSection,
+  InternalLinksSection,
+  ReferenceSection,
+  ChecklistSection,
+  AirlineGuidanceSection,
+  AirportGuidanceSection,
+  DomesticInternationalGuidanceSection,
+  WaterSafetySection,
+  SecurityProcessSection,
+} from '../data/sections';
 import { buildRuleUrl, isNewArchRule } from '../lib/urls';
 import { generateRuleMeta } from '../lib/seoMeta';
 import { getRelatedRules, resolveRuleBySlug } from '../lib/relatedRules';
+import { getArticleSections } from '../lib/sections';
+import { SECTION_RENDERERS, renderChecklistCard, SectionRenderContext } from '../lib/sectionRenderers';
 
 interface RuleDetailProps {
   rule: Rule;
@@ -63,8 +82,37 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
   }
 
   const richContent = rule.richContent;
+  // Branch selector only (which JSX branch to render below) -- deliberately
+  // NOT derived from the sections[] array, so it can't change behaviour
+  // based on what a future rule.sections happens to contain. Section
+  // *content* below is sourced from getArticleSections(), not richContent.
   const hasRichContent = Boolean(richContent);
-  const richExamples = richContent?.examples ?? [];
+
+  // Phase B2: RuleDetail renders from getArticleSections(rule), which
+  // returns rule.sections as-is if authored directly, or derives the
+  // equivalent sections from richContent otherwise (lib/sections.ts). No
+  // rule currently sets `sections`, so every page below reads the same
+  // values it did before -- just through one typed interface instead of
+  // reading richContent's fields directly.
+  const sections = getArticleSections(rule);
+
+  const quickAnswerSection = sections.find((s): s is QuickAnswerSection => s.type === 'quickAnswer');
+  const overviewSection = sections.find((s): s is OverviewSection => s.type === 'overview');
+  const dosDontsSection = sections.find((s): s is DosDontsSection => s.type === 'dosDonts');
+  const tableSection = sections.find((s): s is TableSection => s.type === 'table');
+  const examplesSection = sections.find((s): s is ExamplesSection => s.type === 'examples');
+  const faqSection = sections.find((s): s is FaqSection => s.type === 'faq');
+  const tipsSection = sections.find((s): s is TipsSection => s.type === 'tips');
+  const internalLinksSection = sections.find((s): s is InternalLinksSection => s.type === 'internalLinks');
+  const referenceSection = sections.find((s): s is ReferenceSection => s.type === 'reference');
+  const airlineGuidanceSection = sections.find((s): s is AirlineGuidanceSection => s.type === 'airlineGuidance');
+  const airportGuidanceSection = sections.find((s): s is AirportGuidanceSection => s.type === 'airportGuidance');
+  const domesticInternationalSection = sections.find(
+    (s): s is DomesticInternationalGuidanceSection => s.type === 'domesticInternationalGuidance',
+  );
+  const waterSafetySection = sections.find((s): s is WaterSafetySection => s.type === 'waterSafety');
+  const securityProcessSection = sections.find((s): s is SecurityProcessSection => s.type === 'securityProcess');
+  const checklistSections = sections.filter((s): s is ChecklistSection => s.type === 'checklist');
 
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -87,22 +135,23 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
   // curated (rule.internalLinks is honoured first when it exists).
   const relatedRules: Rule[] = getRelatedRules(rule, rules);
 
-  // In-article "Related guides" chips — only ones that resolve to a real,
-  // current rule. An unresolvable slug is omitted entirely rather than
-  // linking to a legacy or broken URL.
-  const resolvedInternalLinks = (richContent?.internalLinks ?? [])
-    .map((link) => ({ label: link.label, href: getRuleUrl(link.slug) }))
-    .filter((link): link is { label: string; href: string } => link.href !== null);
-
   const sc = STATUS_CONFIG[rule.verdict.status];
+
+  // Shared context handed to every registry renderer (lib/sectionRenderers.tsx)
+  // -- the per-rule inputs a renderer can't derive from its own section alone.
+  const renderCtx: SectionRenderContext = {
+    dosDontsHeadings: { allowedHeading: sc.allowedHeading, notAllowedHeading: sc.notAllowedHeading },
+    resolveInternalLink: getRuleUrl,
+    formatDate,
+  };
 
   // Key highlights: first checklist or first 4 howToComply items
   const highlights =
-    richContent?.checklists?.[0]?.items?.slice(0, 4) ??
+    checklistSections[0]?.items?.slice(0, 4) ??
     rule.howToComply.slice(0, 4);
 
   // Remaining checklists (first is used for highlights)
-  const remainingChecklists = richContent?.checklists?.slice(1) ?? [];
+  const remainingChecklists = checklistSections.slice(1);
 
   const { title: metaTitle, description: metaDescription } = generateRuleMeta(rule);
   const canonicalPath = buildRuleUrl(rule);
@@ -115,8 +164,8 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
 
   return (
     <Layout title={metaTitle} description={metaDescription} canonicalPath={canonicalPath} ogImage={ogImage}>
-      {richContent && richContent.faqs.length > 0 && (
-        <FaqSchema faqs={richContent.faqs} />
+      {faqSection && faqSection.items.length > 0 && (
+        <FaqSchema faqs={faqSection.items} />
       )}
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -143,11 +192,7 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
             <p className="text-slate-800 text-[15px] leading-relaxed font-semibold">
               {rule.verdict.summary}
             </p>
-            {richContent?.quickAnswer && (
-              <p className="mt-2 pt-2 border-t border-slate-200 text-slate-600 text-sm leading-relaxed">
-                {richContent.quickAnswer}
-              </p>
-            )}
+            {quickAnswerSection && SECTION_RENDERERS.quickAnswer?.(quickAnswerSection, renderCtx)}
           </div>
 
           {/* ── Key Highlights ───────────────────────────────────────────── */}
@@ -168,190 +213,43 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
           )}
 
           {/* ── Rich content ─────────────────────────────────────────────── */}
+          {/* Each block below delegates to lib/sectionRenderers.tsx -- this
+              component only decides which sections exist and in what order,
+              not how any individual section is drawn. Checklists are the one
+              grouped exception (see renderChecklistCard's doc comment). */}
           {hasRichContent ? (
             <>
-              {/* Overview */}
-              {richContent!.overview.length > 0 && (
-                <section className="mb-5 space-y-3">
-                  {richContent!.overview.map((paragraph, idx) => (
-                    <p key={idx} className="text-slate-700 leading-relaxed text-[15px]">
-                      {paragraph}
-                    </p>
-                  ))}
-                </section>
-              )}
+              {overviewSection && SECTION_RENDERERS.overview?.(overviewSection, renderCtx)}
 
-              {/* When allowed / When not allowed */}
-              {(richContent!.dos.length > 0 || richContent!.donts.length > 0) && (
-                <section className="mb-5">
-                  <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">
-                    When allowed vs. when not
-                  </h2>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {richContent!.dos.length > 0 && (
-                      <div className="rounded-xl border border-green-200 bg-green-50 p-4">
-                        <p className="text-[11px] font-bold uppercase tracking-wide text-green-700 mb-3">
-                          ✅ {sc.allowedHeading}
-                        </p>
-                        <ul className="space-y-2">
-                          {richContent!.dos.map((item, idx) => (
-                            <li key={idx} className="flex items-start gap-2 text-[13px] text-slate-700 leading-snug">
-                              <span className="text-green-500 mt-0.5 flex-shrink-0">•</span>
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {richContent!.donts.length > 0 && (
-                      <div className="rounded-xl border border-red-200 bg-red-50 p-4">
-                        <p className="text-[11px] font-bold uppercase tracking-wide text-red-700 mb-3">
-                          🚫 {sc.notAllowedHeading}
-                        </p>
-                        <ul className="space-y-2">
-                          {richContent!.donts.map((item, idx) => (
-                            <li key={idx} className="flex items-start gap-2 text-[13px] text-slate-700 leading-snug">
-                              <span className="text-red-400 mt-0.5 flex-shrink-0">•</span>
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                </section>
-              )}
+              {dosDontsSection && SECTION_RENDERERS.dosDonts?.(dosDontsSection, renderCtx)}
 
-              {/* Remaining checklists (first was used for highlights) */}
+              {/* Remaining checklists (first was used for Key Highlights above) */}
               {remainingChecklists.length > 0 && (
                 <section className="mb-5 grid gap-4 sm:grid-cols-2">
-                  {remainingChecklists.map((list, idx) => (
-                    <div key={idx} className="border border-slate-200 rounded-xl p-4 bg-slate-50">
-                      <h3 className="text-[11px] font-bold uppercase tracking-wide text-slate-500 mb-3">
-                        {list.title}
-                      </h3>
-                      <ul className="space-y-2">
-                        {list.items.map((item, itemIdx) => (
-                          <li key={itemIdx} className="flex items-start gap-2 text-[13px] text-slate-700">
-                            <span className="text-green-500 flex-shrink-0 mt-0.5">✔</span>
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
+                  {remainingChecklists.map((list, idx) => renderChecklistCard(list, idx))}
                 </section>
               )}
 
-              {/* Optional Table */}
-              {richContent!.table && (
-                <section className="mb-5">
-                  <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">
-                    {richContent!.table.caption}
-                  </h2>
-                  <div className="overflow-x-auto border border-slate-200 rounded-xl">
-                    <table className="min-w-full divide-y divide-slate-200 text-sm">
-                      <thead className="bg-slate-50">
-                        <tr>
-                          {richContent!.table.headers.map((header, idx) => (
-                            <th key={idx} className="px-4 py-3 text-left font-semibold text-slate-600 uppercase tracking-wide text-xs">
-                              {header}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100">
-                        {richContent!.table.rows.map((row, rowIdx) => (
-                          <tr key={rowIdx} className="even:bg-slate-50">
-                            {row.map((cell, cellIdx) => (
-                              <td key={cellIdx} className="px-4 py-3 text-slate-700 text-sm">
-                                {cell}
-                              </td>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </section>
-              )}
+              {tableSection && SECTION_RENDERERS.table?.(tableSection, renderCtx)}
 
-              {/* Real-world examples */}
-              {richExamples.length > 0 && (
-                <section className="mb-5">
-                  <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">
-                    Real-world examples
-                  </h2>
-                  <ul className="space-y-2">
-                    {richExamples.map((example, idx) => (
-                      <li key={idx} className="bg-white border border-slate-200 rounded-xl p-4 text-[13px] text-slate-700 leading-relaxed">
-                        💡 {example}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              )}
+              {examplesSection && SECTION_RENDERERS.examples?.(examplesSection, renderCtx)}
 
-              {/* FAQ — accordion */}
-              {richContent!.faqs.length > 0 && (
-                <section className="mb-5">
-                  <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">
-                    Frequently asked questions
-                  </h2>
-                  <div className="border border-slate-200 rounded-xl divide-y divide-slate-200 overflow-hidden">
-                    {richContent!.faqs.map((faq, idx) => (
-                      <details key={idx} className="group">
-                        <summary className="flex items-center justify-between gap-3 px-4 py-3.5 cursor-pointer list-none [&::-webkit-details-marker]:hidden hover:bg-slate-50 transition-colors">
-                          <span className="font-semibold text-slate-800 text-sm pr-2">{faq.question}</span>
-                          <span className="text-slate-400 text-xl leading-none transition-transform duration-200 group-open:rotate-45 flex-shrink-0 select-none">
-                            +
-                          </span>
-                        </summary>
-                        <div className="px-4 pb-4 pt-1 bg-slate-50 text-[13px] text-slate-700 leading-relaxed">
-                          {faq.answer}
-                        </div>
-                      </details>
-                    ))}
-                  </div>
-                </section>
-              )}
+              {airlineGuidanceSection && SECTION_RENDERERS.airlineGuidance?.(airlineGuidanceSection, renderCtx)}
 
-              {/* Travel tips */}
-              {richContent!.tips.length > 0 && (
-                <section className="mb-5 bg-blue-50 border border-blue-100 rounded-2xl p-5">
-                  <h2 className="text-[11px] font-bold uppercase tracking-widest text-blue-600 mb-3">
-                    Travel tips
-                  </h2>
-                  <ul className="space-y-2">
-                    {richContent!.tips.map((tip, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5 text-[13px] text-slate-700 leading-snug">
-                        <span className="flex-shrink-0 mt-0.5">✈️</span>
-                        {tip}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              )}
+              {airportGuidanceSection && SECTION_RENDERERS.airportGuidance?.(airportGuidanceSection, renderCtx)}
 
-              {/* In-article links (labelled, from richContent) */}
-              {resolvedInternalLinks.length > 0 && (
-                <section className="mb-5">
-                  <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">
-                    Related guides
-                  </h2>
-                  <div className="flex flex-wrap gap-2">
-                    {resolvedInternalLinks.map((link, idx) => (
-                      <Link
-                        key={idx}
-                        href={link.href}
-                        className="inline-flex items-center px-3 py-1.5 rounded-full border border-slate-200 bg-white text-[13px] font-medium text-blue-600 hover:border-blue-400 hover:bg-blue-50 transition-colors"
-                      >
-                        {link.label}
-                      </Link>
-                    ))}
-                  </div>
-                </section>
-              )}
+              {domesticInternationalSection &&
+                SECTION_RENDERERS.domesticInternationalGuidance?.(domesticInternationalSection, renderCtx)}
+
+              {waterSafetySection && SECTION_RENDERERS.waterSafety?.(waterSafetySection, renderCtx)}
+
+              {securityProcessSection && SECTION_RENDERERS.securityProcess?.(securityProcessSection, renderCtx)}
+
+              {faqSection && SECTION_RENDERERS.faq?.(faqSection, renderCtx)}
+
+              {tipsSection && SECTION_RENDERERS.tips?.(tipsSection, renderCtx)}
+
+              {internalLinksSection && SECTION_RENDERERS.internalLinks?.(internalLinksSection, renderCtx)}
             </>
           ) : (
             <>
@@ -436,28 +334,7 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
           <hr className="border-slate-200 my-6" />
 
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
-            <div>
-              <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-2">
-                Official references
-              </h3>
-              <ul className="space-y-1">
-                {rule.sources.map((source, index) => (
-                  <li key={index}>
-                    <a
-                      href={source.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline text-sm inline-flex items-center gap-1"
-                    >
-                      {source.label}
-                      <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {SECTION_RENDERERS.reference?.(referenceSection ?? { type: 'reference', sources: rule.sources }, renderCtx)}
             <div className="text-xs text-slate-400 shrink-0">
               Last updated: {formatDate(rule.lastUpdated)}
             </div>

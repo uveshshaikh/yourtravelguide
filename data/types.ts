@@ -1,3 +1,5 @@
+import type { ArticleSection } from './sections';
+
 // ─── Subcategory literals per main category ──────────────────────────────────
 
 export type AirportRulesSubcategory =
@@ -131,6 +133,14 @@ interface RuleBase {
   }[];
   lastUpdated: string;       // ISO date string, e.g. "2025-12-04"
   richContent?: RuleRichContent;
+  /**
+   * Modular content architecture (Phase B1, see data/sections.ts).
+   * Optional and unpopulated on every current rule -- when present, it takes
+   * priority over richContent (see lib/sections.ts's getArticleSections()).
+   * Existing rules keep working through richContent unchanged; this is the
+   * forward path for rules that need a non-uniform set of sections.
+   */
+  sections?: ArticleSection[];
 }
 
 /**

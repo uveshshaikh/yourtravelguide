@@ -2769,6 +2769,95 @@ export const rules: Rule[] = [
       ],
       verifiedOn: "2025-12-06",
     },
+    sections: [
+      {
+        type: "airlineGuidance",
+        airlines: [
+          {
+            airline: "Air India",
+            guidance:
+              "Liquids, aerosols and gels (including water) must each be in a container of 100ml or less — a container over 100ml is not accepted at security even if it holds less water than that.",
+            sourceUrl: "https://www.airindia.com/in/en/travel-information/baggage-guidelines/restricted-baggage.html",
+            notes: [
+              "Medicines with a valid prescription, inhalers, and baby food are treated as exceptions to this limit.",
+            ],
+            lastVerified: "2026-08-02",
+          },
+          {
+            airline: "IndiGo",
+            guidance:
+              "Liquids in hand baggage must be in containers with a maximum volume of 100ml each, and all such containers must fit comfortably inside one transparent, re-sealable 1-litre bag.",
+            sourceUrl: "https://www.goindigo.in/travel-information/en/baggage-allowance.html",
+            lastVerified: "2026-08-02",
+          },
+        ],
+      },
+      {
+        type: "airportGuidance",
+        airports: [
+          {
+            airport: "Delhi (DEL) — Indira Gandhi International Airport",
+            guidance:
+              "Free drinking water fountains are available at various locations inside the terminal building.",
+            facilityInfo:
+              "Packaged water is also sold at Maximum Retail Price (MRP) through vending machines and food outlets.",
+            sourceUrl: "https://x.com/DelhiAirport/status/1894373011114913814",
+            lastVerified: "2026-08-02",
+          },
+          {
+            airport: "Mumbai (BOM) — Chhatrapati Shivaji Maharaj International Airport",
+            guidance: "Water bottle refill stations are available at Terminal 2.",
+            facilityInfo:
+              "Drinking water can also be purchased from vending machines located across the terminal.",
+            sourceUrl: "https://x.com/CSMIA_Official/status/2003699027603271819",
+            lastVerified: "2026-08-02",
+          },
+        ],
+      },
+      {
+        type: "domesticInternationalGuidance",
+        domestic:
+          "No official distinction was found. Air India's and IndiGo's own baggage pages state the 100ml-per-container liquids rule without carving out a separate, looser limit for domestic departures.",
+        international:
+          "No official distinction was found. The same 100ml-per-container rule applies at international departures too — neither airline's official page states a stricter or different limit specifically for international flights.",
+        sourceUrls: [
+          "https://www.airindia.com/in/en/travel-information/baggage-guidelines/restricted-baggage.html",
+          "https://www.goindigo.in/travel-information/en/baggage-allowance.html",
+        ],
+        lastVerified: "2026-08-02",
+      },
+      {
+        type: "waterSafety",
+        guidance:
+          "No official statement from Delhi (DIAL) or Mumbai (CSMIA) airport operators was found confirming that refill-station or terminal tap water is safe to drink. This page does not assert water quality either way. If you're unsure, use the packaged bottled water sold at airport vending machines and food outlets instead (see Airport Guidance above).",
+        safetyNotes: [
+          "Mumbai Airport's own official complaints portal has a logged, unresolved passenger complaint (10 June 2024) describing a chlorine/bleaching-powder smell in the international terminal's drinking-water taps, with no documented official response.",
+          "No equivalent complaint or statement — positive or negative — was found for Delhi (DEL).",
+        ],
+        exceptions: [
+          "Sealed, packaged bottled water sold at airport vending machines and food outlets is a separately regulated product and isn't covered by this uncertainty.",
+        ],
+        sourceUrls: [
+          "https://mumbaiairport.in/complaints/regarding-quality-of-the-drinking-water-provided-in-mumbai-international-terminal-drinking-water-taps/",
+        ],
+        lastVerified: "2026-08-02",
+      },
+      {
+        type: "securityProcess",
+        steps: [
+          "Your cabin baggage, including any water bottle, goes through X-ray screening before you're allowed to board — confirmed on Air India's own passenger guidance.",
+          "Any liquid you're carrying, including water, must be in a container of 100ml or less; a container over 100ml is not accepted even if it holds less liquid than that (Air India, IndiGo).",
+          "All permitted liquid containers (100ml or less) must fit inside one transparent, re-sealable bag of up to 1 litre (IndiGo).",
+          "Neither airline's official guidance describes checkpoint-level detail beyond this — for example, tray placement order or whether a bottle is screened separately from other items. That level of procedural detail wasn't found in an official source, so it isn't included here.",
+        ],
+        sourceUrls: [
+          "https://www.airindia.com/in/en/frequently-asked-questions/baggage.html",
+          "https://www.airindia.com/in/en/travel-information/baggage-guidelines/restricted-baggage.html",
+          "https://www.goindigo.in/travel-information/en/baggage-allowance.html",
+        ],
+        lastVerified: "2026-08-02",
+      },
+    ],
     sources: [
       {
         label: "AAI Passenger Facilities Advisory",
