@@ -12,7 +12,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onClear, clearLa
 
   return (
     <div className="relative max-w-xl mx-auto w-full" role="search">
-      <div className="flex items-center gap-3 rounded-2xl border-2 border-slate-200 bg-white px-4 py-3.5 shadow-[0_12px_32px_-16px_rgba(15,23,42,0.3)] transition-colors focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-500/15">
+      {/* A <label>, not a <div>: the box is 56px tall but the bare input is
+          only 24px, which left 16px dead strips top and bottom where taps
+          did nothing -- on the homepage's primary CTA. Wrapping the box in
+          a label makes the whole target focus the field, with no visual
+          change. The input keeps its aria-label: an implicit label with no
+          text of its own provides no accessible name. */}
+      <label className="flex items-center gap-3 rounded-2xl border-2 border-slate-200 bg-white px-4 py-3.5 shadow-[0_12px_32px_-16px_rgba(15,23,42,0.3)] transition-colors focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-500/15">
         <div className="flex items-center text-blue-600 flex-shrink-0">
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -35,7 +41,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onClear, clearLa
             {clearLabel}
           </button>
         )}
-      </div>
+      </label>
     </div>
   );
 };

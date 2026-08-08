@@ -1012,7 +1012,7 @@ export default function Home({ allRules, allRulesHaveSources, mostRecentUpdateDi
                     <button
                       type="button"
                       onClick={() => toggleSection('documents')}
-                      className="text-sm font-semibold text-blue-600 hover:underline whitespace-nowrap"
+                      className="-my-2 py-2 text-sm font-semibold text-blue-600 hover:underline whitespace-nowrap"
                     >
                       {expandedSections.documents ? 'Show less' : 'See all →'}
                     </button>
@@ -1033,7 +1033,7 @@ export default function Home({ allRules, allRulesHaveSources, mostRecentUpdateDi
                   <button
                     type="button"
                     onClick={() => toggleSection('packing')}
-                    className="text-sm font-semibold text-blue-600 hover:underline whitespace-nowrap"
+                    className="-my-2 py-2 text-sm font-semibold text-blue-600 hover:underline whitespace-nowrap"
                   >
                     {expandedSections.packing ? 'Show less' : 'See all →'}
                   </button>
@@ -1057,7 +1057,7 @@ export default function Home({ allRules, allRulesHaveSources, mostRecentUpdateDi
                   <button
                     type="button"
                     onClick={() => toggleSection('customs')}
-                    className="text-sm font-semibold text-blue-600 hover:underline whitespace-nowrap"
+                    className="-my-2 py-2 text-sm font-semibold text-blue-600 hover:underline whitespace-nowrap"
                   >
                     {expandedSections.customs ? 'Show less' : 'See all →'}
                   </button>
@@ -1081,7 +1081,7 @@ export default function Home({ allRules, allRulesHaveSources, mostRecentUpdateDi
                   <button
                     type="button"
                     onClick={() => toggleSection('family')}
-                    className="text-sm font-semibold text-blue-600 hover:underline whitespace-nowrap"
+                    className="-my-2 py-2 text-sm font-semibold text-blue-600 hover:underline whitespace-nowrap"
                   >
                     {expandedSections.family ? 'Show less' : 'See all →'}
                   </button>

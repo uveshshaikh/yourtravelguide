@@ -24,7 +24,7 @@ const SITE_URL = 'https://yourtravelguide.in';
 
 const Layout: React.FC<LayoutProps> = ({ 
   children, 
-  title = "YourTravelGuide - Know what's allowed before you travel",
+  title = "YourTravelGuide – Know what's allowed before you travel",
   description = "Check what items are allowed in flight, train, and bus travel in India. Simple, fast, and reliable rules.",
   canonicalPath,
   ogImage,
