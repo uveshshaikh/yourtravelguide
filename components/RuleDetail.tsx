@@ -43,8 +43,13 @@ const STATUS_CONFIG = {
     icon: '✓',
     iconColor: 'text-green-700',
     dot: 'bg-green-500',
-    allowedHeading: 'When it\'s allowed',
-    notAllowedHeading: 'Exceptions / conditions',
+    // For an allowed rule these two lists hold actions, not conditions --
+    // verified across the allowed rules' `dos` content -- so "Do"/"Don't" is
+    // the honest label. `limited` and `not_allowed` keep their condition-shaped
+    // headings until their content is reviewed the same way.
+    allowedHeading: 'Do',
+    notAllowedHeading: 'Don\'t',
+    dosDontsTitle: 'What to do',
   },
   not_allowed: {
     border: 'border-red-300',
@@ -56,6 +61,7 @@ const STATUS_CONFIG = {
     dot: 'bg-red-500',
     allowedHeading: 'Limited exceptions',
     notAllowedHeading: 'Why it\'s not allowed',
+    dosDontsTitle: 'When allowed vs. when not',
   },
   limited: {
     border: 'border-amber-300',
@@ -67,6 +73,7 @@ const STATUS_CONFIG = {
     dot: 'bg-amber-500',
     allowedHeading: 'When it\'s allowed',
     notAllowedHeading: 'When it\'s NOT allowed',
+    dosDontsTitle: 'When allowed vs. when not',
   },
 } as const;
 
@@ -133,7 +140,12 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
   // lib/relatedRules.ts), not a hardcoded per-rule list. Every rule gets
   // meaningfully relevant related links even where none have been manually
   // curated (rule.internalLinks is honoured first when it exists).
-  const relatedRules: Rule[] = getRelatedRules(rule, rules);
+  // When a rule curates its own related-rules list (top-level internalLinks,
+  // Tier 0 in getRelatedRules), cap the result to exactly that list rather
+  // than padding it with auto-derived matches up to the default of 6. A
+  // no-op for every rule that doesn't set internalLinks (none currently do),
+  // since the fallback is the existing default.
+  const relatedRules: Rule[] = getRelatedRules(rule, rules, rule.internalLinks?.length || 6);
 
   const sc = STATUS_CONFIG[rule.verdict.status];
 
@@ -141,9 +153,41 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
   // -- the per-rule inputs a renderer can't derive from its own section alone.
   const renderCtx: SectionRenderContext = {
     dosDontsHeadings: { allowedHeading: sc.allowedHeading, notAllowedHeading: sc.notAllowedHeading },
+    dosDontsTitle: sc.dosDontsTitle,
     resolveInternalLink: getRuleUrl,
     formatDate,
   };
+
+  /**
+   * Threshold bands pulled from the rule's own comparison table -- no new data
+   * and no second source of truth. A table qualifies only when every row's
+   * second cell carries one of the three status markers already used in the
+   * data, which is what makes it a decision ladder ("which band am I in?")
+   * rather than an arbitrary comparison; anything else falls through to the
+   * existing quick-answer text.
+   */
+  const BAND_STYLES: Record<string, { dot: string; textClass: string }> = {
+    '✅': { dot: 'bg-green-500', textClass: 'text-green-700' },
+    '⚠️': { dot: 'bg-amber-500', textClass: 'text-amber-700' },
+    '❌': { dot: 'bg-red-500', textClass: 'text-red-700' },
+  };
+
+  const thresholdBands = (() => {
+    const rows = tableSection?.rows ?? [];
+    if (rows.length === 0) return [];
+    const bands = rows.map(row => {
+      const marker = Object.keys(BAND_STYLES).find(m => (row[1] ?? '').startsWith(m));
+      if (!marker) return null;
+      const style = BAND_STYLES[marker];
+      return {
+        range: row[0],
+        status: (row[1] ?? '').slice(marker.length).trim(),
+        dot: style.dot,
+        textClass: style.textClass,
+      };
+    });
+    return bands.every(Boolean) ? (bands as NonNullable<(typeof bands)[number]>[]) : [];
+  })();
 
   // Key highlights: first checklist or first 4 howToComply items
   const highlights =
@@ -186,14 +230,66 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
                 {sc.icon}
               </span>
               <span className={`text-xl font-extrabold tracking-tight ${sc.iconColor}`}>
-                {sc.label}
+                {rule.verdictHeadline ?? sc.label}
               </span>
             </div>
             <p className="text-slate-800 text-[15px] leading-relaxed font-semibold">
               {rule.verdict.summary}
             </p>
-            {quickAnswerSection && SECTION_RENDERERS.quickAnswer?.(quickAnswerSection, renderCtx)}
+
+            {/* Threshold bands, colour-coded, inside the answer box. For a
+                rule that hinges on a limit, "which band am I in?" IS the
+                answer. This replaces the prose restatement rather than adding
+                to it, so it costs no vertical space -- promoting the full
+                table here instead measured ~380px and pushed every actionable
+                instruction off the first screen on all four phone sizes. */}
+            {thresholdBands.length > 0 ? (
+              <ul className="mt-3 pt-3 border-t border-slate-900/10 space-y-1.5">
+                {thresholdBands.map((band, idx) => (
+                  <li key={idx} className="flex items-start gap-2 text-[13px] leading-snug">
+                    <span className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${band.dot}`} aria-hidden="true" />
+                    <span className="text-slate-800">
+                      <strong className="font-semibold">{band.range}</strong>
+                      <span className={`ml-1.5 font-semibold ${band.textClass}`}>{band.status}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              quickAnswerSection && SECTION_RENDERERS.quickAnswer?.(quickAnswerSection, renderCtx)
+            )}
           </div>
+
+          {/* ── Do / Don't ───────────────────────────────────────────────────
+              Promoted to sit directly under the verdict: "what do I actually
+              do about it?" is the question a traveller has the instant they
+              read the answer. It previously rendered fourth, below three
+              explanatory paragraphs, so the single most consequential
+              instruction on a page (e.g. never check a power bank) was not
+              visible until well past the fold. */}
+          {dosDontsSection && SECTION_RENDERERS.dosDonts?.(dosDontsSection, renderCtx)}
+
+          {/* ── Topic-specific guidance ────────────────────────────────────────
+              All five guidance types promoted together, above the generic
+              supporting content: when a rule's answer varies by airline,
+              airport, route type, water source or security process, that
+              difference is decision-relevant, not background reading. Grouped
+              here (rather than airlineGuidance alone) so every rule gets the
+              same promotion regardless of which guidance type it happens to
+              use -- previously only airlineGuidance was promoted, so a rule
+              using e.g. airportGuidance instead didn't get this treatment. */}
+          {airlineGuidanceSection && SECTION_RENDERERS.airlineGuidance?.(airlineGuidanceSection, renderCtx)}
+          {airportGuidanceSection && SECTION_RENDERERS.airportGuidance?.(airportGuidanceSection, renderCtx)}
+          {domesticInternationalSection &&
+            SECTION_RENDERERS.domesticInternationalGuidance?.(domesticInternationalSection, renderCtx)}
+          {waterSafetySection && SECTION_RENDERERS.waterSafety?.(waterSafetySection, renderCtx)}
+          {securityProcessSection && SECTION_RENDERERS.securityProcess?.(securityProcessSection, renderCtx)}
+
+          {/* ── Worked examples ──────────────────────────────────────────────
+              A concrete "is mine under the limit?" calculation is far more use
+              than the formula alone, so it sits with the practical guidance
+              rather than down in the prose. */}
+          {examplesSection && SECTION_RENDERERS.examples?.(examplesSection, renderCtx)}
 
           {/* ── Key Highlights ───────────────────────────────────────────── */}
           {highlights.length > 0 && (
@@ -219,9 +315,8 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
               grouped exception (see renderChecklistCard's doc comment). */}
           {hasRichContent ? (
             <>
+              {/* Do/Don't now renders above, immediately under the verdict. */}
               {overviewSection && SECTION_RENDERERS.overview?.(overviewSection, renderCtx)}
-
-              {dosDontsSection && SECTION_RENDERERS.dosDonts?.(dosDontsSection, renderCtx)}
 
               {/* Remaining checklists (first was used for Key Highlights above) */}
               {remainingChecklists.length > 0 && (
@@ -230,20 +325,20 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
                 </section>
               )}
 
-              {tableSection && SECTION_RENDERERS.table?.(tableSection, renderCtx)}
-
-              {examplesSection && SECTION_RENDERERS.examples?.(examplesSection, renderCtx)}
-
-              {airlineGuidanceSection && SECTION_RENDERERS.airlineGuidance?.(airlineGuidanceSection, renderCtx)}
-
-              {airportGuidanceSection && SECTION_RENDERERS.airportGuidance?.(airportGuidanceSection, renderCtx)}
-
-              {domesticInternationalSection &&
-                SECTION_RENDERERS.domesticInternationalGuidance?.(domesticInternationalSection, renderCtx)}
-
-              {waterSafetySection && SECTION_RENDERERS.waterSafety?.(waterSafetySection, renderCtx)}
-
-              {securityProcessSection && SECTION_RENDERERS.securityProcess?.(securityProcessSection, renderCtx)}
+              {/* Examples and all topic-guidance types now render above, with
+                  the practical guidance (see the promoted block near the top).
+                  The full table renders here ONLY as a conservative fallback:
+                  when its rows qualify for the compact threshold strip in the
+                  verdict box (thresholdBands, above), showing the full table
+                  too would restate the same bands twice, so it's suppressed.
+                  When a table's rows DON'T match that shape -- any table that
+                  isn't a simple 3-marker capacity ladder -- it still renders
+                  in full here. Before this fix it was unconditionally
+                  suppressed for every rule, which silently deleted table
+                  content on any rule whose table didn't happen to match
+                  Power Bank's specific shape. */}
+              {tableSection && thresholdBands.length === 0 &&
+                SECTION_RENDERERS.table?.(tableSection, renderCtx)}
 
               {faqSection && SECTION_RENDERERS.faq?.(faqSection, renderCtx)}
 
@@ -340,7 +435,13 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
             </div>
           </div>
 
-          {hasRichContent && (
+          {/* power-bank-in-flight opts out: this box's "DGCA guidelines" label
+              doesn't tie to any specific DGCA citation for the content on this
+              page -- its sourcing is now Air India/IndiGo/IATA (see Official
+              references), and DGCA-as-heading here would read as a trust badge
+              rather than an actual source. Scoped to this one rule rather than
+              changed for every richContent rule, which use it legitimately. */}
+          {hasRichContent && rule.slug !== 'power-bank-in-flight' && (
             <div className="mt-4 bg-slate-50 border border-slate-200 rounded-xl p-4">
               <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-1">
                 DGCA guidelines — simplified

@@ -1,0 +1,2178 @@
+{
+  "summary": {
+    "totalRules": 52,
+    "rulesWithOrderChange": 26,
+    "rulesWithTable": 52,
+    "rulesWhereTableWasSilentlyHiddenBeforeFix": 25,
+    "rulesWithEmptySectionWarnings": 0,
+    "rulesWithPossibleOverlap": 51
+  },
+  "rules": [
+    {
+      "slug": "power-bank-in-flight",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "dosDonts",
+        "table",
+        "examples",
+        "faq",
+        "internalLinks",
+        "reference",
+        "airlineGuidance"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "airlineGuidance",
+        "examples",
+        "faq",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "airlineGuidance",
+        "examples",
+        "faq",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": false,
+      "emptySectionWarnings": [],
+      "possibleOverlap": []
+    },
+    {
+      "slug": "passport-photocopy-valid",
+      "status": "not_allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "name-mismatch-flight-ticket",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "kids-id-requirement",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "passport-expiry-validity",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "laptops-electronics",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "mobile-phone-in-check-in",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "camera-dslr-in-flight",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "dry-cells-spare-batteries",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "smart-luggage",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "electronics-security-tray",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "airport-security-behavior-tips",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "bluetooth-headphones-flight",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "perfume-in-flight",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "sanitizer-in-flight",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "shampoo-and-lotions",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "makeup-in-cabin",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "nail-polish-remover",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "liquids-over-100ml",
+      "status": "not_allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "hair-oil-ghee-flight",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "medicines-in-flight",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "insulin-syringes-flight",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "asthma-inhaler-flight",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "cpap-medical-devices",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "wheelchairs-walking-sticks",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "baby-food-formula-flight",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "food-and-snacks-in-flight",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "water-bottle-airport",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference",
+        "airlineGuidance",
+        "airportGuidance",
+        "domesticInternationalGuidance",
+        "waterSafety",
+        "securityProcess"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "airlineGuidance",
+        "overview",
+        "checklist",
+        "airportGuidance",
+        "domesticInternationalGuidance",
+        "waterSafety",
+        "securityProcess",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "airlineGuidance",
+        "airportGuidance",
+        "domesticInternationalGuidance",
+        "waterSafety",
+        "securityProcess",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "tea-coffee-powder",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "chocolates-on-flight",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "razor-cartridge-vs-blade",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "sharp-objects-in-flight",
+      "status": "not_allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "knife-zero-tolerance",
+      "status": "not_allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "hand-tools-flight",
+      "status": "not_allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "aerosol-cans",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "matches-lighters",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "domestic-id-requirements",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "aadhaar-digital-id",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "digital-boarding-pass",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "printed-ticket-needed",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "baggage-weight-size-limits",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "cabin-bag-count-dimensions",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "fragile-items-packing",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "duty-free-liquids-return",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "prohibited-items-customs",
+      "status": "not_allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "carrying-cash-flight",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "gold-jewellery-limit",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "duty-free-alcohol-allowance",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "cigarettes-tobacco-restrictions",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "gift-items-wrapping",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "empty-bottles-vs-liquid",
+      "status": "allowed",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": false,
+      "hasTable": true,
+      "tableQualifiesForStrip": true,
+      "tableWasSilentlyHiddenBeforeFix": false,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    },
+    {
+      "slug": "pets-in-flight",
+      "status": "limited",
+      "sectionsPresent": [
+        "quickAnswer",
+        "overview",
+        "dosDonts",
+        "checklist",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks",
+        "reference"
+      ],
+      "oldRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "newRenderOrder": [
+        "dosDonts",
+        "overview",
+        "checklist",
+        "table",
+        "faq",
+        "tips",
+        "internalLinks"
+      ],
+      "orderChanged": true,
+      "hasTable": true,
+      "tableQualifiesForStrip": false,
+      "tableWasSilentlyHiddenBeforeFix": true,
+      "hasKeyHighlightsSource": true,
+      "emptySectionWarnings": [],
+      "possibleOverlap": [
+        "rule has both legacy howToComply/checklist content AND a dosDonts module -- may repeat the same guidance in two sections (content review, not fixed by this script)"
+      ]
+    }
+  ]
+}

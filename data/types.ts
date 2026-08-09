@@ -112,7 +112,25 @@ interface RuleBase {
   slug: string;       // "power-bank-in-flight"
   title: string;      // "Power Bank in Flight — Allowed or Not (India)?"
   shortTitle: string; // "Power bank in flight"
+  /**
+   * Overrides the answer-card headline (default: a generic phrase per
+   * verdict.status, e.g. "Yes — Allowed"). Use only when the generic phrase
+   * is materially less clear than a rule-specific one; most rules should
+   * leave this unset.
+   */
+  verdictHeadline?: string;
   tags: string[];     // ["power bank", "battery", "cabin baggage"]
+  /**
+   * Search-only synonyms. Never rendered, never indexed, no effect on URLs,
+   * canonicals, sitemap or article content -- this exists purely so the
+   * homepage search can match the words real users type ("portable charger",
+   * "aadhar") when those words appear nowhere else in the rule's data.
+   *
+   * Only add an entry when the term genuinely cannot be derived from existing
+   * fields. Spacing, punctuation, case and singular/plural variants are all
+   * handled algorithmically and must NOT be listed here.
+   */
+  searchAliases?: string[];
   verdict: {
     status: "allowed" | "not_allowed" | "limited"; // used for colour coding
     summary: string;

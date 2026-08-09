@@ -34,6 +34,8 @@ import {
 export interface SectionRenderContext {
   /** Headings for the dos/donts columns; varies with rule.verdict.status. */
   dosDontsHeadings: { allowedHeading: string; notAllowedHeading: string };
+  /** Heading above the two cards -- must agree with the card labels below it. */
+  dosDontsTitle: string;
   /** Resolves an internal-link target slug to a URL, or null if unresolvable
    *  (an unresolvable slug is a rule that's been removed/renamed -- the
    *  renderer omits that link entirely rather than pointing at a legacy or
@@ -71,7 +73,7 @@ export function renderDosDonts(section: DosDontsSection, ctx: SectionRenderConte
   return (
     <section className="mb-5">
       <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">
-        When allowed vs. when not
+        {ctx.dosDontsTitle}
       </h2>
       <div className="grid gap-3 sm:grid-cols-2">
         {section.dos.length > 0 && (
