@@ -8,99 +8,120 @@ export const rules: Rule[] = [
     category: "airport-rules",
     subcategory: "cabin-baggage",
     tags: ["power bank", "battery", "cabin baggage", "electronics"],
+    searchAliases: ["portable charger", "charger", "battery bank", "power pack"],
+    // Overrides the generic "Yes — Allowed" answer-card headline: for a rule
+    // whose whole complexity is "allowed WHERE, not allowed WHERE", naming
+    // both locations in the headline itself removes a full read-the-summary
+    // step. See data/types.ts for the field.
+    verdictHeadline: "Yes — power banks are allowed in cabin baggage",
     verdict: {
       status: "allowed",
-      summary: "Allowed in cabin baggage only. Strictly prohibited in checked baggage.",
+      summary: "Not allowed in checked baggage.",
     },
-    howToComply: [
-      "Carry power banks in cabin bags; CISF will flag them if seen in checked X-ray.",
-      "Keep capacity below 100Wh (about 27,000mAh).",
-      "Above 160Wh is banned from commercial flights.",
-      "Mask exposed terminals with tape to avoid short circuits.",
-    ],
+    // Curates the "Related rules" section (Tier 0 in lib/relatedRules.ts) to
+    // exactly these 3, instead of letting it auto-pad to 6 via subcategory/tag
+    // matches. See components/RuleDetail.tsx's getRelatedRules call.
+    internalLinks: ["dry-cells-spare-batteries", "smart-luggage", "laptops-electronics"],
+    // Emptied deliberately: the fallback "Key highlights" section (RuleDetail.tsx)
+    // reads from this when there are no checklists. Both are cut for this rule
+    // per the answer-first restructure -- see richContent.checklists below.
+    howToComply: [],
     whyRuleExists: "Lithium batteries can enter thermal runaway if damaged. Cabins allow crew intervention; cargo holds do not.",
-    extraNotes: [
-      "Markings must show voltage/capacity; unmarked packs may be seized.",
-      "DGCA also bans damaged or recalled batteries even in cabin.",
+    extraNotes: [],
+    // Airline-specific guidance, verified against each airline's own current
+    // published page (2026-08-08) -- see richContent.faqs and the sources list
+    // below for the same verification. Two airlines only, per the "do not
+    // create a giant airline table" instruction.
+    sections: [
+      {
+        type: 'airlineGuidance',
+        airlines: [
+          {
+            airline: 'Air India',
+            guidance: 'Air India allows power banks up to 100Wh in cabin baggage, with a maximum of 2 power banks/spare batteries. They must be protected against short circuits.',
+            sourceUrl: 'https://www.airindia.com/in/en/travel-information/baggage-guidelines/restricted-baggage.html',
+            lastVerified: '2026-08-08',
+          },
+          {
+            airline: 'IndiGo',
+            guidance: "IndiGo requires power banks to be carried in hand baggage and kept within the passenger's reach. Its detailed baggage policy permits power banks up to 100Wh; its 100–160Wh exception is specifically for batteries used for portable medical devices and requires approval/security clearance.",
+            sourceUrl: 'https://www.goindigo.in/information/baggage-policy.html',
+            lastVerified: '2026-08-08',
+          },
+        ],
+      },
     ],
     richContent: {
       quickAnswer:
-        "Carry power banks only in cabin baggage, with the watt-hour rating printed on the shell. Anything up to 100Wh breezes through security, 100–160Wh needs airline approval, and anything bigger stays on the ground.",
-      overview: [
-        "Lithium cells are happiest in the pressurised cabin where crew can reach them if the chemistry misbehaves. In the hold, a runaway cell can smoulder unnoticed, so DGCA, ICAO, and every airline tell passengers to keep detachable batteries by their side.",
-        "Security officers scan each pack for a watt-hour (Wh) label. If the pack only lists milliamp-hours, convert it (mAh × volts ÷ 1,000) before you leave home and jot the math on masking tape. A clear label saves you from being sidelined at the X-ray belt while others file past.",
-        "Treat exposed terminals with respect: cover them with tape or slot them inside silicone sleeves, store the bank at 30–60% charge, and never check it with your suitcase. Airline policies are aligned on this because regulators would rather refuse a charger than divert a flight for smoke in the belly.",
-      ],
-      checklists: [
-        {
-          title: "Before heading to the airport",
-          items: [
-            "Confirm the capacity is under 100Wh or get a written nod from the airline if it is 100–160Wh.",
-            "Inspect the casing for swelling, dents, or loose USB ports; damaged packs are confiscated on sight.",
-            "Label each bank with your name, phone number, and watt-hour math if the shell only shows mAh.",
-          ],
-        },
-        {
-          title: "During screening and boarding",
-          items: [
-            "Place the power bank in the electronics tray, separate from cables, so the X-ray shows a clean outline.",
-            "Keep spare USB-C or lightning cables coiled; tangled wires trigger manual bag checks for hidden batteries.",
-            "Store the bank in a ventilated pocket while charging your phone on board—crew can ask you to unplug bloated packs.",
-          ],
-        },
-      ],
+        "Power banks are allowed in cabin/hand baggage, not checked baggage. Keep it at or below 100Wh — don't assume anything higher will be accepted without checking your airline first.",
+      overview: [],
+      checklists: [],
       table: {
-        caption: "Watt-hour thresholds airlines actually enforce",
-        headers: ["Capacity", "Allowed?", "What security expects"],
+        caption: "Power bank Wh thresholds",
+        headers: ["Capacity", "Status"],
         rows: [
-          ["0–100Wh", "✅ Yes", "Carry in cabin, declare only if casing is scuffed"],
-          ["100–160Wh", "⚠️ Airline approval", "Show written approval + tape terminals"],
-          [">160Wh", "❌ No", "Not accepted on commercial flights; ship by cargo instead"],
+          ["Up to 100Wh", "✅ Generally allowed — carry in cabin baggage"],
+          ["100–160Wh", "⚠️ Don't assume it's allowed — check your airline first"],
+          ["Over 160Wh", "❌ Not permitted as passenger baggage"],
         ],
       },
       dos: [
-        "Travel with two smaller packs instead of one chunky 200Wh brick.",
-        "Use fire-resistant pouches (Lipo bags) if you carry photography batteries alongside power banks.",
-        "Charge banks only after security so officers can feel the shell is cool.",
+        "Keep it in hand/cabin baggage.",
+        "Protect the terminals from short circuits.",
+        "If your cabin bag is gate-checked, remove the power bank and keep it with you.",
       ],
       donts: [
-        "Don’t tape a power bank to the outside of smart luggage; remove it and carry it with you.",
-        "Don’t throw loose coins or keys into the same pocket—scratches can short exposed ports.",
-        "Never check a backpack that still contains a power bank; luggage scans catch it and delay your flight.",
+        "Do not put it in checked baggage.",
+        "Do not carry a swollen or damaged battery.",
+        "Do not assume a larger power bank is acceptable just because another battery category has an approval pathway.",
+        "Do not assume another airline's rules apply to your flight.",
+      ],
+      examples: [
+        "20,000mAh × 3.7V ÷ 1,000 ≈ 74Wh. Use the voltage and capacity printed by the manufacturer where available.",
       ],
       faqs: [
         {
-          question: "Can I carry unlimited power banks if each one is under 100Wh?",
-          answer: "Most airlines cap it at two medium banks or four smaller ones. If you show up with a dozen, expect questions about resale and dangerous goods allowances.",
+          question: "Can I carry a power bank in checked baggage?",
+          answer: "No. Power banks must travel in cabin/hand baggage, not checked baggage.",
         },
         {
-          question: "Do airlines accept third-party brands without BIS marks?",
-          answer: "Yes, but uncertified or unbranded packs draw scrutiny. Carry the retail invoice or BIS-coded packaging if the logo has rubbed off.",
+          question: "Is a 20,000mAh power bank allowed?",
+          answer: "A 20,000mAh power bank rated at 3.7V is about 74Wh. Check the Wh rating printed on your specific power bank where available.",
         },
         {
-          question: "What about power banks built into backpacks?",
-          answer: "You must remove the module and carry it separately. If it is non-removable, the bag is treated like prohibited smart luggage.",
+          question: "What if my power bank is over 100Wh?",
+          answer: "Don't assume it is allowed. Check your airline's current baggage policy before travelling.",
+        },
+        {
+          question: "Can I use or charge a power bank during the flight?",
+          answer: "Air India and IndiGo do not allow power banks to be charged during the flight or used to charge another device. Follow your airline's current instructions before flying.",
         },
       ],
-      tips: [
-        "Snap a photo of the watt-hour label right after purchase; handy when the shell scuffs over time.",
-        "Keep USB ports dust-free with silicone plugs so officers can quickly inspect them.",
-        "Pack a short 0.3m cable exclusively for security trays so your main cable stays organised.",
-      ],
+      tips: [],
       internalLinks: [
-        { label: "Dry cell & spare battery rules", slug: "dry-cells-spare-batteries" },
-        { label: "Smart luggage checklist", slug: "smart-luggage" },
         { label: "Electronics tray etiquette", slug: "electronics-security-tray" },
       ],
-      verifiedOn: "2025-12-06",
+      verifiedOn: "2026-08-08",
     },
     sources: [
       {
         label: "DGCA CAR Section 2 Series X Part II",
         url: "https://www.dgca.gov.in/",
       },
+      {
+        label: "Air India — Restricted Baggage & Prohibited Items",
+        url: "https://www.airindia.com/in/en/travel-information/baggage-guidelines/restricted-baggage.html",
+      },
+      {
+        label: "IndiGo — Baggage Policy",
+        url: "https://www.goindigo.in/information/baggage-policy.html",
+      },
+      {
+        label: "IATA — Lithium Battery Guidance for Passengers",
+        url: "https://www.iata.org/en/youandiata/travelers/batteries/",
+      },
     ],
-    lastUpdated: "2025-12-04",
+    lastUpdated: "2026-08-08",
   },
   {
     slug: "passport-photocopy-valid",
@@ -109,6 +130,7 @@ export const rules: Rule[] = [
     category: "travel-documents",
     subcategory: "passport",
     tags: ["passport", "photocopy", "id", "documents"],
+    searchAliases: ["passport copy", "xerox passport"],
     verdict: {
       status: "not_allowed",
       summary: "Photocopies are not accepted as primary ID. Carry the original passport even for domestic flights if you intend to use it as ID.",
@@ -1898,7 +1920,6 @@ export const rules: Rule[] = [
     howToComply: [
       "Use screw-top steel or HDPE containers with shrink wrap.",
       "Avoid glass jars in cabin; pressure changes can break them.",
-      "Freeze ghee before packing so it stays semi-solid longer.",
     ],
     whyRuleExists: "Fats behave like gels in scanners and can conceal liquids.",
     extraNotes: [
@@ -2685,6 +2706,7 @@ export const rules: Rule[] = [
     category: "airport-rules",
     subcategory: "liquids-aerosols-gels",
     tags: ["water", "bottle", "hydration"],
+    searchAliases: ["empty bottle", "drinking bottle", "reusable bottle"],
     verdict: {
       status: "limited",
       summary: "Full bottles banned at security; empty bottles allowed and can be refilled post-screening.",
@@ -3754,6 +3776,7 @@ export const rules: Rule[] = [
     category: "travel-documents",
     subcategory: "domestic-flight-id",
     tags: ["aadhaar", "digital id", "digilocker"],
+    searchAliases: ["aadhar", "adhaar", "uidai id", "uidai"],
     verdict: {
       status: "limited",
       summary: "Printed Aadhaar photocopies accepted if QR code is legible. Photos on phone accepted only via mAadhaar/DigiLocker, not gallery images.",
@@ -4021,6 +4044,7 @@ export const rules: Rule[] = [
     category: "airport-rules",
     subcategory: "checked-baggage",
     tags: ["baggage", "weight", "dimensions"],
+    searchAliases: ["checked baggage", "check in baggage", "luggage weight", "luggage allowance"],
     verdict: {
       status: "limited",
       summary: "Domestic economy tickets include 15kg checked and 7kg cabin allowance unless airline offers more.",
@@ -4920,7 +4944,6 @@ export const rules: Rule[] = [
     },
     howToComply: [
       "Leave gifts unwrapped until you clear security, then use gift bags instead of tape and scissors.",
-      "Place decorative scissors, craft knives, or tape dispensers in checked baggage.",
       "Carry gift receipts to explain electronics or jewelry values.",
     ],
     whyRuleExists: "Opaque wrapping hides contents and can mask prohibited items.",

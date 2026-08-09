@@ -64,10 +64,19 @@ const NEW_ORDER: SectionType[] = [
 
 const BAND_MARKERS = ['✅', '⚠️', '❌'];
 
+// Mirrors components/RuleDetail.tsx's thresholdBands check exactly -- kept in
+// sync by hand since this script has no import path into a React component.
+// A marker prefix alone isn't enough: 24 of the original 27 "qualifying"
+// tables were item-by-item matrices (e.g. "Kitchen knife -- not allowed"),
+// not numeric ladders, and rendered as a nonsensical strip. Requiring every
+// row's range cell to contain a digit narrows this to genuine capacity
+// ladders (Wh, ml, g).
 function qualifiesForThresholdStrip(section: ArticleSection | undefined): boolean {
   if (!section || section.type !== 'table') return false;
   const rows = section.rows;
   if (!rows || rows.length === 0) return false;
+  const allRangesNumeric = rows.every((row) => /\d/.test(row[0] ?? ''));
+  if (!allRangesNumeric) return false;
   return rows.every((row) => BAND_MARKERS.some((m) => (row[1] ?? '').startsWith(m)));
 }
 

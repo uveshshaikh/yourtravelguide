@@ -1,0 +1,1268 @@
+{
+  "summary": {
+    "totalRules": 52,
+    "totalWordCount": 21914,
+    "safeMechanicalDedup": 0,
+    "needsHumanReview": 12,
+    "noActionNeeded": 40,
+    "rulesWithRepeatedFigures": 12,
+    "rulesByFactCheckDomain": {
+      "airline-specific": 2,
+      "airport-specific": 1,
+      "dangerous-goods/battery": 4,
+      "medical-equipment": 4,
+      "customs/currency": 8,
+      "visa/immigration": 2,
+      "security-screening": 8,
+      "baggage-limits": 2
+    }
+  },
+  "rules": [
+    {
+      "slug": "power-bank-in-flight",
+      "wordCount": 206,
+      "sectionsPresent": [
+        "whyRuleExists",
+        "quickAnswer",
+        "dos",
+        "donts",
+        "examples",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "airline-specific",
+        "dangerous-goods/battery",
+        "baggage-limits"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "passport-photocopy-valid",
+      "wordCount": 559,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "visa/immigration"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "name-mismatch-flight-ticket",
+      "wordCount": 534,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "kids-id-requirement",
+      "wordCount": 532,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "passport-expiry-validity",
+      "wordCount": 549,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "visa/immigration"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "laptops-electronics",
+      "wordCount": 544,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "security-screening"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "mobile-phone-in-check-in",
+      "wordCount": 501,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "dangerous-goods/battery"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "camera-dslr-in-flight",
+      "wordCount": 453,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "dry-cells-spare-batteries",
+      "wordCount": 425,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "dangerous-goods/battery"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "smart-luggage",
+      "wordCount": 483,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "dangerous-goods/battery"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "electronics-security-tray",
+      "wordCount": 438,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "security-screening"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "airport-security-behavior-tips",
+      "wordCount": 555,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "security-screening"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "bluetooth-headphones-flight",
+      "wordCount": 422,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "perfume-in-flight",
+      "wordCount": 365,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {
+        "100ml": [
+          "howToComply",
+          "whyRuleExists",
+          "quickAnswer",
+          "overview",
+          "checklists",
+          "faqs"
+        ],
+        "1l": [
+          "quickAnswer",
+          "checklists",
+          "faqs"
+        ]
+      },
+      "factCheckDomains": [],
+      "editRecommendation": "needs-human-review"
+    },
+    {
+      "slug": "sanitizer-in-flight",
+      "wordCount": 390,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {
+        "350ml": [
+          "howToComply",
+          "quickAnswer",
+          "overview",
+          "checklists",
+          "faqs"
+        ],
+        "100ml": [
+          "howToComply",
+          "overview",
+          "checklists"
+        ]
+      },
+      "factCheckDomains": [],
+      "editRecommendation": "needs-human-review"
+    },
+    {
+      "slug": "shampoo-and-lotions",
+      "wordCount": 416,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {
+        "100ml": [
+          "quickAnswer",
+          "overview",
+          "donts",
+          "checklists",
+          "faqs"
+        ]
+      },
+      "factCheckDomains": [],
+      "editRecommendation": "needs-human-review"
+    },
+    {
+      "slug": "makeup-in-cabin",
+      "wordCount": 399,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {
+        "100ml": [
+          "quickAnswer",
+          "checklists",
+          "faqs"
+        ]
+      },
+      "factCheckDomains": [],
+      "editRecommendation": "needs-human-review"
+    },
+    {
+      "slug": "nail-polish-remover",
+      "wordCount": 383,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "liquids-over-100ml",
+      "wordCount": 388,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {
+        "100ml": [
+          "extraNotes",
+          "quickAnswer",
+          "overview",
+          "donts",
+          "checklists"
+        ]
+      },
+      "factCheckDomains": [
+        "security-screening"
+      ],
+      "editRecommendation": "needs-human-review"
+    },
+    {
+      "slug": "hair-oil-ghee-flight",
+      "wordCount": 384,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {
+        "100ml": [
+          "quickAnswer",
+          "overview",
+          "checklists",
+          "faqs"
+        ]
+      },
+      "factCheckDomains": [],
+      "editRecommendation": "needs-human-review"
+    },
+    {
+      "slug": "medicines-in-flight",
+      "wordCount": 393,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "medical-equipment"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "insulin-syringes-flight",
+      "wordCount": 406,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "medical-equipment"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "asthma-inhaler-flight",
+      "wordCount": 371,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {
+        "100ml": [
+          "quickAnswer",
+          "overview",
+          "tips"
+        ]
+      },
+      "factCheckDomains": [
+        "medical-equipment"
+      ],
+      "editRecommendation": "needs-human-review"
+    },
+    {
+      "slug": "cpap-medical-devices",
+      "wordCount": 412,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {
+        "48hours": [
+          "howToComply",
+          "quickAnswer",
+          "checklists"
+        ]
+      },
+      "factCheckDomains": [
+        "medical-equipment"
+      ],
+      "editRecommendation": "needs-human-review"
+    },
+    {
+      "slug": "wheelchairs-walking-sticks",
+      "wordCount": 420,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "baby-food-formula-flight",
+      "wordCount": 400,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "food-and-snacks-in-flight",
+      "wordCount": 384,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {
+        "100ml": [
+          "howToComply",
+          "quickAnswer",
+          "checklists",
+          "faqs"
+        ]
+      },
+      "factCheckDomains": [],
+      "editRecommendation": "needs-human-review"
+    },
+    {
+      "slug": "water-bottle-airport",
+      "wordCount": 378,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "airline-specific",
+        "airport-specific"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "tea-coffee-powder",
+      "wordCount": 362,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {
+        "1kg": [
+          "howToComply",
+          "quickAnswer",
+          "checklists"
+        ]
+      },
+      "factCheckDomains": [
+        "customs/currency"
+      ],
+      "editRecommendation": "needs-human-review"
+    },
+    {
+      "slug": "chocolates-on-flight",
+      "wordCount": 419,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "customs/currency"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "razor-cartridge-vs-blade",
+      "wordCount": 381,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "sharp-objects-in-flight",
+      "wordCount": 378,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "knife-zero-tolerance",
+      "wordCount": 404,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "hand-tools-flight",
+      "wordCount": 379,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "aerosol-cans",
+      "wordCount": 363,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {
+        "500ml": [
+          "extraNotes",
+          "quickAnswer",
+          "overview",
+          "checklists"
+        ],
+        "2l": [
+          "quickAnswer",
+          "donts",
+          "checklists"
+        ]
+      },
+      "factCheckDomains": [],
+      "editRecommendation": "needs-human-review"
+    },
+    {
+      "slug": "matches-lighters",
+      "wordCount": 361,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "domestic-id-requirements",
+      "wordCount": 421,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "aadhaar-digital-id",
+      "wordCount": 462,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "digital-boarding-pass",
+      "wordCount": 431,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "security-screening"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "printed-ticket-needed",
+      "wordCount": 422,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "security-screening"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "baggage-weight-size-limits",
+      "wordCount": 411,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "baggage-limits"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "cabin-bag-count-dimensions",
+      "wordCount": 421,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "fragile-items-packing",
+      "wordCount": 362,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "duty-free-liquids-return",
+      "wordCount": 512,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "customs/currency"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "prohibited-items-customs",
+      "wordCount": 444,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {
+        "249g": [
+          "howToComply",
+          "quickAnswer",
+          "faqs"
+        ]
+      },
+      "factCheckDomains": [
+        "customs/currency"
+      ],
+      "editRecommendation": "needs-human-review"
+    },
+    {
+      "slug": "carrying-cash-flight",
+      "wordCount": 432,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "customs/currency"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "gold-jewellery-limit",
+      "wordCount": 435,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "customs/currency"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "duty-free-alcohol-allowance",
+      "wordCount": 408,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "customs/currency"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "cigarettes-tobacco-restrictions",
+      "wordCount": 408,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "customs/currency"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "gift-items-wrapping",
+      "wordCount": 376,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "security-screening"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "empty-bottles-vs-liquid",
+      "wordCount": 400,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [
+        "security-screening"
+      ],
+      "editRecommendation": "no-action-needed"
+    },
+    {
+      "slug": "pets-in-flight",
+      "wordCount": 432,
+      "sectionsPresent": [
+        "howToComply",
+        "extraNotes",
+        "whyRuleExists",
+        "quickAnswer",
+        "overview",
+        "dos",
+        "donts",
+        "tips",
+        "checklists",
+        "faqs",
+        "table"
+      ],
+      "duplicatePairs": [],
+      "repeatedFigures": {},
+      "factCheckDomains": [],
+      "editRecommendation": "no-action-needed"
+    }
+  ]
+}

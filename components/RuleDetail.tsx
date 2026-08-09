@@ -160,11 +160,22 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
 
   /**
    * Threshold bands pulled from the rule's own comparison table -- no new data
-   * and no second source of truth. A table qualifies only when every row's
-   * second cell carries one of the three status markers already used in the
-   * data, which is what makes it a decision ladder ("which band am I in?")
-   * rather than an arbitrary comparison; anything else falls through to the
-   * existing quick-answer text.
+   * and no second source of truth. A table qualifies only when BOTH:
+   *   1. every row's second cell carries one of the three status markers, AND
+   *   2. every row's first cell (the "range") contains a digit.
+   * Marker-only was the original check and it was too loose: 27 of 52 rules
+   * have a table where column 2 happens to start with an emoji for reasons
+   * that have nothing to do with a numeric threshold ladder -- e.g. a
+   * per-item cabin/checked matrix ("Kitchen knife -- not allowed", "Aadhaar
+   * via DigiLocker -- accepted"). Rendering those as a colour-coded strip
+   * ("which band am I in?") is actively misleading, since there's no
+   * numeric range to be "in" -- confirmed live on perfume-in-flight, which
+   * rendered "150ml aerosol" as a bare red dot with no explanatory text.
+   * Requiring a digit in every range cell narrows this to the 3 rules that
+   * are genuinely a numeric ladder (Wh, ml, g), which is what this UI
+   * pattern was actually designed for. The other 24 correctly fall through
+   * to rendering as a full table (components/RuleDetail.tsx's table-fallback
+   * branch, below), which is what they were rendering as before either bug.
    */
   const BAND_STYLES: Record<string, { dot: string; textClass: string }> = {
     '✅': { dot: 'bg-green-500', textClass: 'text-green-700' },
@@ -175,6 +186,8 @@ export default function RuleDetail({ rule }: RuleDetailProps) {
   const thresholdBands = (() => {
     const rows = tableSection?.rows ?? [];
     if (rows.length === 0) return [];
+    const allRangesNumeric = rows.every(row => /\d/.test(row[0] ?? ''));
+    if (!allRangesNumeric) return [];
     const bands = rows.map(row => {
       const marker = Object.keys(BAND_STYLES).find(m => (row[1] ?? '').startsWith(m));
       if (!marker) return null;
