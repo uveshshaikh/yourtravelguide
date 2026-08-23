@@ -5,7 +5,13 @@ import { rules } from '../../data/rules';
 import { Rule } from '../../data/types';
 import Layout from '../../components/Layout';
 import Breadcrumb, { BreadcrumbItem } from '../../components/Breadcrumb';
-import { isNewArchRule, NEW_ARCH_CATEGORIES, buildCategoryUrl, buildSubcategoryUrl } from '../../lib/urls';
+import {
+  isNewArchRule,
+  NEW_ARCH_CATEGORIES,
+  buildCategoryUrl,
+  buildSubcategoryUrl,
+  buildRuleUrl,
+} from '../../lib/urls';
 import { labelFor, SUBCATEGORY_LABELS } from '../../lib/labels';
 import { HUB_CONTENT, HubContent } from '../../lib/hubContent';
 import { generateCategoryMeta } from '../../lib/seoMeta';
@@ -17,6 +23,11 @@ interface SubcategoryGroup {
   topRules: Pick<Rule, 'slug' | 'shortTitle' | 'verdict'>[];
 }
 
+interface GuidanceGroup {
+  heading: string;
+  rules: (Pick<Rule, 'slug' | 'shortTitle' | 'category'> & { subcategory?: string })[];
+}
+
 interface PageProps {
   category: string;
   categoryLabel: string;
@@ -24,7 +35,36 @@ interface PageProps {
   groups: SubcategoryGroup[];
   breadcrumbs: BreadcrumbItem[];
   hub: HubContent;
+  guidanceGroups: GuidanceGroup[];
 }
+
+const AIRPORT_GUIDANCE_GROUPS = [
+  {
+    heading: 'Electronics',
+    slugs: ['power-bank-in-flight', 'camera-dslr-in-flight', 'bluetooth-headphones-flight', 'mobile-phone-in-check-in'],
+  },
+  {
+    heading: 'Medicines & medical items',
+    slugs: ['medicines-in-flight', 'asthma-inhaler-flight', 'insulin-syringes-flight', 'wheelchairs-walking-sticks'],
+  },
+  {
+    heading: 'Food & drinks',
+    slugs: ['food-and-snacks-in-flight', 'chocolates-on-flight', 'water-bottle-airport', 'baby-food-formula-flight'],
+  },
+  {
+    heading: 'Baggage & security essentials',
+    slugs: ['cabin-bag-count-dimensions', 'liquids-over-100ml', 'makeup-in-cabin', 'sharp-objects-in-flight', 'printed-ticket-needed'],
+  },
+] as const;
+
+const AIRPORT_SUBCATEGORY_ORDER = [
+  'cabin-baggage',
+  'hand-baggage-size-weight',
+  'liquids-aerosols-gels',
+  'security-screening',
+  'restricted-items',
+  'checked-baggage',
+] as const;
 
 const STATUS_DOT: Record<Rule['verdict']['status'], string> = {
   allowed:     'bg-green-500',
@@ -51,6 +91,7 @@ export default function CategoryIndexPage({
   groups,
   breadcrumbs,
   hub,
+  guidanceGroups,
 }: PageProps) {
 
   // JSON-LD: FAQPage schema
@@ -82,7 +123,7 @@ export default function CategoryIndexPage({
         {/* ── Hero ────────────────────────────────────────────────────── */}
         <header className="mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 leading-snug mb-2">
-            {categoryLabel}
+            {category === 'airport-rules' ? 'Airport Rules for Indian Travellers' : categoryLabel}
           </h1>
           <p className="text-base text-slate-500 font-medium mb-4">{hub.tagline}</p>
           <p className="text-[15px] text-slate-700 leading-relaxed">{hub.intro}</p>
@@ -105,6 +146,36 @@ export default function CategoryIndexPage({
         </header>
 
         {/* ── Why it matters callout ──────────────────────────────────── */}
+        {guidanceGroups.length > 0 && (
+          <section className="mb-10">
+            <h2 className="text-lg font-bold text-slate-900 mb-1">
+              Start with what you are carrying
+            </h2>
+            <p className="text-sm text-slate-500 mb-4">
+              Choose a common item group, or browse the complete airport-rule categories below.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {guidanceGroups.map((guidanceGroup) => (
+                <div key={guidanceGroup.heading} className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <h3 className="text-sm font-bold text-slate-800 mb-2">{guidanceGroup.heading}</h3>
+                  <ul className="space-y-2">
+                    {guidanceGroup.rules.map((rule) => (
+                      <li key={rule.slug}>
+                        <Link
+                          href={buildRuleUrl(rule)}
+                          className="text-[13px] font-medium text-slate-700 hover:text-blue-600 hover:underline"
+                        >
+                          {rule.shortTitle}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         <div className="mb-8 border-l-4 border-amber-400 bg-amber-50 rounded-r-xl px-4 py-3">
           <p className="text-[13px] font-bold uppercase tracking-wider text-amber-700 mb-1">Why this matters</p>
           <p className="text-[13px] text-slate-700 leading-relaxed">{hub.whyItMatters}</p>
@@ -283,6 +354,32 @@ export const getStaticProps: GetStaticProps<PageProps> = async ({ params }) => {
   }
 
   const categoryLabel = labelFor(category);
+  const guidanceGroups: GuidanceGroup[] = category === 'airport-rules'
+    ? AIRPORT_GUIDANCE_GROUPS.map((group) => ({
+        heading: group.heading,
+        rules: group.slugs.map((slug) => {
+          const rule = categoryRules.find((candidate) => candidate.slug === slug);
+          if (!rule) throw new Error(`Missing Airport Rules hub link target: ${slug}`);
+          return {
+            slug: rule.slug,
+            shortTitle: rule.shortTitle,
+            category: rule.category,
+            subcategory: rule.subcategory,
+          };
+        }),
+      }))
+    : [];
+
+  const groups = Array.from(groupMap.values());
+  if (category === 'airport-rules') {
+    const order = new Map<string, number>(
+      AIRPORT_SUBCATEGORY_ORDER.map((subcategory, index) => [subcategory, index]),
+    );
+    groups.sort((a, b) =>
+      (order.get(a.subcategory) ?? Number.MAX_SAFE_INTEGER) -
+      (order.get(b.subcategory) ?? Number.MAX_SAFE_INTEGER),
+    );
+  }
 
   const breadcrumbs: BreadcrumbItem[] = [
     { label: 'Home',        href: '/' },
@@ -294,9 +391,10 @@ export const getStaticProps: GetStaticProps<PageProps> = async ({ params }) => {
       category,
       categoryLabel,
       totalRules: categoryRules.length,
-      groups: Array.from(groupMap.values()),
+      groups,
       breadcrumbs,
       hub,
+      guidanceGroups,
     },
   };
 };

@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
 
   /**
-   * Server-level 308 redirects — auto-generated from rules data.
+   * Server-level 301 redirects — auto-generated from rules data.
    * No manual maintenance: update category in data/rules.ts and it propagates.
    */
   async redirects() {
@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
       .map((rule) => ({
         source: `/rules/${rule.slug}`,
         destination: buildRuleUrl(rule),
-        permanent: true,
+        statusCode: 301,
       }));
 
     return ruleRedirects;

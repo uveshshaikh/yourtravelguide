@@ -32,9 +32,9 @@ export const HUB_CONTENT: Record<string, HubContent> = {
      AIRPORT RULES
   ───────────────────────────────────────────────────────────────────────── */
   'airport-rules': {
-    tagline: 'Everything you are allowed — and not allowed — to carry at Indian airports',
+    tagline: 'Cabin baggage, checked baggage, and airport security guidance for Indian travellers',
     intro:
-      'India\'s aviation security framework is governed by the DGCA (Directorate General of Civil Aviation), the BCAS (Bureau of Civil Aviation Security), and on-ground enforcement by CISF (Central Industrial Security Force). Rules change frequently and vary between cabin baggage and checked baggage, domestic and international travel, and even airline-to-airline. This guide consolidates every major restriction into one place — updated regularly and written in plain language.',
+      'Find clear guidance on liquids, electronics, medicines, food, restricted items, baggage size and weight, and what to expect at airport security.',
     whyItMatters:
       'Baggage violations at Indian airports lead to confiscation, fines, or missed flights. Knowing exactly what is allowed — and under what conditions — before you reach the security gate saves time, money, and stress.',
     sections: [

@@ -39,7 +39,7 @@ export const getStaticProps: GetStaticProps<RulePageProps> = async ({ params }) 
     return {
       redirect: {
         destination: buildRuleUrl(rule),
-        permanent: true,
+        statusCode: 301,
       },
     };
   }
