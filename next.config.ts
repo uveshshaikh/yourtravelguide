@@ -10,12 +10,26 @@ validateRules(rules);
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  skipTrailingSlashRedirect: true,
 
   /**
    * Server-level 301 redirects — auto-generated from rules data.
    * No manual maintenance: update category in data/rules.ts and it propagates.
    */
   async redirects() {
+    const staticRedirects = [
+      {
+        source: "/home/",
+        destination: "/",
+        statusCode: 301,
+      },
+      {
+        source: "/:path+/",
+        destination: "/:path+",
+        statusCode: 308,
+      },
+    ];
+
     const ruleRedirects = rules
       .filter(isNewArchRule)
       .map((rule) => ({
@@ -24,7 +38,7 @@ const nextConfig: NextConfig = {
         statusCode: 301,
       }));
 
-    return ruleRedirects;
+    return [...staticRedirects, ...ruleRedirects];
   },
 
   /**
